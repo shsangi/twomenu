@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0ea5e9">
+    <title>Login · Self Learners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --navy: #0a1e3f; --navy-dark: #061428; --navy-light: #1a3a6b; --navy-soft: #e8eef7;
+            --black: #0f1419; --yellow: #f5b800; --yellow-soft: #fff7dd;
+            --sky: #0ea5e9; --sky-dark: #0284c7; --sky-soft: #e0f2fe; --sky-light: #7dd3fc;
+            --bg: #f4f6fa; --sf: #ffffff; --sf2: #f8fafc;
+            --text: #0f1419; --text-soft: #475569; --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --danger: #dc2626;
+            --r: 20px; --rf: 9999px;
+            --shadow-lg: 0 20px 40px -12px rgba(10,30,63,.18);
+            --shadow-xl: 0 30px 60px -15px rgba(10,30,63,.25);
+        }
+        html, body { -webkit-text-size-adjust: 100%; }
+        body {
+            background: transparent;
+            min-height: 100dvh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.25rem;
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            overscroll-behavior: contain;
+        }
+        .login-page { width: 100%; max-width: 420px; }
+
+        .toast-container { position: fixed; top: 1.3rem; right: 1.3rem; z-index: 9999; display: flex; flex-direction: column; gap: .7rem; max-width: 380px; width: calc(100% - 2.6rem); }
+        .toast { padding: 1rem 1.2rem; border-radius: var(--r); font-size: .88rem; font-weight: 600; box-shadow: var(--shadow-xl); animation: slideInToast .35s cubic-bezier(.16,1,.3,1); display: flex; align-items: center; gap: .7rem; border-left: 4px solid; }
+        .toast.success { background: #d1fae5; color: #065f46; border-left-color: #059669; }
+        .toast.error { background: #fee2e2; color: #991b1b; border-left-color: #dc2626; }
+        .toast.warning { background: #fef3c7; color: #92400e; border-left-color: #d97706; }
+        .toast.info { background: var(--sky-soft); color: #075985; border-left-color: var(--sky); }
+        .toast .toast-close { margin-left: auto; background: 0 0; border: none; font-size: 1.1rem; cursor: pointer; color: inherit; opacity: .5; }
+        @keyframes slideInToast { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-8px); } }
+        .toast.removing { animation: fadeOutToast .25s ease forwards; }
+
+        .login-wrapper {
+            background: var(--sf); border-radius: 28px;
+            padding: 3rem 2.25rem; box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border); position: relative; overflow: hidden;
+        }
+        .login-wrapper::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+            background: linear-gradient(90deg,var(--navy) 0%,var(--sky) 50%,var(--yellow) 100%);
+        }
+        .login-wrapper .logo {
+            width: 80px; height: 80px; border-radius: var(--r); object-fit: contain;
+            background: var(--sf2); padding: 12px;
+            margin: 0 auto 1.4rem; display: block;
+            box-shadow: 0 8px 24px -8px rgba(10,30,63,.2);
+        }
+        .login-wrapper h1 {
+            font-size: 2rem; font-weight: 800; letter-spacing: -.03em;
+            color: var(--navy); text-align: center; margin-bottom: .35rem;
+        }
+        .login-wrapper h1::after {
+            content: ""; display: block; width: 50px; height: 4px;
+            background: var(--sky); border-radius: 4px; margin: .8rem auto 0;
+        }
+        .login-wrapper .sub {
+            color: var(--text-muted); font-size: .92rem; text-align: center;
+            margin-bottom: 2rem; font-weight: 500;
+        }
+        .login-wrapper label {
+            display: block; font-weight: 700; font-size: .82rem;
+            color: var(--navy); margin-bottom: .4rem;
+        }
+        .login-wrapper .input-group { position: relative; margin-bottom: 1.3rem; }
+        .login-wrapper .input-group input {
+            width: 100%; padding: 1rem 1.2rem; padding-right: 3.2rem;
+            border: 1.5px solid var(--border); border-radius: var(--rf);
+            font-size: .95rem; font-family: inherit; background: var(--sf2);
+            color: var(--text); font-weight: 500; transition: all .2s;
+        }
+        .login-wrapper .input-group input:focus {
+            outline: 0; border-color: var(--sky); background: #fff;
+            box-shadow: 0 0 0 4px rgba(14,165,233,.15);
+        }
+        .login-wrapper .toggle-password {
+            position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+            background: 0 0; border: none; cursor: pointer; font-size: 1.2rem;
+            color: var(--text-muted); padding: .3rem;
+        }
+        .login-wrapper .btn-login {
+            width: 100%; background: linear-gradient(135deg,var(--sky),var(--sky-dark));
+            border: none; color: #fff; font-weight: 800; font-size: 1rem;
+            padding: 1rem; border-radius: var(--rf); cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 8px 20px -6px rgba(14,165,233,.5);
+            margin-top: .5rem; transition: all .2s;
+        }
+        .login-wrapper .btn-login:hover:not(:disabled) { transform: translateY(-1px); }
+        .login-wrapper .btn-login:disabled { opacity: .5; cursor: not-allowed; }
+        .login-wrapper .btn-guest {
+            width: 100%; background: var(--sf2);
+            border: 1.5px solid var(--border); color: var(--text-soft);
+            font-weight: 700; font-size: .95rem; padding: .9rem;
+            border-radius: var(--rf); cursor: pointer; font-family: inherit;
+            margin-top: .85rem; display: flex; align-items: center;
+            justify-content: center; gap: .4rem;
+        }
+        .login-wrapper .btn-guest:hover { background: #fff; border-color: var(--sky); color: var(--sky-dark); }
+        .login-wrapper .divider {
+            display: flex; align-items: center; gap: .8rem; margin: 1rem 0 .6rem;
+            color: var(--text-muted); font-size: .72rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .08em;
+        }
+        .login-wrapper .divider::before,
+        .login-wrapper .divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        .login-wrapper .login-footer {
+            text-align: center; font-size: .8rem; color: var(--text-muted);
+            margin-top: 1.4rem; font-weight: 500;
+        }
+        @media (max-width: 560px) {
+            body { padding: 1rem .9rem; }
+            .login-wrapper { padding: 2rem 1.4rem; border-radius: 22px; }
+            .login-wrapper .logo { width: 64px; height: 64px; margin-bottom: 1rem; padding: 10px; }
+            .login-wrapper h1 { font-size: 1.65rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="login-page">
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="login-wrapper">
+        <img class="logo" id="loginLogo"
+             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230a1e3f'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter,sans-serif' font-size='38' font-weight='800' fill='%23f5b800'%3ESL%3C/text%3E%3C/svg%3E"
+             alt="Logo"/>
+        <h1>Self Learners</h1>
+        <p class="sub">We provide you high quality content.</p>
+
+        <label for="emailInput">Email / Username</label>
+        <div class="input-group">
+            <input type="text" id="emailInput" placeholder="Enter your email or username" autocomplete="username"/>
+        </div>
+
+        <label for="passwordInput">Password</label>
+        <div class="input-group">
+            <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password"/>
+            <button class="toggle-password" id="togglePasswordBtn" type="button">👁️</button>
+        </div>
+
+        <button class="btn-login" id="loginBtn">Sign In</button>
+        <div class="divider">or</div>
+        <button class="btn-guest" id="guestBtn">
+            👤 Continue as Guest
+            <span style="font-size:.75rem;font-weight:500;color:#92400e;">(15 MCQs only)</span>
+        </button>
+        <div class="login-footer"><span id="loginStatus">Loading...</span></div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const LOGIN_LOGO = 'https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27';
+    const SHEET_ID = '17yY_LUiqMsABz7tbtAXFpZIYpHN2TJTZSxo7oJWzckI';
+    const LOGIN_GID = '2076597807';
+    const LOGIN_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
+    const KEY_USER = 'slUser';
+
+    const $ = (id) => document.getElementById(id);
+    const ui = {
+        logo: $('loginLogo'), email: $('emailInput'), pass: $('passwordInput'),
+        tglPw: $('togglePasswordBtn'), loginBtn: $('loginBtn'),
+        guestBtn: $('guestBtn'), loginStat: $('loginStatus')
+    };
+
+    let users = [];
+    let passwordVisible = false;
+    let toastTimer = null;
+
+    function clean(v) { if (v == null) return ''; return String(v).replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ').replace(/\s+/g, ' ').trim(); }
+    function parseCSVLine(line) {
+        const result = []; let cell = ''; let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (inQuotes) {
+                if (ch === '"' && line[i + 1] === '"') { cell += '"'; i++; }
+                else if (ch === '"') inQuotes = false;
+                else cell += ch;
+            } else {
+                if (ch === '"') inQuotes = true;
+                else if (ch === ',') { result.push(clean(cell)); cell = ''; }
+                else cell += ch;
+            }
+        }
+        result.push(clean(cell));
+        return result;
+    }
+
+    function toast(message, type, duration, showIcon) {
+        type = type || 'info'; duration = duration || 4000;
+        if (toastTimer) clearTimeout(toastTimer);
+        const container = $('toastContainer');
+        while (container.firstChild) container.removeChild(container.firstChild);
+        const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+        const t = document.createElement('div');
+        t.className = 'toast ' + type;
+        t.innerHTML = (showIcon !== false ? `<span>${icons[type]}</span>` : '') + `<span>${message}</span>` + `<button class="toast-close">✕</button>`;
+        container.appendChild(t);
+        const remove = () => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); };
+        t.querySelector('.toast-close').onclick = remove;
+        toastTimer = setTimeout(remove, duration);
+    }
+
+    // Try loading the real logo, fall back to SVG
+    (function () {
+        const probe = new Image();
+        probe.onload = () => (ui.logo.src = LOGIN_LOGO);
+        probe.src = LOGIN_LOGO;
+    })();
+
+    ui.tglPw.onclick = () => {
+        passwordVisible = !passwordVisible;
+        ui.pass.type = passwordVisible ? 'text' : 'password';
+        ui.tglPw.textContent = passwordVisible ? '🙈' : '👁️';
+    };
+
+    function fetchUsers() {
+        ui.loginStat.textContent = '⏳ Loading...';
+        ui.loginBtn.disabled = true;
+        fetch(LOGIN_URL + '&_t=' + Date.now())
+            .then((r) => r.text())
+            .then((text) => {
+                const lines = text.split('\n').filter((l) => l.trim());
+                users = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = parseCSVLine(lines[i]);
+                    if (cols.length >= 2 && cols[0] && cols[1]) {
+                        users.push({ user: cols[0].trim(), pass: cols[1].trim() });
+                    }
+                }
+                ui.loginStat.textContent = '🔐 Sign in to continue';
+                ui.loginBtn.disabled = false;
+            })
+            .catch(() => {
+                ui.loginStat.textContent = '⚠️ Unable to connect';
+                ui.loginBtn.disabled = true;
+                toast('Unable to load user data', 'error', 4000, true);
+            });
+    }
+
+    function notifyParent(user, isGuest) {
+        try {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'SL_LOGIN',
+                    user: user,
+                    isGuest: !!isGuest
+                }, '*');
+            }
+        } catch (e) { /* ignore */ }
+    }
+
+    function handleLogin() {
+        const u = ui.email.value.trim();
+        const p = ui.pass.value.trim();
+        if (!u || !p) { toast('Enter username and password', 'warning', 3000, true); return; }
+        const match = users.find((x) => x.user.toLowerCase() === u.toLowerCase() && x.pass === p);
+        if (match) {
+            toast('Welcome, ' + match.user + '!', 'success', 2000, true);
+            try { localStorage.setItem(KEY_USER, JSON.stringify(match)); } catch (e) { /* ignore */ }
+            setTimeout(() => notifyParent(match, false), 400);
+        } else {
+            toast('Invalid credentials', 'error', 3000, true);
+            ui.loginStat.textContent = '❌ Login failed';
+        }
+    }
+
+    function handleGuest() {
+        const guestUser = { user: 'Guest' };
+        toast('Welcome, Guest! Limited to 15 MCQs.', 'info', 2500, true);
+        try { localStorage.setItem(KEY_USER, JSON.stringify(guestUser)); } catch (e) { /* ignore */ }
+        setTimeout(() => notifyParent(guestUser, true), 400);
+    }
+
+    ui.loginBtn.onclick = handleLogin;
+    ui.guestBtn.onclick = handleGuest;
+    ui.email.onkeydown = ui.pass.onkeydown = (e) => { if (e.key === 'Enter') handleLogin(); };
+
+    fetchUsers();
+})();
+</script>
+</body>
+</html>
