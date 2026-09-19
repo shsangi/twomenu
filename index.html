@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0ea5e9">
+    <title>Self Learners · CSS 2027 Hub</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Self Learners">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --navy: #0a1e3f; --navy-light: #1a3a6b; --navy-soft: #e8eef7;
+            --black: #0f1419; --black-soft: #1c232b;
+            --yellow: #f5b800; --yellow-dark: #d99e00; --yellow-soft: #fff7dd;
+            --sky: #0ea5e9; --sky-dark: #0284c7; --sky-soft: #e0f2fe; --sky-light: #7dd3fc;
+            --bg: #f4f6fa; --card: #ffffff; --text: #0f1419;
+            --text-soft: #475569; --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --shadow-sm: 0 2px 6px rgba(10,30,63,.06);
+            --shadow-md: 0 8px 20px -6px rgba(10,30,63,.12);
+            --shadow-lg: 0 20px 40px -12px rgba(10,30,63,.18);
+            --radius-full: 9999px; --bottom-nav-h: 68px;
+        }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(circle at 0% 0%, rgba(14,165,233,.06) 0%, transparent 40%),
+                              radial-gradient(circle at 100% 100%, rgba(10,30,63,.05) 0%, transparent 45%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 1rem .75rem 2rem;
+            color: var(--text);
+            display: flex; justify-content: center;
+            font-size: 15px; line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .app-wrapper { max-width: 1560px; width: 100%; }
+
+        .toggle-bar {
+            display: flex; gap: 4px; margin-bottom: 16px;
+            background: var(--card); padding: 6px;
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            position: sticky; top: 8px; z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .toggle-btn {
+            flex: 1; text-align: center;
+            padding: 10px 14px;
+            border-radius: var(--radius-full);
+            font-weight: 600; font-size: .82rem;
+            color: var(--text-soft); background: transparent;
+            border: none; cursor: pointer;
+            transition: all .22s cubic-bezier(.4,0,.2,1);
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; white-space: nowrap; min-height: 40px;
+        }
+        .toggle-btn .emoji { font-size: .95rem; }
+        .toggle-btn:hover { background: var(--sky-soft); color: var(--sky-dark); }
+        .toggle-btn.active {
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(14,165,233,.35);
+        }
+        .toggle-btn.active .emoji { color: #fff; }
+
+        .page-stage {
+            position: relative;
+            min-height: calc(100vh - 100px);
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .page-frame {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            border: none; background: transparent;
+            opacity: 0; pointer-events: none;
+            transition: opacity .25s ease;
+        }
+        .page-frame.active {
+            opacity: 1; pointer-events: auto;
+            position: relative;
+            min-height: calc(100vh - 100px);
+            height: auto;
+        }
+        .page-loading {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 12px; padding: 4rem 2rem;
+            color: var(--text-soft); font-weight: 600;
+        }
+        .spinner {
+            width: 32px; height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--sky);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .bottom-nav {
+            display: none;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: var(--bottom-nav-h);
+            background: rgba(255,255,255,.96);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -8px 24px rgba(10,30,63,.08);
+            z-index: 9000;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .bottom-nav-inner {
+            display: flex; height: var(--bottom-nav-h);
+            justify-content: space-around; max-width: 720px; margin: 0 auto;
+        }
+        .bottom-nav-btn {
+            flex: 1; background: transparent; border: none;
+            cursor: pointer; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 3px; color: var(--text-muted);
+            font-family: inherit; font-weight: 600;
+            font-size: .63rem; padding: 8px 4px;
+            position: relative; transition: color .2s;
+        }
+        .bottom-nav-btn .nav-emoji {
+            font-size: 1.3rem; transition: transform .22s cubic-bezier(.34,1.56,.64,1);
+        }
+        .bottom-nav-btn.active { color: var(--sky-dark); }
+        .bottom-nav-btn.active .nav-emoji {
+            transform: translateY(-3px) scale(1.1);
+            filter: drop-shadow(0 3px 6px rgba(14,165,233,.4));
+        }
+        .bottom-nav-btn.active::before {
+            content: ''; position: absolute; top: 0;
+            left: 50%; transform: translateX(-50%);
+            width: 32px; height: 3px;
+            border-radius: 0 0 4px 4px;
+            background: var(--sky);
+        }
+
+        @media (max-width: 768px) {
+            .toggle-bar { display: none; }
+            .bottom-nav { display: block; }
+            body { padding: .6rem .6rem calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 16px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-wrapper">
+    <!-- MENU 1: Pre-login (top toggle bar) -->
+    <div class="toggle-bar" id="topToggleBarPreLogin">
+        <button class="toggle-btn active" data-page="login" data-src="page-login.html">
+            <span class="emoji">🔐</span> Login
+        </button>
+        <button class="toggle-btn" data-page="schedule" data-src="page-schedule.html">
+            <span class="emoji">📅</span> Schedule
+        </button>
+        <button class="toggle-btn" data-page="eligibility" data-src="page-eligibility.html">
+            <span class="emoji">🛡️</span> Eligibility
+        </button>
+        <button class="toggle-btn" data-page="syllabus" data-src="page-syllabus.html">
+            <span class="emoji">📋</span> Syllabus
+        </button>
+    </div>
+
+    <!-- MENU 2: Post-login (top toggle bar) -->
+    <div class="toggle-bar" id="topToggleBarPostLogin" style="display:none">
+        <button class="toggle-btn active" data-mode="mcq">
+            <span class="emoji">📝</span> MCQs
+        </button>
+        <button class="toggle-btn" data-mode="read">
+            <span class="emoji">📖</span> Solved
+        </button>
+        <button class="toggle-btn" data-mode="facts">
+            <span class="emoji">💡</span> Facts
+        </button>
+        <button class="toggle-btn" data-mode="papers">
+            <span class="emoji">📄</span> Papers
+        </button>
+    </div>
+
+    <div class="page-stage" id="pageStage"></div>
+</div>
+
+<!-- MENU 1: Pre-login bottom nav -->
+<nav class="bottom-nav" id="bottomNavPreLogin" role="navigation">
+    <div class="bottom-nav-inner">
+        <button class="bottom-nav-btn active" data-page="login" data-src="page-login.html">
+            <span class="nav-emoji">🔐</span>
+            <span class="nav-label">Login</span>
+        </button>
+        <button class="bottom-nav-btn" data-page="schedule" data-src="page-schedule.html">
+            <span class="nav-emoji">📅</span>
+            <span class="nav-label">Schedule</span>
+        </button>
+        <button class="bottom-nav-btn" data-page="eligibility" data-src="page-eligibility.html">
+            <span class="nav-emoji">🛡️</span>
+            <span class="nav-label">Eligibility</span>
+        </button>
+        <button class="bottom-nav-btn" data-page="syllabus" data-src="page-syllabus.html">
+            <span class="nav-emoji">📋</span>
+            <span class="nav-label">Syllabus</span>
+        </button>
+    </div>
+</nav>
+
+<!-- MENU 2: Post-login bottom nav -->
+<nav class="bottom-nav" id="bottomNavPostLogin" role="navigation" style="display:none">
+    <div class="bottom-nav-inner">
+        <button class="bottom-nav-btn active" data-mode="mcq">
+            <span class="nav-emoji">📝</span>
+            <span class="nav-label">MCQs</span>
+        </button>
+        <button class="bottom-nav-btn" data-mode="read">
+            <span class="nav-emoji">📖</span>
+            <span class="nav-label">Solved</span>
+        </button>
+        <button class="bottom-nav-btn" data-mode="facts">
+            <span class="nav-emoji">💡</span>
+            <span class="nav-label">Facts</span>
+        </button>
+        <button class="bottom-nav-btn" data-mode="papers">
+            <span class="nav-emoji">📄</span>
+            <span class="nav-label">Papers</span>
+        </button>
+    </div>
+</nav>
+
+<script>
+    (function () {
+        const stage = document.getElementById('pageStage');
+        const topBarPre = document.getElementById('topToggleBarPreLogin');
+        const topBarPost = document.getElementById('topToggleBarPostLogin');
+        const bottomNavPre = document.getElementById('bottomNavPreLogin');
+        const bottomNavPost = document.getElementById('bottomNavPostLogin');
+
+        const preLoginButtons = () => document.querySelectorAll('#topToggleBarPreLogin .toggle-btn, #bottomNavPreLogin .bottom-nav-btn');
+        const postLoginButtons = () => document.querySelectorAll('#topToggleBarPostLogin .toggle-btn, #bottomNavPostLogin .bottom-nav-btn');
+
+        const frames = new Map(); // pageId -> wrapper div
+        let activePage = null;
+
+        const THEME = {
+            navy: '#0a1e3f', navyLight: '#1a3a6b', navySoft: '#e8eef7',
+            black: '#0f1419', yellow: '#f5b800', yellowDark: '#d99e00',
+            yellowSoft: '#fff7dd', sky: '#0ea5e9', skyDark: '#0284c7', skySoft: '#e0f2fe',
+            bg: '#f4f6fa', card: '#ffffff',
+            text: '#0f1419', textSoft: '#475569', textMuted: '#94a3b8',
+            border: '#e2e8f0',
+            success: '#059669', danger: '#dc2626', warning: '#d97706', info: '#0284c7'
+        };
+
+        const KEY_USER = 'slUser';
+        const KEY_POST_LOGIN = 'slPostLogin';
+        let eduFrameRef = null; // reference to the edu iframe for postMessage
+
+        /* ---------- Page management (outer shell iframes) ---------- */
+        function showPage(pageId, src) {
+            if (activePage === pageId) return;
+            activePage = pageId;
+
+            preLoginButtons().forEach(b => {
+                if (b.dataset.page) b.classList.toggle('active', b.dataset.page === pageId);
+            });
+
+            if (!frames.has(pageId)) {
+                const wrap = document.createElement('div');
+                wrap.className = 'page-frame';
+                wrap.style.position = 'relative';
+                wrap.style.minHeight = 'calc(100vh - 100px)';
+                wrap.style.opacity = '0';
+                wrap.style.pointerEvents = 'none';
+                wrap.dataset.pageId = pageId;
+
+                const loader = document.createElement('div');
+                loader.className = 'page-loading';
+                loader.innerHTML = '<div class="spinner"></div><span>Loading…</span>';
+
+                const iframe = document.createElement('iframe');
+                iframe.src = src;
+                iframe.title = 'Self Learners · ' + pageId;
+                iframe.setAttribute('loading', 'lazy');
+                iframe.style.cssText = 'width:100%;min-height:calc(100vh - 100px);border:none;display:block;background:transparent;';
+
+                wrap.appendChild(loader);
+                wrap.appendChild(iframe);
+                stage.appendChild(wrap);
+
+                iframe.addEventListener('load', () => {
+                    try {
+                        iframe.contentWindow.postMessage({ type: 'SL_THEME', theme: THEME }, '*');
+                    } catch (e) { /* ignore */ }
+                    wrap.style.opacity = '1';
+                    wrap.style.pointerEvents = 'auto';
+                    loader.style.display = 'none';
+                });
+
+                setTimeout(() => {
+                    if (loader.style.display !== 'none') {
+                        wrap.style.opacity = '1';
+                        wrap.style.pointerEvents = 'auto';
+                        loader.style.display = 'none';
+                    }
+                }, 3000);
+
+                frames.set(pageId, wrap);
+            }
+
+            frames.forEach((wrap, id) => {
+                const isActive = id === pageId;
+                wrap.classList.toggle('active', isActive);
+                wrap.style.opacity = isActive ? '1' : '0';
+                wrap.style.pointerEvents = isActive ? 'auto' : 'none';
+                wrap.style.position = isActive ? 'relative' : 'absolute';
+                wrap.style.display = isActive ? 'block' : 'none';
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ---------- Login-state swapping ---------- */
+        function enterPostLogin(opts) {
+            opts = opts || {};
+            // Save state
+            try {
+                const savedUser = JSON.parse(localStorage.getItem(KEY_USER) || 'null');
+                if (savedUser) localStorage.setItem(KEY_POST_LOGIN, '1');
+            } catch (e) { /* ignore */ }
+
+            topBarPre.style.display = 'none';
+            bottomNavPre.style.display = 'none';
+            topBarPost.style.display = '';
+            bottomNavPost.style.display = '';
+
+            // Hide all pre-login frames
+            frames.forEach((wrap, id) => {
+                wrap.style.display = 'none';
+                wrap.style.opacity = '0';
+                wrap.style.pointerEvents = 'none';
+            });
+
+            // Load Edu iframe (only once)
+            if (!eduFrameRef) {
+                const wrap = document.createElement('div');
+                wrap.className = 'page-frame active';
+                wrap.style.position = 'relative';
+                wrap.style.minHeight = 'calc(100vh - 100px)';
+                wrap.style.opacity = '1';
+                wrap.style.pointerEvents = 'auto';
+                wrap.dataset.pageId = 'edu';
+
+                const loader = document.createElement('div');
+                loader.className = 'page-loading';
+                loader.innerHTML = '<div class="spinner"></div><span>Loading…</span>';
+
+                const iframe = document.createElement('iframe');
+                iframe.src = 'page-edu.html';
+                iframe.title = 'Self Learners · Edu';
+                iframe.style.cssText = 'width:100%;min-height:calc(100vh - 100px);border:none;display:block;background:transparent;';
+
+                wrap.appendChild(loader);
+                wrap.appendChild(iframe);
+                stage.appendChild(wrap);
+
+                iframe.addEventListener('load', () => {
+                    try {
+                        iframe.contentWindow.postMessage({ type: 'SL_THEME', theme: THEME }, '*');
+                        if (opts.user) iframe.contentWindow.postMessage({ type: 'SL_USER', user: opts.user, isGuest: opts.isGuest }, '*');
+                        if (opts.mode) iframe.contentWindow.postMessage({ type: 'SL_SET_MODE', mode: opts.mode }, '*');
+                    } catch (e) { /* ignore */ }
+                    wrap.style.opacity = '1';
+                    wrap.style.pointerEvents = 'auto';
+                    loader.style.display = 'none';
+                });
+
+                setTimeout(() => {
+                    if (loader.style.display !== 'none') {
+                        wrap.style.opacity = '1';
+                        wrap.style.pointerEvents = 'auto';
+                        loader.style.display = 'none';
+                    }
+                }, 3000);
+
+                eduFrameRef = { wrap, iframe };
+                frames.set('edu', wrap);
+            } else {
+                eduFrameRef.wrap.style.display = 'block';
+                eduFrameRef.wrap.style.opacity = '1';
+                eduFrameRef.wrap.style.pointerEvents = 'auto';
+                eduFrameRef.wrap.classList.add('active');
+                // Notify iframe of user/mode
+                try {
+                    if (opts.user) eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_USER', user: opts.user, isGuest: opts.isGuest }, '*');
+                    if (opts.mode) eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_SET_MODE', mode: opts.mode }, '*');
+                } catch (e) { /* ignore */ }
+            }
+
+            // Mark MCQs active
+            setActivePostLoginButton('mcq');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function exitToLogin() {
+            try { localStorage.removeItem(KEY_POST_LOGIN); } catch (e) { /* ignore */ }
+
+            topBarPost.style.display = 'none';
+            bottomNavPost.style.display = 'none';
+            topBarPre.style.display = '';
+            bottomNavPre.style.display = '';
+
+            // Hide edu frame
+            if (eduFrameRef) {
+                eduFrameRef.wrap.style.display = 'none';
+                eduFrameRef.wrap.style.opacity = '0';
+                eduFrameRef.wrap.style.pointerEvents = 'none';
+                eduFrameRef.wrap.classList.remove('active');
+            }
+
+            // Remove cached login frame so it reloads fresh
+            if (frames.has('login')) {
+                const w = frames.get('login');
+                w.remove();
+                frames.delete('login');
+            }
+            activePage = null;
+
+            // Show login page
+            showPage('login', 'page-login.html');
+        }
+
+        function setActivePostLoginButton(mode) {
+            postLoginButtons().forEach(b => {
+                if (b.dataset.mode) b.classList.toggle('active', b.dataset.mode === mode);
+            });
+        }
+
+        /* ---------- Button wiring ---------- */
+        preLoginButtons().forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.page && btn.dataset.src) {
+                    showPage(btn.dataset.page, btn.dataset.src);
+                }
+            });
+        });
+
+        postLoginButtons().forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!btn.dataset.mode) return;
+                setActivePostLoginButton(btn.dataset.mode);
+                if (eduFrameRef) {
+                    try {
+                        eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_SET_MODE', mode: btn.dataset.mode }, '*');
+                    } catch (e) { /* ignore */ }
+                }
+            });
+        });
+
+        /* ---------- postMessage from inner pages ---------- */
+        window.addEventListener('message', (e) => {
+            const d = e.data;
+            if (!d || typeof d !== 'object') return;
+
+            if (d.type === 'SL_LOGIN') {
+                // Login succeeded (from page-login.html)
+                try {
+                    if (d.user) localStorage.setItem(KEY_USER, JSON.stringify(d.user));
+                } catch (err) { /* ignore */ }
+                enterPostLogin({ user: d.user, isGuest: d.isGuest, mode: 'mcq' });
+            } else if (d.type === 'SL_LOGOUT') {
+                // Logout (from page-edu.html)
+                try { localStorage.removeItem(KEY_USER); } catch (err) { /* ignore */ }
+                exitToLogin();
+            } else if (d.type === 'SL_SET_MODE_FROM_EDU') {
+                // Edu internally changed mode (e.g. user tapped a mode inside the page)
+                setActivePostLoginButton(d.mode);
+            }
+        });
+
+        /* ---------- Initial load ---------- */
+        function boot() {
+            let loggedIn = false;
+            let savedUser = null;
+            try {
+                savedUser = JSON.parse(localStorage.getItem(KEY_USER) || 'null');
+                loggedIn = !!localStorage.getItem(KEY_POST_LOGIN) && !!savedUser;
+            } catch (e) { /* ignore */ }
+
+            if (loggedIn) {
+                enterPostLogin({ user: savedUser, isGuest: savedUser.user === 'Guest', mode: 'mcq' });
+            } else {
+                showPage('login', 'page-login.html');
+            }
+        }
+
+        window.__enterPostLogin = enterPostLogin;
+        window.__exitToLogin = exitToLogin;
+
+        boot();
+    })();
+</script>
+
+<script>
+/* Service worker registration */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+            .then((reg) => console.log('[PWA] SW registered', reg.scope))
+            .catch((e) => console.warn('[PWA] SW failed', e));
+    });
+}
+</script>
+</body>
+</html>
