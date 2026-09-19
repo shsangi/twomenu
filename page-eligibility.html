@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0ea5e9">
+    <title>Eligibility · Self Learners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --navy: #0a1e3f; --navy-light: #1a3a6b; --navy-soft: #e8eef7;
+            --black: #0f1419; --yellow: #f5b800; --yellow-soft: #fff7dd;
+            --sky: #0ea5e9; --sky-dark: #0284c7; --sky-soft: #e0f2fe; --sky-light: #7dd3fc;
+            --bg: #f4f6fa; --card: #fff; --text: #0f1419;
+            --text-soft: #475569; --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --success: #059669; --success-bg: #d1fae5;
+            --danger: #dc2626; --danger-bg: #fee2e2;
+            --warning: #d97706; --warning-bg: #fef3c7;
+            --shadow-sm: 0 2px 6px rgba(10,30,63,.06);
+            --shadow-md: 0 8px 20px -6px rgba(10,30,63,.12);
+            --shadow-lg: 0 20px 40px -12px rgba(10,30,63,.18);
+            --radius: 14px; --radius-full: 9999px;
+        }
+        html, body { -webkit-text-size-adjust: 100%; }
+        body {
+            background: transparent;
+            min-height: 100dvh;
+            display: flex; justify-content: center; align-items: flex-start;
+            padding: 1rem;
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+        .eligibility-page { width: 100%; max-width: 520px; }
+
+        .app-container { background: var(--card); border-radius: 28px; box-shadow: var(--shadow-lg); overflow: hidden; border: 1px solid var(--border); }
+        .top-accent { height: 5px; background: linear-gradient(90deg, var(--sky) 0%, var(--sky-dark) 50%, var(--yellow) 100%); }
+        .content { padding: 28px 24px 32px; position: relative; }
+        .version-watermark { position: absolute; top: 18px; right: 20px; font-size: 10px; font-weight: 800; color: #fff; background: var(--sky); padding: 3px 10px; border-radius: var(--radius-full); letter-spacing: .08em; text-transform: uppercase; }
+        .brand-header { display: flex; flex-direction: column; align-items: center; padding-top: 4px; margin-bottom: 8px; gap: 12px; }
+        .brand-logo { width: 64px; height: 64px; object-fit: contain; border-radius: var(--radius); background: #fff; padding: 8px; box-shadow: 0 4px 16px rgba(14,165,233,.2); border: 1px solid var(--border); }
+        .brand-name { font-size: 24px; font-weight: 800; color: var(--navy); letter-spacing: -.03em; text-align: center; }
+        .brand-name .brand-accent { color: var(--sky); -webkit-text-stroke: .5px var(--sky-dark); }
+        .brand-divider { width: 60px; height: 4px; background: linear-gradient(90deg, var(--sky), var(--yellow)); border-radius: 4px; margin: 14px auto 4px; }
+        h2 { text-align: center; font-size: 19px; font-weight: 800; color: var(--navy); margin: 16px 0 24px; letter-spacing: -.02em; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 13.5px; color: var(--navy); }
+        .helper-text { display: block; margin-top: 8px; font-size: 12px; color: var(--text-muted); line-height: 1.5; font-weight: 500; }
+
+        input[type="date"], select {
+            width: 100%; padding: 14px 16px;
+            border: 1.5px solid var(--border); border-radius: var(--radius);
+            font-size: 15px; font-family: inherit; font-weight: 500;
+            background: var(--bg); color: var(--text);
+            transition: all .2s; appearance: none; -webkit-appearance: none;
+        }
+        input[type="date"]:focus, select:focus {
+            outline: none; border-color: var(--sky); background: #fff;
+            box-shadow: 0 0 0 4px rgba(14,165,233,.15);
+        }
+        .select-wrapper { position: relative; }
+        .select-wrapper::after {
+            content: ''; position: absolute; right: 18px; top: 50%;
+            transform: translateY(-50%); width: 0; height: 0;
+            border-left: 5px solid transparent; border-right: 5px solid transparent;
+            border-top: 6px solid var(--sky); pointer-events: none;
+        }
+        select { padding-right: 40px; cursor: pointer; }
+
+        .radio-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .radio-option { position: relative; }
+        .radio-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+        .radio-option label {
+            display: flex; align-items: center; justify-content: center;
+            padding: 14px 8px; background: var(--bg);
+            border: 1.5px solid var(--border); border-radius: var(--radius);
+            font-weight: 700; font-size: 15px; color: var(--text);
+            cursor: pointer; transition: all .2s; margin: 0;
+        }
+        .radio-option label:hover { border-color: var(--sky); background: var(--sky-soft); }
+        .radio-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            color: #fff; border-color: var(--sky-dark);
+            box-shadow: 0 4px 12px rgba(14,165,233,.35);
+        }
+
+        .btn-primary {
+            width: 100%; padding: 16px 18px;
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            color: #fff; border: none; border-radius: var(--radius);
+            font-size: 16px; font-weight: 800; font-family: inherit;
+            cursor: pointer; margin-top: 8px;
+            box-shadow: 0 8px 20px -6px rgba(14,165,233,.5);
+            transition: all .2s;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 24px -6px rgba(14,165,233,.6); }
+
+        .results-section { margin-top: 28px; padding-top: 24px; border-top: 2px dashed var(--border); display: none; }
+        .results-section.visible { display: block; animation: slideUp .4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .results-title { font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
+        .results-title::before { content: ""; width: 4px; height: 18px; background: var(--sky); border-radius: 2px; }
+
+        .year-cards-container { display: flex; flex-direction: column; gap: 10px; }
+        .year-card { background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 10px; }
+        .year-card.eligible { border-left: 5px solid var(--success); background: linear-gradient(90deg, rgba(5,150,105,.05) 0%, #fff 25%); }
+        .year-card.overage { border-left: 5px solid var(--danger); background: linear-gradient(90deg, rgba(220,38,38,.05) 0%, #fff 25%); }
+        .year-card.underage { border-left: 5px solid var(--warning); background: linear-gradient(90deg, rgba(217,119,6,.05) 0%, #fff 25%); }
+        .year-card.attempts-finished { border-left: 5px solid var(--text-muted); background: linear-gradient(90deg, rgba(148,163,184,.05) 0%, #fff 25%); }
+        .year-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .year-card-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .year-card-title { font-weight: 800; font-size: 16px; color: var(--navy); }
+        .year-card-age { font-size: 13px; color: var(--text-soft); font-weight: 600; line-height: 1.4; }
+        .status-badge { display: inline-block; padding: 5px 11px; border-radius: var(--radius-full); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+        .badge-success { background: var(--success-bg); color: var(--success); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); }
+        .badge-warning { background: var(--warning-bg); color: var(--warning); }
+        .badge-neutral { background: var(--bg); color: var(--text-soft); }
+        .year-card-note { font-size: 12.5px; color: var(--text-soft); font-weight: 600; line-height: 1.4; }
+        .year-card-note.last-attempt { color: var(--danger); font-weight: 800; }
+
+        .results-note { font-size: 12.5px; color: var(--text-soft); margin-top: 20px; line-height: 1.6; padding: 16px 18px; background: var(--sky-soft); border-radius: var(--radius); border-left: 4px solid var(--sky); font-weight: 500; }
+        .results-note strong { color: var(--navy); font-weight: 800; }
+
+        @media (max-width: 400px) {
+            body { padding: .75rem; }
+            .content { padding: 22px 18px 26px; }
+            .brand-logo { width: 56px; height: 56px; }
+            .brand-name { font-size: 21px; }
+            h2 { font-size: 17px; }
+        }
+    </style>
+</head>
+<body>
+<div class="eligibility-page">
+    <div class="app-container">
+        <div class="top-accent"></div>
+        <div class="content">
+            <div class="version-watermark">v2.6</div>
+            <div class="brand-header">
+                <img class="brand-logo"
+                     src="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27"
+                     alt="Self Learners Logo"
+                     onerror="this.style.display='none'">
+                <div class="brand-name">Self<span class="brand-accent">Learners</span></div>
+            </div>
+            <div class="brand-divider"></div>
+            <h2>CSS Eligibility Tracker</h2>
+
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" value="1997-03-11">
+            </div>
+
+            <div class="form-group">
+                <label>Previous Attempts (Completed Cycles)</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="prev0" name="prevAttempts" value="0" checked>
+                        <label for="prev0">0</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="prev1" name="prevAttempts" value="1">
+                        <label for="prev1">1</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="prev2" name="prevAttempts" value="2">
+                        <label for="prev2">2</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="relaxation">Age Relaxation Category (Rule 6(2))</label>
+                <div class="select-wrapper">
+                    <select id="relaxation">
+                        <option value="none">No Relaxation (Max Age: 30)</option>
+                        <option value="relaxed">Scheduled Caste / Buddhist Community (+2 Years)</option>
+                        <option value="relaxed">Recognized Tribes (Balochistan, Tribal Areas) (+2 Years)</option>
+                        <option value="relaxed">Azad Kashmir (AJK) Permanent Resident (+2 Years)</option>
+                        <option value="relaxed">Gilgit-Baltistan (GB) Permanent Resident (+2 Years)</option>
+                        <option value="relaxed">Special Candidates (+2 Years)</option>
+                        <option value="relaxed">In-Service Government Servant (+2 Years)</option>
+                    </select>
+                </div>
+                <span class="helper-text">Select your category to apply the 2-year upper age relaxation.</span>
+            </div>
+
+            <button class="btn-primary" onclick="calculateEligibility()">Check Eligibility</button>
+
+            <div class="results-section" id="resultsSection">
+                <div class="results-title">Year-by-Year Eligibility</div>
+                <div class="year-cards-container" id="yearCardsContainer"></div>
+                <p class="results-note">
+                    <strong>Note (CSS CE Rules 2019):</strong> Age must be <strong>21–30 years</strong> on the cut-off date (31st Dec of the preceding year).
+                    <strong>2-year relaxation</strong> (max 32) for SC/Buddhist, recognized tribes, AJK/GB residents, special candidates, and in-service Govt servants (2+ years) — one concession only.
+                    <strong>Max 3 attempts</strong> within age limit.
+                    <strong>Qualifying marks:</strong> 40% compulsory, 33% optional, 50% aggregate.
+                    Bachelor's degree (2nd div/C grade), Pakistani/J&K nationality, and domicile required.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const CURRENT_CYCLE_YEAR = 2027;
+
+function calculateEligibility() {
+    const dobInput = document.getElementById('dob').value;
+    const relaxation = document.getElementById('relaxation').value;
+    let prevAttempts = 0;
+    for (const r of document.getElementsByName('prevAttempts')) if (r.checked) { prevAttempts = parseInt(r.value); break; }
+    if (!dobInput) { alert("Please enter your Date of Birth."); return; }
+    const dob = new Date(dobInput);
+    const minAge = 21;
+    const maxAge = (relaxation === 'none') ? 30 : 32;
+    const maxAttempts = 3;
+    let cardsHtml = "";
+    let simulatedAttemptsUsed = prevAttempts;
+
+    for (let i = 0; i < 10; i++) {
+        const targetExamYear = CURRENT_CYCLE_YEAR + i;
+        const targetCutoffYear = targetExamYear - 1;
+        const simulatedCutoff = new Date(`${targetCutoffYear}-12-31`);
+        let yearAge = simulatedCutoff.getFullYear() - dob.getFullYear();
+        let yearMonths = simulatedCutoff.getMonth() - dob.getMonth();
+        if (simulatedCutoff.getDate() - dob.getDate() < 0) yearMonths--;
+        if (yearMonths < 0) { yearAge--; yearMonths += 12; }
+        const isSimAgeEligible = (yearAge >= minAge && yearAge < maxAge);
+        let cardClass = "", statusBadge = "", noteText = "";
+
+        if (isSimAgeEligible) {
+            if (simulatedAttemptsUsed < maxAttempts) {
+                simulatedAttemptsUsed++;
+                let isLastUsable = false;
+                if (simulatedAttemptsUsed === maxAttempts) isLastUsable = true;
+                else {
+                    const nextCutoff = new Date(`${targetExamYear}-12-31`);
+                    let nextAge = nextCutoff.getFullYear() - dob.getFullYear();
+                    if (nextCutoff.getMonth() - dob.getMonth() < 0) nextAge--;
+                    if (nextAge >= maxAge) isLastUsable = true;
+                }
+                cardClass = "eligible";
+                statusBadge = `<span class="status-badge badge-success">Eligible</span>`;
+                noteText = isLastUsable
+                    ? `<span class="year-card-note last-attempt">Last usable attempt (#${simulatedAttemptsUsed})</span>`
+                    : `<span class="year-card-note">Attempt #${simulatedAttemptsUsed}</span>`;
+            } else {
+                cardClass = "attempts-finished";
+                statusBadge = `<span class="status-badge badge-neutral">Age OK</span>`;
+                noteText = `<span class="year-card-note">Attempts finished</span>`;
+            }
+        } else if (yearAge < minAge) {
+            cardClass = "underage";
+            statusBadge = `<span class="status-badge badge-warning">Underage</span>`;
+            noteText = `<span class="year-card-note">Below min age (${minAge})</span>`;
+        } else {
+            cardClass = "overage";
+            statusBadge = `<span class="status-badge badge-danger">Overage</span>`;
+            noteText = `<span class="year-card-note">Completed ${maxAge}+ years</span>`;
+        }
+
+        cardsHtml += `<div class="year-card ${cardClass}"><div class="year-card-top"><div class="year-card-info"><span class="year-card-title">CSS ${targetExamYear}</span><span class="year-card-age">Cut-off: Dec ${targetCutoffYear} · Age: ${yearAge}y ${yearMonths}m</span></div><div class="year-card-status">${statusBadge}</div></div>${noteText}</div>`;
+    }
+    document.getElementById('yearCardsContainer').innerHTML = cardsHtml;
+    document.getElementById('resultsSection').classList.add('visible');
+    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0ea5e9">
+    <title>Syllabus · Self Learners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --navy: #0a1e3f; --navy-light: #1a3a6b; --navy-soft: #e8eef7;
+            --black: #0f1419; --yellow: #f5b800; --yellow-soft: #fff7dd;
+            --sky: #0ea5e9; --sky-dark: #0284c7; --sky-soft: #e0f2fe; --sky-light: #7dd3fc;
+            --bg: #f4f6fa; --card: #fff; --text: #0f1419;
+            --text-soft: #475569; --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --shadow-sm: 0 2px 6px rgba(10,30,63,.06);
+            --shadow-md: 0 8px 20px -6px rgba(10,30,63,.12);
+            --radius-lg: 20px; --radius-full: 9999px;
+        }
+        html, body { -webkit-text-size-adjust: 100%; }
+        body {
+            background: transparent;
+            min-height: 100dvh;
+            display: flex; justify-content: center; align-items: flex-start;
+            padding: 1rem;
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+        .syllabus-page { width: 100%; max-width: 820px; }
+
+        .header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 8px; }
+        .header h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; display: flex; align-items: center; gap: 10px; color: var(--navy); }
+        .header h1 span { background: var(--sky); padding: 4px 12px; border-radius: var(--radius-full); font-size: .7rem; font-weight: 700; color: #fff; text-transform: uppercase; }
+        .count-badge { background: var(--sky); color: #fff; padding: 6px 16px; border-radius: var(--radius-full); font-size: .78rem; font-weight: 700; box-shadow: var(--shadow-sm); }
+
+        .controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+        .controls-row { display: flex; flex-wrap: wrap; gap: 10px; }
+        .search-box { flex: 1; position: relative; min-width: 180px; }
+        .search-box input { width: 100%; padding: 12px 18px 12px 44px; border: 1.5px solid var(--border); border-radius: var(--radius-full); background: var(--card); font-size: .9rem; color: var(--text); box-shadow: var(--shadow-sm); transition: all .2s; }
+        .search-box input:focus { outline: none; border-color: var(--sky); box-shadow: 0 0 0 4px rgba(14,165,233,.1); }
+        .search-box::before { content: "🔍"; position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1rem; opacity: .5; }
+        .subject-select { padding: 12px 40px 12px 18px; border: 1.5px solid var(--border); border-radius: var(--radius-full); background: var(--card); font-size: .9rem; color: var(--text); cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230ea5e9' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px; min-width: 160px; font-weight: 600; box-shadow: var(--shadow-sm); }
+        .subject-select:focus { outline: none; border-color: var(--sky); box-shadow: 0 0 0 4px rgba(14,165,233,.1); }
+
+        .syllabus { display: flex; flex-direction: column; gap: 0; }
+        .paper-block { background: var(--card); border-radius: var(--radius-lg); padding: 20px 18px 18px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: all .2s; }
+        .paper-block:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+        .paper-title { font-size: 1.15rem; font-weight: 800; color: var(--navy); display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; padding-bottom: 8px; }
+        .paper-title .marks { font-weight: 700; font-size: .72rem; color: #fff; background: var(--sky); padding: 4px 14px; border-radius: var(--radius-full); }
+        .paper-title .subject-link { color: var(--navy); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .paper-title .subject-link:hover { color: var(--sky-dark); }
+        .paper-title .subject-link::after { content: "↗"; font-size: .75rem; opacity: .5; font-weight: 700; }
+        .last-studied { font-size: .68rem; color: var(--sky-dark); background: var(--sky-soft); padding: 5px 14px; border-radius: var(--radius-full); display: inline-block; margin: 6px 0 12px 0; font-weight: 600; border: 1px solid var(--sky-light); }
+        .last-studied span { font-weight: 700; }
+        .subject-divider { border: none; border-top: 2px dashed var(--border); margin: 8px 0 14px 0; }
+        .module-group { margin-bottom: 14px; }
+        .module-head { font-weight: 700; font-size: .88rem; color: var(--black); margin-bottom: 8px; display: flex; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+        .topic-item { padding: 10px 0 10px 16px; border-left: 3px solid var(--sky); margin-left: 4px; margin-bottom: 10px; background: linear-gradient(to right, rgba(14,165,233,.04), transparent 60%); border-radius: 0 10px 10px 0; }
+        .topic-item .topic-label { font-weight: 700; font-size: .88rem; color: var(--navy); }
+        .topic-item .topic-label .topic-link { color: var(--navy); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        .topic-item .topic-label .topic-link:hover { color: var(--sky-dark); }
+        .topic-item .topic-label .topic-link::after { content: "↗"; font-size: .65rem; opacity: .5; font-weight: 700; }
+        .subtopic-list { margin: 6px 0 2px 6px; padding-left: 6px; list-style: none; counter-reset: sub-counter; }
+        .subtopic-list li { counter-increment: sub-counter; font-size: .83rem; color: var(--text-soft); line-height: 1.55; padding: 3px 0 3px 26px; position: relative; margin-bottom: 2px; }
+        .subtopic-list li::before { content: counter(sub-counter); position: absolute; left: 0; top: 3px; width: 18px; height: 18px; background: var(--sky); color: #fff; border-radius: 50%; font-size: .65rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .subtopic-list li .sub-link { color: var(--text-soft); cursor: pointer; }
+        .subtopic-list li .sub-link:hover { color: var(--sky-dark); }
+        .subtopic-list li .sub-link::after { content: "↗"; font-size: .55rem; opacity: .4; }
+        .sub-subtopic-list { margin: 4px 0 4px 22px; padding-left: 4px; list-style: none; }
+        .sub-subtopic-list li { font-size: .8rem; color: var(--text-soft); line-height: 1.55; padding: 2px 0 2px 20px; position: relative; }
+        .sub-subtopic-list li::before { content: attr(data-letter) ")"; position: absolute; left: 0; font-weight: 600; color: var(--sky-dark); font-size: .72rem; }
+        .sub-subtopic-list li .sub-link { color: var(--text-soft); cursor: pointer; }
+        .sub-subtopic-list li .sub-link:hover { color: var(--sky-dark); }
+        .sub-subtopic-list li .sub-link::after { content: "↗"; font-size: .5rem; opacity: .35; margin-left: 2px; }
+        .topic-item .book-ref { font-size: .78rem; color: var(--text-soft); margin-top: 6px; padding: 6px 12px; background: var(--sky-soft); border-radius: 10px; border-left: 3px solid var(--sky); }
+        .topic-item .book-ref .book-link { color: var(--sky-dark); cursor: pointer; font-weight: 600; }
+        .topic-item .book-ref .book-link::after { content: "↗"; font-size: .55rem; opacity: .5; }
+        .empty-state { padding: 48px 20px; text-align: center; background: var(--card); border-radius: var(--radius-lg); color: var(--text-soft); border: 2px dashed var(--border); font-size: .92rem; font-weight: 500; }
+        .loading { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 48px 0; color: var(--text-soft); font-size: .9rem; font-weight: 600; }
+        .spinner { width: 24px; height: 24px; border: 3px solid var(--border); border-top: 3px solid var(--sky); border-radius: 50%; animation: spin .8s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .footer { margin-top: 20px; font-size: .72rem; color: var(--text-muted); text-align: center; border-top: 1px solid var(--border); padding-top: 16px; font-weight: 500; }
+    </style>
+</head>
+<body>
+<div class="syllabus-page">
+    <div class="header">
+        <h1>CSS <span>Syllabus</span></h1>
+        <span class="count-badge" id="countDisplay">0</span>
+    </div>
+    <div class="controls">
+        <div class="controls-row">
+            <div class="search-box"><input type="text" id="searchInput" placeholder="Search topic, book…" /></div>
+            <select id="subjectSelect" class="subject-select"><option value="">All subjects</option></select>
+        </div>
+    </div>
+    <div class="syllabus" id="syllabusContainer">
+        <div class="loading"><span class="spinner"></span> Loading syllabus…</div>
+    </div>
+    <div class="footer">FPSC syllabus · live from Google Sheets</div>
+</div>
+
+<script>
+(function () {
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSficiiXO39uzMxJ7TUSd_2GNxZaX8R_ZlIjr_CUIpG2DTbMfw3eXJH3b1wJdbeX6ZUCykDg82uAiac/pub?output=csv';
+    const container = document.getElementById('syllabusContainer');
+    const searchInput = document.getElementById('searchInput');
+    const subjectSelect = document.getElementById('subjectSelect');
+    const countDisplay = document.getElementById('countDisplay');
+    let allRecords = [], filtered = [];
+
+    function parseLine(line) { const res = []; let cur = '', inside = false; for (let i = 0; i < line.length; i++) { const ch = line[i]; if (inside) { if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; } else if (ch === '"') inside = false; else cur += ch; } else { if (ch === ',') { res.push(cur.trim()); cur = ''; } else if (ch === '"') inside = true; else cur += ch; } } res.push(cur.trim()); return res; }
+
+    function parseCSV(text) {
+        const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+        if (lines.length < 2) return [];
+        const h = parseLine(lines[0]);
+        const idx = {
+            srno: h.indexOf('srno'),
+            subject: h.indexOf('subjectPaper') !== -1 ? h.indexOf('subjectPaper') : h.indexOf('subject'),
+            Module: h.indexOf('Module'),
+            topicNumber: h.indexOf('Topic Number'),
+            topicName: h.indexOf('Topic Name / Detail'),
+            inFPSC: h.indexOf('Given in FPSC CSS Syllabus?'),
+            book: h.indexOf('Recommended Book / Source to Study'),
+            dateRead: h.indexOf('date_read'),
+            subtopics: h.indexOf('Possible Subtopics (FPSC Syllabus Past Papers & Recent Topics)')
+        };
+        const subtopicsIdx = idx.subtopics !== -1 ? idx.subtopics : idx.topicName;
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+            const c = parseLine(lines[i]);
+            if (c.length < 8) continue;
+            const r = { srno: c[idx.srno] || '', subject: c[idx.subject] || '', Module: c[idx.Module] || '', topicNumber: c[idx.topicNumber] || '', topicName: c[idx.topicName] || '', inFPSC: c[idx.inFPSC] || '', book: c[idx.book] || '', dateRead: c[idx.dateRead] || '', subtopics: c[subtopicsIdx] || '' };
+            if (!isNaN(parseFloat(r.srno)) && r.srno.trim() !== '') rows.push(r);
+        }
+        return rows;
+    }
+
+    function googleSearch(query) { const clean = query.trim(); if (!clean) return; window.open(`https://www.google.com/search?q=css+${encodeURIComponent(clean)}`, '_blank'); }
+
+    function smartSplit(text) {
+        if (!text || text.trim() === '') return [];
+        if (text.includes('\n')) { const parts = text.split('\n').map(s => s.trim()).filter(s => s.length > 0); if (parts.length > 1) return parts; }
+        const letterMatch = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi);
+        if (letterMatch && letterMatch.length > 1) { const afterLetters = text.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim(); if (afterLetters && /\d+\./.test(afterLetters)) { const result = [...letterMatch]; const numberedMatch = afterLetters.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g); if (numberedMatch) for (const item of numberedMatch) if (item.trim()) result.push(item.trim()); return result; } return letterMatch.map(s => s.trim()); }
+        const numberedMatch = text.match(/\d+\.\s*[^.]*?(?:\.\s*(?=\d+\.)|$)/g);
+        if (numberedMatch && numberedMatch.length > 1) return numberedMatch.map(s => s.trim());
+        if (text.includes(';')) { const parts = text.split(';').map(s => s.trim()).filter(s => s.length > 0); if (parts.length > 1) return parts; }
+        if (text.includes(',')) { const parts = text.split(',').map(s => s.trim()).filter(s => s.length > 0); if (parts.length > 1) return parts; }
+        if (text.includes('. ')) { const parts = text.split('. ').map(s => s.trim()).filter(s => s.length > 0); if (parts.length > 1) return parts; }
+        return [text.trim()];
+    }
+
+    function isNumbered(text) { return /^\d+\./.test(text.trim()); }
+    function hasSubLetters(text) { if (!text) return false; return /[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi.test(text) && (text.match(/[a-z]\)/gi) || []).length > 1; }
+    function extractSubLetters(text) { if (!text) return []; const matches = text.match(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi); if (!matches) return []; return matches.map(s => s.trim()); }
+
+    function formatDateInPKT(dateStr) {
+        if (!dateStr || dateStr.trim() === '') return '';
+        try {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+            const pktDate = new Date(utc + (5 * 60 * 60000));
+            const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            let hours = pktDate.getUTCHours();
+            const minutes = String(pktDate.getUTCMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            return `${days[pktDate.getUTCDay()]}, ${pktDate.getUTCDate()} ${months[pktDate.getUTCMonth()]}, ${pktDate.getUTCFullYear()}, ${hours}:${minutes} ${ampm}`;
+        } catch (e) { return dateStr; }
+    }
+
+    function render(records) {
+        if (!records || records.length === 0) { container.innerHTML = `<div class="empty-state">✨ No topics match your search</div>`; countDisplay.textContent = '0'; return; }
+        const groups = {};
+        for (const r of records) { const key = r.subject || 'Uncategorized'; if (!groups[key]) groups[key] = []; groups[key].push(r); }
+        let html = '';
+        for (const [subject, items] of Object.entries(groups)) {
+            items.sort((a, b) => parseFloat(a.srno) - parseFloat(b.srno));
+            let latestDate = '';
+            for (const item of items) { if (item.dateRead && item.dateRead.trim() !== '') { const d = new Date(item.dateRead); if (!isNaN(d.getTime())) { if (!latestDate || d > new Date(latestDate)) latestDate = item.dateRead; } } }
+            html += `<div class="paper-block">`;
+            html += `<div class="paper-title"><span class="subject-link" onclick="googleSearch('${subject.replace(/'/g, "\\'")}')">📄 ${subject}</span><span class="marks">${items.length} topics</span></div>`;
+            if (latestDate) html += `<div class="last-studied">📅 Last studied: <span>${formatDateInPKT(latestDate)}</span></div>`;
+            else html += `<div class="last-studied" style="opacity:.6;">📅 Not studied yet</div>`;
+            html += `<hr class="subject-divider" />`;
+            const moduleMap = {};
+            for (const item of items) { const mod = item.Module || 'General'; if (!moduleMap[mod]) moduleMap[mod] = []; moduleMap[mod].push(item); }
+            for (const [mod, topics] of Object.entries(moduleMap)) {
+                html += `<div class="module-group"><div class="module-head">${mod}</div>`;
+                for (const t of topics) {
+                    const topicNum = t.topicNumber ? `${t.topicNumber}` : '';
+                    html += `<div class="topic-item"><div class="topic-label"><span class="topic-link" onclick="googleSearch('${(t.topicName || '').replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span></div>`;
+                    const subItems = smartSplit(t.subtopics || t.topicName || '');
+                    if (subItems.length > 0) {
+                        html += `<ul class="subtopic-list">`;
+                        for (const sub of subItems) {
+                            if (hasSubLetters(sub)) {
+                                const subLetters = extractSubLetters(sub);
+                                const mainPart = sub.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
+                                const cleanMain = mainPart.replace(/[:–-]\s*$/, '').trim();
+                                if (cleanMain) html += `<li><span class="sub-link" onclick="googleSearch('${cleanMain.replace(/'/g, "\\'")}')">${cleanMain}</span></li>`;
+                                if (subLetters.length > 0) {
+                                    html += `<ul class="sub-subtopic-list">`;
+                                    const letters = 'abcdefghijklmnopqrstuvwxyz';
+                                    for (let i = 0; i < subLetters.length; i++) { const letter = letters[i] || '?'; const cleanSub = subLetters[i].replace(/^[a-z]\)\s*/, '').trim(); html += `<li data-letter="${letter}"><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`; }
+                                    html += `</ul>`;
+                                }
+                            } else if (isNumbered(sub)) { const numClean = sub.replace(/^\d+\.\s*/, '').trim(); html += `<li><span class="sub-link" onclick="googleSearch('${numClean.replace(/'/g, "\\'")}')">${numClean}</span></li>`; }
+                            else { let cleanSub = sub.replace(/^\d+\.\s*/, '').replace(/[;,:]\s*$/, '').trim(); if (cleanSub) html += `<li><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`; }
+                        }
+                        html += `</ul>`;
+                    }
+                    if (t.book && t.book !== '—') html += `<div class="book-ref">📖 <span class="book-link" onclick="googleSearch('${t.book.replace(/'/g, "\\'")}')">${t.book}</span></div>`;
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            }
+            html += `</div>`;
+        }
+        container.innerHTML = html;
+        countDisplay.textContent = records.length;
+    }
+
+    function applyFilters() {
+        const search = searchInput.value.trim().toLowerCase();
+        const subject = subjectSelect.value;
+        filtered = allRecords.filter(r => {
+            if (search) { const all = `${r.srno} ${r.subject} ${r.Module} ${r.topicNumber} ${r.topicName} ${r.book} ${r.subtopics}`.toLowerCase(); if (!all.includes(search)) return false; }
+            if (subject && r.subject !== subject) return false;
+            return true;
+        });
+        render(filtered);
+    }
+
+    function updateSubjects(records) {
+        const subs = new Set();
+        records.forEach(r => { if (r.subject) subs.add(r.subject); });
+        const current = subjectSelect.value;
+        subjectSelect.innerHTML = `<option value="">All subjects</option>`;
+        [...subs].sort().forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.textContent = s; subjectSelect.appendChild(opt); });
+        if ([...subs].includes(current)) subjectSelect.value = current;
+    }
+
+    async function loadSyllabus() {
+        try {
+            container.innerHTML = `<div class="loading"><span class="spinner"></span> Loading syllabus…</div>`;
+            const resp = await fetch(CSV_URL);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const text = await resp.text();
+            const parsed = parseCSV(text);
+            if (parsed.length === 0) { container.innerHTML = `<div class="empty-state">⚠️ No data found</div>`; countDisplay.textContent = '0'; return; }
+            allRecords = parsed;
+            updateSubjects(allRecords);
+            applyFilters();
+        } catch (e) { container.innerHTML = `<div class="empty-state" style="color:#b33;">❌ ${e.message}</div>`; countDisplay.textContent = 'err'; }
+    }
+
+    window.googleSearch = googleSearch;
+    searchInput.addEventListener('input', applyFilters);
+    subjectSelect.addEventListener('change', applyFilters);
+    loadSyllabus();
+})();
+</script>
+</body>
+</html>

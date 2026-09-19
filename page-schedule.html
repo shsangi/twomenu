@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0ea5e9">
+    <title>Schedule · Self Learners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --navy: #0a1e3f; --navy-light: #1a3a6b; --navy-soft: #e8eef7;
+            --black: #0f1419; --yellow: #f5b800; --yellow-soft: #fff7dd;
+            --sky: #0ea5e9; --sky-dark: #0284c7; --sky-soft: #e0f2fe; --sky-light: #7dd3fc;
+            --bg: #f4f6fa; --card: #fff; --text: #0f1419;
+            --text-soft: #475569; --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --shadow-md: 0 8px 20px -6px rgba(10,30,63,.12);
+            --radius-xl: 28px; --radius-full: 9999px;
+        }
+        html, body { -webkit-text-size-adjust: 100%; }
+        body {
+            background: transparent;
+            min-height: 100dvh;
+            display: flex; justify-content: center; align-items: flex-start;
+            padding: 1rem;
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+        .schedule-page { width: 100%; max-width: 700px; }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            padding: 20px 18px 22px;
+            border: 1px solid var(--border);
+        }
+
+        .banner {
+            background: linear-gradient(135deg, var(--sky) 0%, var(--sky-dark) 100%);
+            color: #fff;
+            border-radius: var(--radius-full);
+            padding: 12px 22px;
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 16px; min-height: 56px;
+            box-shadow: 0 8px 20px -6px rgba(14,165,233,.35);
+            position: relative; overflow: hidden;
+        }
+        .banner::after {
+            content: ''; position: absolute; top: 0; right: 0;
+            width: 120px; height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .banner-activity { display: flex; align-items: center; gap: 12px; flex: 1; position: relative; z-index: 1; }
+        .status-dot {
+            display: inline-block; width: 10px; height: 10px;
+            background: #fff; border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(255,255,255,.25);
+            animation: pulseDot 2s infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 3px rgba(255,255,255,.25); }
+            50% { opacity: .75; box-shadow: 0 0 0 6px rgba(255,255,255,.1); }
+        }
+        .banner-subject { font-weight: 600; font-size: .98rem; line-height: 1.3; }
+
+        .status-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 8px; background: var(--sky-soft);
+            padding: 8px 16px; border-radius: var(--radius-full);
+            margin-bottom: 14px; font-size: .82rem; font-weight: 600;
+            color: var(--sky-dark); flex-wrap: wrap;
+            border: 1px solid var(--sky-light);
+        }
+        .status-bar > span { display: flex; align-items: center; gap: 5px; }
+        .done-count span { background: var(--sky); color: #fff; padding: 2px 12px; border-radius: var(--radius-full); font-weight: 700; }
+        .remaining-time { color: #fff; font-weight: 700; background: linear-gradient(135deg, var(--sky), var(--sky-dark)); padding: 2px 14px; border-radius: var(--radius-full); font-size: .9rem; white-space: nowrap; box-shadow: 0 2px 8px -2px rgba(14,165,233,.5); }
+        .remaining-count span { background: #fff; color: var(--sky-dark); padding: 2px 12px; border-radius: var(--radius-full); font-weight: 700; border: 1px solid var(--sky-light); }
+
+        .schedule-grid { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+        .row {
+            display: flex; align-items: center; padding: 9px 14px;
+            border-radius: var(--radius-full); background: var(--bg);
+            border: 1px solid transparent; font-size: .85rem; gap: 6px;
+            transition: all .15s ease;
+        }
+        .row .srno { font-weight: 700; color: var(--text-muted); min-width: 26px; font-size: .72rem; text-align: center; }
+        .row .time { font-weight: 600; color: var(--text); min-width: 76px; font-size: .75rem; }
+        .row .subject { flex: 1; font-weight: 500; color: var(--text); padding: 0 4px; font-size: .83rem; }
+        .row .duration-badge { background: #fff; padding: 3px 12px; border-radius: var(--radius-full); font-size: .68rem; font-weight: 700; color: var(--text-soft); white-space: nowrap; border: 1px solid var(--border); }
+
+        .row.done { background: var(--sky-soft); border-color: var(--sky-light); }
+        .row.done .subject { color: var(--sky-dark); font-weight: 600; }
+        .row.done .duration-badge { background: var(--sky); color: #fff; border-color: var(--sky); }
+
+        .row.current {
+            background: linear-gradient(135deg, #e0f2fe 0%, #fff 100%);
+            border: 1.5px solid var(--sky);
+            box-shadow: 0 4px 12px rgba(14,165,233,.2);
+        }
+        .row.current .subject { color: var(--sky-dark); font-weight: 700; }
+        .row.current .duration-badge { background: var(--sky); color: #fff; border-color: var(--sky); }
+        .row.current .srno, .row.current .time { color: var(--sky-dark); }
+
+        .row.break-row { background: var(--bg); opacity: .85; }
+        .row.break-row .subject { color: var(--text-soft); }
+
+        .footer {
+            margin-top: 16px; display: flex; justify-content: space-between;
+            align-items: center; font-size: .72rem; color: var(--text-muted);
+            border-top: 1px solid var(--border); padding-top: 14px;
+            flex-wrap: wrap; gap: 8px;
+        }
+        .footer .pkt-clock { background: var(--sky-soft); padding: 6px 16px; border-radius: var(--radius-full); font-weight: 600; color: var(--sky-dark); font-size: .75rem; }
+        .footer .exam-dates { display: flex; gap: 10px; font-weight: 600; flex-wrap: wrap; }
+        .footer .exam-dates span { padding: 5px 14px; border-radius: var(--radius-full); font-size: .72rem; }
+        .footer .mpt-date { background: var(--navy); color: #fff; }
+        .footer .written-date { background: var(--sky); color: #fff; }
+        .footer .exam-dates .count-days { font-weight: 800; margin-left: 3px; }
+
+        .loading-text, .error-text { text-align: center; padding: 32px 20px; font-size: .9rem; color: var(--text-soft); }
+        .error-text { color: #dc2626; }
+        .loading-text small, .error-text small { color: var(--text-muted); font-size: .75rem; display: block; margin-top: 6px; }
+
+        @media (max-width: 480px) {
+            body { padding: .5rem; }
+            .card { padding: 14px 12px 18px; border-radius: 22px; }
+            .banner { padding: 10px 16px; min-height: 48px; }
+            .banner-subject { font-size: .85rem; }
+            .row { padding: 7px 10px; font-size: .75rem; }
+            .row .srno { min-width: 20px; font-size: .66rem; }
+            .row .time { min-width: 62px; font-size: .68rem; }
+            .row .duration-badge { font-size: .62rem; padding: 2px 9px; }
+            .row .subject { font-size: .74rem; }
+            .status-bar { font-size: .72rem; padding: 6px 12px; }
+            .footer { font-size: .63rem; flex-direction: column; align-items: stretch; gap: 6px; }
+        }
+    </style>
+</head>
+<body>
+<div class="schedule-page">
+    <div class="card">
+        <div class="banner">
+            <div class="banner-activity">
+                <span class="status-dot"></span>
+                <span class="banner-subject" id="currentActivity">Loading schedule…</span>
+            </div>
+        </div>
+        <div class="status-bar">
+            <span class="done-count">✅ Done: <span id="doneCount">0</span></span>
+            <span class="remaining-time">⏳ <span id="remainingTimeMinutes">--</span>:<span id="remainingTimeSeconds">--</span></span>
+            <span class="remaining-count">⏳ Left: <span id="remainingCount">0</span></span>
+        </div>
+        <div class="schedule-grid" id="scheduleContainer">
+            <div class="loading-text">⏳ Loading from Google Sheet…<br><small>Please wait</small></div>
+        </div>
+        <div class="footer">
+            <div class="exam-dates">
+                <span class="mpt-date">📝 MPT: <span id="mptDateDisplay">--</span> <span class="count-days" id="mptDays">--</span>d</span>
+                <span class="written-date">✍️ Written: <span id="writtenDateDisplay">--</span> <span class="count-days" id="writtenDays">--</span>d</span>
+            </div>
+            <span class="pkt-clock">🇵🇰 <span id="pkTime">--:-- --</span></span>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const S = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTX16x-Eeh1mguy6se1B25x0hkRIzIme4pX71KlxpML_vZAD34mtlITIqFs8MCAVycXFFft82j1RZDc/pub?output=csv';
+    let s = [], mpt = null, written = null;
+    const $ = id => document.getElementById(id), c = $('scheduleContainer');
+
+    function getPK() { const n = new Date(); return new Date(n.getTime() + n.getTimezoneOffset() * 6e4 + 18e6); }
+    function fmt(d) { const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; let h = d.getHours() % 12 || 12; return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}, ${d.getFullYear()}, ${h}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')} ${d.getHours()>=12?'PM':'AM'}`; }
+    function parseDate(str) { if (!str) return null; const p = str.trim().split(' '); if (p.length !== 3) return null; const m = { jan:0, feb:1, mar:2, apr:3, may:4, jun:5, jul:6, aug:7, sep:8, oct:9, nov:10, dec:11 }, mn = m[p[1].toLowerCase().substring(0, 3)]; return mn === undefined ? null : new Date(parseInt(p[2]), mn, parseInt(p[0])); }
+    function daysUntil(t, n) { if (!t) return '--'; const T = new Date(t); T.setHours(0,0,0,0); const N = new Date(n); N.setHours(0,0,0,0); return Math.max(0, Math.ceil((T - N) / 864e5)); }
+
+    function parseCSV(txt) {
+        const lines = txt.split('\n').filter(l => l.trim());
+        if (lines.length < 2) return null;
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const idx = {
+            subject: headers.findIndex(h => h.includes('activity') || h.includes('subject')),
+            from: headers.findIndex(h => h === 'from' || h === 'start'),
+            to: headers.findIndex(h => h === 'to' || h === 'end'),
+            duration: headers.findIndex(h => h === 'duration' || h === 'time'),
+            type: headers.findIndex(h => h === 'type' || h === 'activitytype'),
+            mpt: headers.findIndex(h => h.includes('mpt') || h.includes('test date')),
+            written: headers.findIndex(h => h.includes('written') || h.includes('exam'))
+        };
+        const data = []; let mptStr = null, writtenStr = null;
+
+        for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',').map(c => c.trim());
+            if (cols.length < 4 || cols.every(c => !c)) continue;
+            const subject = idx.subject >= 0 ? cols[idx.subject] : cols[0] || '';
+            let from = (idx.from >= 0 ? cols[idx.from] : cols[1] || '').replace(/\s/g, ''),
+                to = (idx.to >= 0 ? cols[idx.to] : cols[2] || '').replace(/\s/g, ''),
+                duration = (idx.duration >= 0 ? cols[idx.duration] : cols[3] || '').replace(/\s/g, '');
+            if (idx.mpt >= 0 && cols[idx.mpt]?.match(/\d{1,2}\s+[A-Za-z]{3}\s+\d{4}/)) mptStr = cols[idx.mpt];
+            if (idx.written >= 0 && cols[idx.written]?.match(/\d{1,2}\s+[A-Za-z]{3}\s+\d{4}/)) writtenStr = cols[idx.written];
+            if (!from || !to || !subject) continue;
+            if (from.length === 4) from = '0' + from;
+            if (to.length === 4) to = '0' + to;
+            if (!/^\d{2}:\d{2}$/.test(from) || !/^\d{2}:\d{2}$/.test(to)) continue;
+            if (!duration || !/^\d+[hm]/i.test(duration)) { const diff = parseInt(to.split(':')[0]) - parseInt(from.split(':')[0]); duration = (diff > 0 && diff <= 24) ? diff + 'h' : '1h'; }
+            let type = 'compulsory';
+            if (idx.type >= 0 && cols[idx.type]) { const t = cols[idx.type].toLowerCase(); if (['core','compulsory','optional','mpt','review','break','sleep'].includes(t)) type = t; }
+            else { const subj = subject.toLowerCase(); if (subj.includes('break') || subj.includes('lunch') || subj.includes('dinner')) type = 'break'; else if (subj.includes('sleep') || subj.includes('rest')) type = 'sleep'; else if (subj.includes('mpt') || subj.includes('practice')) type = 'mpt'; else if (subj.includes('review')) type = 'review'; else if (subj.includes('essay') || subj.includes('precis')) type = 'core'; else if (subj.includes('optional')) type = 'optional'; }
+            data.push({ from, to, duration, subject, type });
+        }
+        if (mptStr) { const d = parseDate(mptStr); if (d) { mpt = d; $('mptDateDisplay').textContent = mptStr; } }
+        if (writtenStr) { const d = parseDate(writtenStr); if (d) { written = d; $('writtenDateDisplay').textContent = writtenStr; } }
+        return data.length ? data : null;
+    }
+
+    async function load() {
+        try {
+            const r = await fetch(S, { cache: 'no-store' });
+            if (!r.ok) throw new Error();
+            const csv = await r.text();
+            const parsed = parseCSV(csv);
+            if (parsed && parsed.length) { s = parsed; return true; }
+            return false;
+        } catch (e) { return false; }
+    }
+
+    function getCurrent(now) {
+        const secs = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+        let idx = -1, remain = 0;
+        for (let i = 0; i < s.length; i++) {
+            const [fh, fm] = s[i].from.split(':').map(Number), [th, tm] = s[i].to.split(':').map(Number);
+            const from = fh * 3600 + fm * 60;
+            let to = th * 3600 + tm * 60;
+            if (to < from) { if (secs >= from || secs < to) { idx = i; remain = secs >= from ? (86400 - secs) + to : to - secs; break; } }
+            else if (secs >= from && secs < to) { idx = i; remain = to - secs; break; }
+        }
+        if (idx === -1) {
+            let min = Infinity;
+            for (let i = 0; i < s.length; i++) {
+                const [h, m] = s[i].from.split(':').map(Number);
+                let diff = h * 3600 + m * 60 - secs;
+                if (diff < 0) diff += 86400;
+                if (diff < min) { min = diff; idx = i; }
+            }
+            remain = min;
+        }
+        return { idx: Math.max(0, idx), remain };
+    }
+
+    function render() {
+        const now = getPK();
+        $('pkTime').textContent = fmt(now);
+        if (mpt) $('mptDays').textContent = daysUntil(mpt, now);
+        if (written) $('writtenDays').textContent = daysUntil(written, now);
+        const { idx, remain } = getCurrent(now);
+        const item = s[idx] || { subject: 'No schedule', type: '' };
+        const prefix = { core: '📘 ', compulsory: '📖 ', optional: '📚 ', mpt: '📝 ', review: '📋 ' };
+        let activity = item.subject;
+        if (item.type === 'break') activity = '☕ ' + activity;
+        else if (item.type === 'sleep') activity = '🌙 ' + activity;
+        else if (prefix[item.type]) activity = prefix[item.type] + activity;
+        $('currentActivity').textContent = activity;
+        $('remainingTimeMinutes').textContent = String(Math.floor(remain / 60)).padStart(2, '0');
+        $('remainingTimeSeconds').textContent = String(Math.floor(remain % 60)).padStart(2, '0');
+        let html = '', done = 0, left = 0;
+        for (let i = 0; i < s.length; i++) {
+            const row = s[i];
+            const isBreak = row.type === 'break' || row.type === 'sleep';
+            let cls = 'row';
+            if (i < idx) { cls += ' done'; done++; }
+            else if (i === idx) { cls += ' current'; left++; }
+            else { left++; }
+            if (isBreak) cls += ' break-row';
+            const emoji = { core: ' ✏️', compulsory: ' 📖', optional: ' 📚', mpt: ' 📝', review: ' 📘', break: '', sleep: ' 🌙' };
+            html += `<div class="${cls}"><span class="srno">${i+1}</span><span class="time">${row.from} – ${row.to}</span><span class="subject">${row.subject}${emoji[row.type]||''}</span><span class="duration-badge">${row.duration}</span></div>`;
+        }
+        c.innerHTML = html;
+        $('doneCount').textContent = done;
+        $('remainingCount').textContent = left;
+    }
+
+    async function init() {
+        const loaded = await load();
+        if (!loaded) {
+            c.innerHTML = '<div class="error-text">❌ Failed to load schedule<br><small>Check internet and refresh</small></div>';
+            return;
+        }
+        render();
+        setInterval(render, 1000);
+    }
+    init();
+})();
+</script>
+</body>
+</html>
