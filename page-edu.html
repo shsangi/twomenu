@@ -1315,4 +1315,123 @@
         });
     }
 
-    function renderJobC
+    function renderJobChipsBoth() { const handler = (job) => { selJobs = selJobs.filter((j) => !sameText(j, job)); updateAvailableSubjects(); renderJobChipsBoth(); renderJobDropdowns(); renderSubjectChipsBoth(); renderSubjectDropdowns(); }; renderChipsInto(panels.modal.jobChips, selJobs, handler); renderChipsInto(panels.drawer.jobChips, selJobs, handler); }
+    function renderSubjectChipsBoth() { const handler = (subj) => { selSubjs = selSubjs.filter((s) => !sameText(s, subj)); renderSubjectChipsBoth(); renderSubjectDropdowns(); }; renderChipsInto(panels.modal.subjChips, selSubjs, handler); renderChipsInto(panels.drawer.subjChips, selSubjs, handler); }
+    function updateAvailableSubjects() { const set = new Set(); originalQuestions.forEach((q) => { if (!selJobs.length || selJobs.some((j) => sameText(q.job, j))) { if (q.subject && q.subject.trim()) set.add(q.subject); } }); availSubjs = [...set]; selSubjs = selSubjs.filter((s) => availSubjs.some((a) => sameText(a, s))); }
+
+    ['modal', 'drawer'].forEach((key) => {
+        const p = panels[key];
+        p.jobW.onclick = (e) => { if (e.target.closest('.ms-chip-remove')) return; const wasOpen = p.jobC.classList.contains('open'); closeAllDropdowns(); if (!wasOpen) p.jobC.classList.add('open'); p.jobSearch.focus(); };
+        p.subjW.onclick = (e) => { if (e.target.closest('.ms-chip-remove')) return; const wasOpen = p.subjC.classList.contains('open'); closeAllDropdowns(); if (!wasOpen) p.subjC.classList.add('open'); p.subjSearch.focus(); };
+        p.jobSearch.oninput = () => { jobSearchText = p.jobSearch.value; renderJobDropdowns(); closeAllDropdowns(); p.jobC.classList.add('open'); };
+        p.subjSearch.oninput = () => { subjSearchText = p.subjSearch.value; renderSubjectDropdowns(); closeAllDropdowns(); p.subjC.classList.add('open'); };
+    });
+
+    document.addEventListener('click', (e) => { ['modal', 'drawer'].forEach((key) => { const p = panels[key]; if (!p.jobC.contains(e.target) && !p.subjC.contains(e.target)) { p.jobC.classList.remove('open'); p.subjC.classList.remove('open'); } }); });
+
+    function resetFilters() { selJobs = []; selSubjs = []; jobSearchText = subjSearchText = ''; panels.modal.jobSearch.value = ''; panels.modal.subjSearch.value = ''; panels.drawer.jobSearch.value = ''; panels.drawer.subjSearch.value = ''; updateAvailableSubjects(); renderJobChipsBoth(); renderJobDropdowns(); renderSubjectChipsBoth(); renderSubjectDropdowns(); toast('Filters reset', 'info', 2000, false); }
+    function confirmAndRefresh() { closeBothPanels(); if (timerHandle) clearInterval(timerHandle); resetToQuizView(); fetchQuestions(true); factsLoaded = false; if (mode === 'facts') fetchFacts(() => renderFactsMode()); }
+    function populatePanels() { updateUserLabels(); renderJobChipsBoth(); renderJobDropdowns(); updateAvailableSubjects(); renderSubjectChipsBoth(); renderSubjectDropdowns(); }
+    function openModal() { populatePanels(); ui.modal.classList.add('active'); }
+    function closeModal() { ui.modal.classList.remove('active'); closeAllDropdowns(); }
+    function openDrawer() { populatePanels(); ui.drawer.classList.add('open'); ui.drawerOverlay.classList.add('active'); ui.drawer.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
+    function closeDrawer() { ui.drawer.classList.remove('open'); ui.drawerOverlay.classList.remove('active'); ui.drawer.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; closeAllDropdowns(); }
+    function closeBothPanels() { closeModal(); closeDrawer(); }
+
+    ui.refresh.onclick = openModal; ui.mCancel.onclick = closeModal; ui.mConfirm.onclick = confirmAndRefresh; ui.mReset.onclick = resetFilters; ui.modal.onclick = (e) => { if (e.target === ui.modal) closeModal(); };
+    ui.drawerBtn.onclick = openDrawer; ui.drawerCloseBtn.onclick = closeDrawer; ui.drawerOverlay.onclick = closeDrawer; ui.dCancel.onclick = closeDrawer; ui.dConfirm.onclick = confirmAndRefresh; ui.dReset.onclick = resetFilters;
+
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (ui.drawer.classList.contains('open')) closeDrawer(); else if (ui.modal.classList.contains('active')) closeModal(); else if (ui.jobsitesOverlay.classList.contains('active')) closeJobSitesModal(); } });
+
+    async function doLogout() { const ok = await confirmBox('🚪', 'Logout?', 'Your quiz progress will NOT be saved.', 'Logout'); if (!ok) return; triggerLogout(); }
+    ui.mLogout.onclick = doLogout; ui.dLogout.onclick = doLogout;
+
+    ui.prev.onclick = () => { if (currentQ > 0) { currentQ--; renderQuestion(); renderDots(currentQ); } };
+    ui.next.onclick = () => { if (isGuest && currentQ >= GUEST_LIMIT - 1) { promptGuestLock(); return; } if (currentQ < total - 1) { currentQ++; renderQuestion(); renderDots(currentQ); } };
+    ui.endBtn.onclick = handleEndQuiz;
+    ui.restart.onclick = () => { if (isGuest) { promptGuestLock(); return; } restartQuiz(); };
+
+    window.addEventListener('scroll', () => { ui.topBar.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+
+    /* ---------- Job sites ---------- */
+    function openJobSitesModal() { ui.jobsitesOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; ui.jobsitesSearchInput.value = ''; jobSitesSearchQuery = ''; if (!jobSitesLoaded && !jobSitesLoading) fetchJobSites(() => renderJobSites()); else renderJobSites(); }
+    function closeJobSitesModal() { ui.jobsitesOverlay.classList.remove('active'); document.body.style.overflow = ''; }
+    function fetchJobSites(callback) {
+        if (jobSitesLoaded) { if (callback) callback(); return; }
+        if (jobSitesLoading) return;
+        jobSitesLoading = true;
+        ui.jobsitesList.innerHTML = '<div class="jobsites-loading"><div class="spinner"></div><br>Loading job sites...</div>';
+        fetch(JOBSITES_URL + (JOBSITES_URL.includes('?') ? '&' : '?') + '_t=' + Date.now(), { cache: 'no-store' }).then((r) => r.text()).then((text) => {
+            const lines = text.split('\n').filter((l) => l.trim());
+            jobSites = [];
+            if (lines.length < 2) { jobSitesLoaded = true; jobSitesLoading = false; if (callback) callback(); return; }
+            const headerCols = parseCSVLine(lines[0]).map((h) => h.toLowerCase().trim());
+            const findIdx = (keywords, fallback) => { for (let k = 0; k < headerCols.length; k++) { const h = headerCols[k]; if (keywords.some((kw) => h.includes(kw))) return k; } return fallback; };
+            const srnoIdx = findIdx(['srno', 'sr no', 's.no', 'serial'], 0);
+            const sectorIdx = findIdx(['sector'], 1);
+            const nameIdx = findIdx(['name of job', 'name', 'website'], 2);
+            const urlIdx = findIdx(['url', 'link'], 3);
+            for (let i = 1; i < lines.length; i++) {
+                const cols = parseCSVLine(lines[i]);
+                if (!cols.length) continue;
+                const name = cols[nameIdx] ? cols[nameIdx].trim() : '';
+                if (!name) continue;
+                jobSites.push({ srno: cols[srnoIdx] ? cols[srnoIdx].trim() : String(i), sector: cols[sectorIdx] ? cols[sectorIdx].trim() : '', name, url: cols[urlIdx] ? cols[urlIdx].trim() : '' });
+            }
+            jobSitesLoaded = true; jobSitesLoading = false; if (callback) callback();
+        }).catch((err) => { console.error('Job sites fetch error:', err); jobSitesLoading = false; ui.jobsitesList.innerHTML = '<div class="jobsites-empty" style="color:#dc2626;">❌ Failed to load job sites.</div>'; });
+    }
+    function renderJobSites() {
+        if (!jobSitesLoaded) return;
+        if (!jobSites.length) { ui.jobsitesList.innerHTML = '<div class="jobsites-empty">No job sites available.</div>'; return; }
+        const q = jobSitesSearchQuery.toLowerCase().trim();
+        const filtered = jobSites.filter((s) => { if (!q) return true; return (s.sector && s.sector.toLowerCase().includes(q)) || (s.name && s.name.toLowerCase().includes(q)) || (s.url && s.url.toLowerCase().includes(q)); });
+        if (!filtered.length) { ui.jobsitesList.innerHTML = '<div class="jobsites-empty">🔍 No matches.</div>'; return; }
+        let html = '';
+        filtered.forEach((s) => {
+            let urlHtml = '';
+            if (s.url) { let displayUrl = s.url; try { displayUrl = new URL(s.url).hostname; } catch (e) {} urlHtml = `<a class="js-url" href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(displayUrl)}</a>`; }
+            html += `<div class="jobsites-item"><span class="js-srno">${escapeHtml(s.srno)}</span>${s.sector ? `<span class="js-sector">${escapeHtml(s.sector)}</span>` : ''}<span class="js-name">${escapeHtml(s.name)}</span>${urlHtml}</div>`;
+        });
+        ui.jobsitesList.innerHTML = html;
+    }
+
+    ui.jobSitesBtn.addEventListener('click', openJobSitesModal);
+    ui.jobsitesClose.addEventListener('click', closeJobSitesModal);
+    ui.jobsitesOverlay.addEventListener('click', (e) => { if (e.target === ui.jobsitesOverlay) closeJobSitesModal(); });
+    ui.jobsitesSearchInput.addEventListener('input', () => { jobSitesSearchQuery = ui.jobsitesSearchInput.value; renderJobSites(); });
+
+    /* ---------- Parent messaging ---------- */
+    window.addEventListener('message', (e) => {
+        const d = e.data;
+        if (!d || typeof d !== 'object') return;
+
+        if (d.type === 'SL_THEME') { /* theme already applied */ }
+        else if (d.type === 'SL_USER') {
+            user = d.user || null;
+            isGuest = !!d.isGuest;
+            if (user) updateUserLabels();
+        } else if (d.type === 'SL_SET_MODE') {
+            setMode(d.mode, true); // silent — don't bounce back to parent
+        }
+    });
+
+    function updateUserLabels() { const name = user ? user.user : 'User'; const initial = name[0].toUpperCase(); ui.mUserAv.textContent = initial; ui.mUserName.textContent = name; ui.dUserAv.textContent = initial; ui.dUserName.textContent = name; }
+
+    /* ---------- Init ---------- */
+    function init() {
+        updateUserLabels();
+        try { const saved = JSON.parse(localStorage.getItem(KEY_FACTS_READ) || '[]'); factsReadSet = new Set(saved); } catch (e) { factsReadSet = new Set(); }
+        // Load user from storage (parent may not send SL_USER if same page persists)
+        try { const savedUser = JSON.parse(localStorage.getItem(KEY_USER) || 'null'); if (savedUser) { user = savedUser; isGuest = savedUser.user === 'Guest'; updateUserLabels(); } } catch (e) { /* ignore */ }
+        fetchQuestions(false);
+        let savedMode = 'mcq';
+        try { const m = localStorage.getItem(KEY_MODE); if (m === 'read' || m === 'facts' || m === 'papers') savedMode = m; } catch (e) { /* ignore */ }
+        setMode(savedMode, true);
+    }
+
+    init();
+})();
+</script>
+</body>
+</html>
