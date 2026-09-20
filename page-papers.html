@@ -206,12 +206,11 @@
         .filter-search input:focus { border-color: var(--sky); background: #fff; box-shadow: 0 0 0 4px rgba(14,165,233,.1); }
 
         .filter-selects {
-            display: flex; gap: .4rem;
+            display: flex; gap: .45rem;
             flex: 1 1 100%;
-            flex-wrap: wrap;
         }
         .filter-selects select {
-            flex: 1 1 calc(33.333% - .3rem);
+            flex: 1 1 0;
             min-width: 0;
             border: 1.5px solid var(--border);
             background: var(--bg);
@@ -496,7 +495,6 @@
             .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
             .filter-search { flex: 1 1 220px; }
             .filter-selects { flex: 1 1 auto; }
-            .filter-selects select { flex: 1 1 120px; }
             .filter-count { flex: 0 0 auto; margin-left: auto; min-width: 120px; }
         }
         @media (min-width: 900px) {
@@ -546,7 +544,7 @@
 
         <div class="lock-features">
             <div class="lf-item"><span class="lf-icon">📄</span> Complete solved essay papers archive</div>
-            <div class="lf-item"><span class="lf-icon">📅</span> Filter by year, subject &amp; topic</div>
+            <div class="lf-item"><span class="lf-icon">📅</span> Filter by year &amp; subject</div>
             <div class="lf-item"><span class="lf-icon">🇵🇰</span> Urdu meanings + full exam context</div>
             <div class="lf-item"><span class="lf-icon">🔗</span> Direct solution links</div>
         </div>
@@ -577,7 +575,6 @@
                 <div class="filter-selects">
                     <select id="yearFilter"><option value="">All years</option></select>
                     <select id="subjectFilter"><option value="">All subjects</option></select>
-                    <select id="topicFilter"><option value="">All topics</option></select>
                 </div>
                 <span id="statsCount" class="filter-count">0 records</span>
             </div>
@@ -605,7 +602,6 @@
     const searchInput = document.getElementById("searchInputPapers");
     const yearFilter = document.getElementById("yearFilter");
     const subjectFilter = document.getElementById("subjectFilter");
-    const topicFilter = document.getElementById("topicFilter");
     const statsCount = document.getElementById("statsCount");
     const headerTotalRecords = document.getElementById("headerTotalRecords");
     const headerTotalYears = document.getElementById("headerTotalYears");
@@ -774,11 +770,10 @@
 
     function applyFilters() {
         const searchTerm = searchInput.value.trim().toLowerCase();
-        const selectedYear = yearFilter.value, selectedSubject = subjectFilter.value, selectedTopic = topicFilter.value;
+        const selectedYear = yearFilter.value, selectedSubject = subjectFilter.value;
         filteredEssays = allEssays.filter(essay => {
             if (selectedYear && essay.year !== selectedYear) return false;
             if (selectedSubject && essay.subject !== selectedSubject) return false;
-            if (selectedTopic && essay.topic !== selectedTopic) return false;
             if (searchTerm) {
                 const haystack = [essay.topic, essay.urduMeaning, essay.category, essay.subject, essay.requirement, essay.year, essay.srno, essay.examTitle, essay.solutionRaw].join(' ').toLowerCase();
                 if (!haystack.includes(searchTerm)) return false;
@@ -791,13 +786,10 @@
     function populateFilters(essays) {
         const years = [...new Set(essays.map(e => e.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
         const subjects = [...new Set(essays.map(e => e.subject).filter(Boolean))].sort();
-        const topics = [...new Set(essays.map(e => e.topic).filter(Boolean))].sort();
         yearFilter.innerHTML = '<option value="">All years</option>';
         years.forEach(y => { const opt = document.createElement('option'); opt.value = y; opt.textContent = y; yearFilter.appendChild(opt); });
         subjectFilter.innerHTML = '<option value="">All subjects</option>';
         subjects.forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.textContent = s; subjectFilter.appendChild(opt); });
-        topicFilter.innerHTML = '<option value="">All topics</option>';
-        topics.forEach(t => { const opt = document.createElement('option'); opt.value = t; opt.textContent = t.length > 42 ? t.slice(0, 40) + '…' : t; opt.title = t; topicFilter.appendChild(opt); });
     }
 
     function updateHeaderStats(essays) {
@@ -823,7 +815,6 @@
             searchInput.addEventListener('input', applyFilters);
             yearFilter.addEventListener('change', applyFilters);
             subjectFilter.addEventListener('change', applyFilters);
-            topicFilter.addEventListener('change', applyFilters);
         } catch (error) {
             cardsContainer.innerHTML = `<div class="no-results"><span class="emoji">⚠️</span>Could not load past papers.<small>${escapeHtml(error.message)}</small></div>`;
             statsCount.textContent = '0 records';
