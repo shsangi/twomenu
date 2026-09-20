@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#0ea5e9">
-    <title>Self Learners · CSS 2027 Hub</title>
+    <title>Self Learners · Jobs Exam Hub</title>
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -155,13 +155,6 @@
 
         /* ============================================================
            NAV VISIBILITY RULES
-           ------------------------------------------------------------
-           Desktop (>768px):
-             - Pre-login:  Menu 1 top toggle bar visible
-             - Post-login: NO outer menu at all (Edu has its own toggle)
-           Mobile (<=768px):
-             - Pre-login:  Menu 1 bottom nav visible
-             - Post-login: Menu 2 bottom nav visible
            ============================================================ */
 
         /* Hide Post-login top toggle bar — always. Edu has its own toggle. */
@@ -175,8 +168,6 @@
         }
 
         @media (min-width: 769px) {
-            /* Desktop: only Menu 1's top bar (pre-login) shows.
-               All bottom navs and Menu 2's top bar stay hidden. */
             #bottomNavPreLogin { display: none !important; }
             #bottomNavPostLogin { display: none !important; }
         }
@@ -292,12 +283,15 @@
 
         const KEY_USER = 'slUser';
         const KEY_POST_LOGIN = 'slPostLogin';
+        const KEY_LAST_PAGE = 'slLastPage';
         let eduFrameRef = null;
 
         /* ---------- Pre-login page management ---------- */
         function showPage(pageId, src) {
             if (activePage === pageId) return;
             activePage = pageId;
+
+            try { localStorage.setItem(KEY_LAST_PAGE, pageId); } catch (e) { /* ignore */ }
 
             preLoginButtons().forEach(b => {
                 if (b.dataset.page) b.classList.toggle('active', b.dataset.page === pageId);
@@ -355,6 +349,19 @@
                 wrap.style.display = isActive ? 'block' : 'none';
             });
 
+            // Ask data pages to refresh their content
+            if (pageId === 'syllabus' || pageId === 'schedule' || pageId === 'eligibility') {
+                const frame = frames.get(pageId);
+                if (frame) {
+                    const iframe = frame.querySelector('iframe');
+                    if (iframe && iframe.contentWindow) {
+                        try {
+                            iframe.contentWindow.postMessage({ type: 'SL_REFRESH_DATA' }, '*');
+                        } catch (e) { /* ignore */ }
+                    }
+                }
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -367,7 +374,6 @@
             bottomNavPre.style.display = 'none';
             bottomNavPost.style.display = '';
 
-            // Hide all pre-login frames
             frames.forEach((wrap) => {
                 wrap.style.display = 'none';
                 wrap.style.opacity = '0';
@@ -439,19 +445,16 @@
             topBarPre.style.display = '';
             bottomNavPre.style.display = '';
 
-            // Hide edu frame
             if (eduFrameRef) {
                 eduFrameRef.wrap.style.display = 'none';
                 eduFrameRef.wrap.style.opacity = '0';
                 eduFrameRef.wrap.style.pointerEvents = 'none';
                 eduFrameRef.wrap.classList.remove('active');
-                // Ask Edu to close any open overlays
                 try {
                     eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_FORCE_CLOSE_OVERLAYS' }, '*');
                 } catch (e) { /* ignore */ }
             }
 
-            // Remove cached login frame so it reloads fresh
             if (frames.has('login')) {
                 const w = frames.get('login');
                 w.remove();
@@ -495,6 +498,8 @@
             if (!d || typeof d !== 'object') return;
 
             if (d.type === 'SL_LOGIN') {
+                if (activePage !== 'login') return;
+
                 try {
                     if (d.user) localStorage.setItem(KEY_USER, JSON.stringify(d.user));
                 } catch (err) { /* ignore */ }
@@ -511,15 +516,25 @@
         function boot() {
             let loggedIn = false;
             let savedUser = null;
+            let lastPage = null;
             try {
                 savedUser = JSON.parse(localStorage.getItem(KEY_USER) || 'null');
                 loggedIn = !!localStorage.getItem(KEY_POST_LOGIN) && !!savedUser;
+                lastPage = localStorage.getItem(KEY_LAST_PAGE);
             } catch (e) { /* ignore */ }
 
             if (loggedIn) {
                 enterPostLogin({ user: savedUser, isGuest: savedUser.user === 'Guest', mode: 'mcq' });
             } else {
-                showPage('login', 'page-login.html');
+                const validPages = ['login', 'schedule', 'eligibility', 'syllabus'];
+                const startPage = (lastPage && validPages.includes(lastPage)) ? lastPage : 'login';
+                const srcMap = {
+                    login: 'page-login.html',
+                    schedule: 'page-schedule.html',
+                    eligibility: 'page-eligibility.html',
+                    syllabus: 'page-syllabus.html'
+                };
+                showPage(startPage, srcMap[startPage]);
             }
         }
 
