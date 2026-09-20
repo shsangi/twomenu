@@ -122,7 +122,7 @@
             border: 1px solid var(--border);
         }
 
-        /* TOP BAR (3 ROWS) */
+        /* TOP BAR — 2 ROWS ONLY (brand + pills). No mode toggle row. */
         .top-bar {
             display: flex; flex-direction: column; gap: .65rem;
             padding: .5rem 0 1rem; margin-bottom: .5rem;
@@ -181,26 +181,7 @@
         }
         .btn-drawer:hover { background: var(--sky); border-color: var(--sky); color: #fff; }
 
-        .top-row-2 { display: flex; align-items: center; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
-        .mode-toggle {
-            display: inline-flex; align-items: center;
-            background: var(--sf2); border: 1.5px solid var(--border);
-            border-radius: var(--rf); padding: 3px; gap: 2px;
-            flex: 1 1 auto; max-width: 480px;
-        }
-        .mode-toggle label {
-            flex: 1; display: inline-flex; align-items: center; justify-content: center;
-            gap: .3rem; padding: .45rem .55rem; border-radius: var(--rf);
-            font-size: .72rem; font-weight: 700; color: var(--text-soft);
-            cursor: pointer; white-space: nowrap; transition: all .2s;
-        }
-        .mode-toggle label input { display: none; }
-        .mode-toggle label.active {
-            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
-            color: #fff; box-shadow: 0 2px 8px -2px rgba(14,165,233,.5);
-        }
-        .mode-toggle label.active .mode-emoji { color: #fff; }
-
+        /* TOP ROW 3 — PILLS ONLY */
         .top-row-3 { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
         .attempted-pill, .timer-pill, .facts-pill {
             display: inline-flex; align-items: center; gap: .35rem;
@@ -234,6 +215,45 @@
         .papers-mode-active .attempted-pill,
         .papers-mode-active .timer-pill,
         .papers-mode-active .facts-pill { display: none !important; }
+
+        /* MODE PILL — a single dropdown button replacing the 4-button toggle */
+        .mode-pill-wrap { position: relative; display: inline-block; }
+        .mode-pill-btn {
+            display: inline-flex; align-items: center; gap: .4rem;
+            padding: .5rem .95rem; border-radius: var(--rf);
+            font-size: .76rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--navy), var(--navy-light));
+            color: #fff; border: 1.5px solid var(--navy);
+            cursor: pointer; font-family: inherit;
+            box-shadow: 0 4px 12px -4px rgba(10,30,63,.4);
+            transition: all .18s; white-space: nowrap;
+        }
+        .mode-pill-btn:hover { transform: translateY(-1px); }
+        .mode-pill-btn .arrow { font-size: .6rem; transition: transform .2s; }
+        .mode-pill-wrap.open .mode-pill-btn .arrow { transform: rotate(180deg); }
+        .mode-pill-menu {
+            position: absolute; top: calc(100% + 6px); left: 0;
+            background: #fff; border: 1.5px solid var(--border);
+            border-radius: var(--r); box-shadow: 0 16px 40px -10px rgba(10,30,63,.25);
+            min-width: 180px; padding: .4rem; z-index: 300;
+            display: none; flex-direction: column; gap: .15rem;
+        }
+        .mode-pill-wrap.open .mode-pill-menu { display: flex; }
+        .mode-pill-item {
+            display: flex; align-items: center; gap: .5rem;
+            padding: .6rem .75rem; border-radius: 12px;
+            font-size: .82rem; font-weight: 700;
+            color: var(--text); background: transparent;
+            border: none; cursor: pointer; font-family: inherit;
+            text-align: left; width: 100%;
+            transition: all .15s;
+        }
+        .mode-pill-item:hover { background: var(--sky-soft); color: var(--sky-dark); }
+        .mode-pill-item.active {
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            color: #fff;
+        }
+        .mode-pill-item .emoji { font-size: 1rem; }
 
         /* PROGRESS */
         .progress-block { background: var(--border); height: 6px; border-radius: var(--rf); margin: .6rem 0 .6rem; overflow: hidden; }
@@ -552,8 +572,6 @@
             .fact-card .fact-head { font-size: .88rem; }
             .fact-card .fact-answer { font-size: .8rem; }
             .mode-search-bar input { font-size: .82rem; }
-            .mode-toggle label { font-size: .64rem; padding: .4rem .35rem; gap: .15rem; }
-            .mode-toggle label .mode-emoji { display: none; }
             .attempted-pill, .timer-pill, .facts-pill { font-size: .7rem; padding: .45rem .75rem; }
             .install-banner { padding: .9rem 1rem; gap: .7rem; }
             .install-banner .ib-icon { width: 44px; height: 44px; }
@@ -591,6 +609,7 @@
 
     <div class="quiz-wrapper" id="quizApp">
         <div class="top-bar" id="topBar">
+            <!-- ROW 1: Brand + actions -->
             <div class="top-row-1">
                 <div class="brand">
                     <img class="brand-logo" id="brandLogo"
@@ -609,28 +628,30 @@
                 </div>
             </div>
 
-            <div class="top-row-2">
-                <div class="mode-toggle" id="modeToggle">
-                    <label id="modeMcqLabel" class="active">
-                        <input type="radio" name="displayMode" id="modeMcqRadio" value="mcq" checked/>
-                        <span class="mode-emoji">📝</span> MCQs
-                    </label>
-                    <label id="modeReadLabel">
-                        <input type="radio" name="displayMode" id="modeReadRadio" value="read"/>
-                        <span class="mode-emoji">📖</span> Solved
-                    </label>
-                    <label id="modeFactsLabel">
-                        <input type="radio" name="displayMode" id="modeFactsRadio" value="facts"/>
-                        <span class="mode-emoji">💡</span> Facts
-                    </label>
-                    <label id="modePapersLabel">
-                        <input type="radio" name="displayMode" id="modePapersRadio" value="papers"/>
-                        <span class="mode-emoji">📄</span> Papers
-                    </label>
-                </div>
-            </div>
-
+            <!-- ROW 2: Mode pill (dropdown) + Pills (attempted / timer / facts) -->
             <div class="top-row-3">
+                <div class="mode-pill-wrap" id="modePillWrap">
+                    <button class="mode-pill-btn" id="modePillBtn" type="button">
+                        <span id="modePillEmoji">📝</span>
+                        <span id="modePillLabel">MCQs</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="mode-pill-menu" id="modePillMenu">
+                        <button class="mode-pill-item active" data-mode="mcq" type="button">
+                            <span class="emoji">📝</span> MCQs
+                        </button>
+                        <button class="mode-pill-item" data-mode="read" type="button">
+                            <span class="emoji">📖</span> Solved
+                        </button>
+                        <button class="mode-pill-item" data-mode="facts" type="button">
+                            <span class="emoji">💡</span> Facts
+                        </button>
+                        <button class="mode-pill-item" data-mode="papers" type="button">
+                            <span class="emoji">📄</span> Papers
+                        </button>
+                    </div>
+                </div>
+
                 <span class="attempted-pill" id="attemptedPill">
                     <span>📊</span>
                     <span class="attempted" id="attemptedCount">0</span>
@@ -842,8 +863,7 @@
     const $ = (id) => document.getElementById(id);
     const ui = {
         quizApp: $('quizApp'), topBar: $('topBar'), brandLogo: $('brandLogo'), qTitle: $('quizTitle'), subjLine: $('selectedSubjectsLine'),
-        mMcqL: $('modeMcqLabel'), mReadL: $('modeReadLabel'), mFactsL: $('modeFactsLabel'), mPapersL: $('modePapersLabel'),
-        mMcqR: $('modeMcqRadio'), mReadR: $('modeReadRadio'), mFactsR: $('modeFactsRadio'), mPapersR: $('modePapersRadio'),
+        modePillWrap: $('modePillWrap'), modePillBtn: $('modePillBtn'), modePillEmoji: $('modePillEmoji'), modePillLabel: $('modePillLabel'),
         att: $('attemptedCount'), tot: $('totalCount'), timer: $('timerDisplay'), timerPill: $('timerPill'), factsPill: $('factsPill'), factsDone: $('factsDoneCount'), factsTotal: $('factsTotalCount'),
         refresh: $('refreshBtn'), refreshIcon: $('refreshIcon'), drawerBtn: $('drawerBtn'),
         prog: $('progressFill'), single: $('singleQuestionView'), subBanner: $('submittedBanner'), qCard: $('questionCard'),
@@ -866,7 +886,7 @@
     let selJobs = [], selSubjs = [], availSubjs = [], jobSearchText = '', subjSearchText = '';
     let facts = [], factsLoaded = false, factsLoading = false, factsReadSet = new Set();
     let readSearchQuery = '', factsSearchQuery = '';
-    let passwordVisible = false, toastTimer = null, confirmResolve = null;
+    let toastTimer = null, confirmResolve = null;
     let jobSites = [], jobSitesLoaded = false, jobSitesLoading = false, jobSitesSearchQuery = '';
     let deferredPrompt = null;
     let papersFrameLoaded = false;
@@ -1040,9 +1060,15 @@
 
     function promptGuestLock() { confirmBox('🔒', 'Login Required', `You have reached the ${GUEST_LIMIT}-MCQ guest limit. Please login to unlock all questions.`, '🔐 Login Now').then((ok) => { if (ok) triggerLogout(); }); }
 
-    /* ---------- Logout → notify parent ---------- */
+    /* ---------- Logout → notify parent + close overlays ---------- */
     function triggerLogout() {
-        if (timerHandle) clearInterval(timerHandle);
+        if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+        // Force-close any open overlays
+        closeBothPanels();
+        if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
+        if (ui.cOverlay) ui.cOverlay.classList.remove('active');
+        if (ui.modePillWrap) ui.modePillWrap.classList.remove('open');
+        document.body.style.overflow = '';
         try { localStorage.removeItem(KEY_USER); localStorage.removeItem(KEY_QUIZ); } catch (e) { /* ignore */ }
         try {
             if (window.parent && window.parent !== window) {
@@ -1154,26 +1180,45 @@
         saveState(); window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* ---------- Mode switching ---------- */
+    /* ---------- Mode switching (via dropdown pill) ---------- */
     function ensurePapersLoaded() {
         if (papersFrameLoaded) return;
         const src = ui.papersFrame.getAttribute('data-src');
         if (src) { ui.papersFrame.src = src; papersFrameLoaded = true; }
     }
+
+    const MODE_META = {
+        mcq:    { emoji: '📝', label: 'MCQs' },
+        read:   { emoji: '📖', label: 'Solved' },
+        facts:  { emoji: '💡', label: 'Facts' },
+        papers: { emoji: '📄', label: 'Papers' }
+    };
+
+    function updateModePill(m) {
+        const meta = MODE_META[m] || MODE_META.mcq;
+        ui.modePillEmoji.textContent = meta.emoji;
+        ui.modePillLabel.textContent = meta.label;
+        document.querySelectorAll('.mode-pill-item').forEach((item) => {
+            item.classList.toggle('active', item.dataset.mode === m);
+        });
+    }
+
     function setMode(newMode, silent) {
         mode = (newMode === 'read' || newMode === 'facts' || newMode === 'papers') ? newMode : 'mcq';
         ui.quizApp.classList.remove('read-mode-active', 'facts-mode-active', 'papers-mode-active', 'result-active');
         ui.result.style.display = 'none'; $('endQuizBottom').style.display = 'flex';
-        ui.mMcqL.classList.remove('active'); ui.mReadL.classList.remove('active'); ui.mFactsL.classList.remove('active'); ui.mPapersL.classList.remove('active');
+        updateModePill(mode);
+        ui.modePillWrap.classList.remove('open');
+
         if (mode === 'mcq') {
-            ui.mMcqR.checked = true; ui.mMcqL.classList.add('active'); applyQuizTitle(); renderSelectedSubjectsLine();
+            applyQuizTitle(); renderSelectedSubjectsLine();
             if (finished) { ui.single.style.display = 'none'; ui.result.style.display = 'block'; $('endQuizBottom').style.display = 'none'; ui.quizApp.classList.add('result-active'); } else { ui.single.style.display = 'block'; }
         } else if (mode === 'read') {
-            ui.mReadR.checked = true; ui.mReadL.classList.add('active'); ui.quizApp.classList.add('read-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); renderReadMode();
+            ui.quizApp.classList.add('read-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); renderReadMode();
         } else if (mode === 'facts') {
-            ui.mFactsR.checked = true; ui.mFactsL.classList.add('active'); ui.quizApp.classList.add('facts-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); if (!factsLoaded && !factsLoading) fetchFacts(() => renderFactsMode()); else renderFactsMode();
+            ui.quizApp.classList.add('facts-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); if (!factsLoaded && !factsLoading) fetchFacts(() => renderFactsMode()); else renderFactsMode();
         } else if (mode === 'papers') {
-            ui.mPapersR.checked = true; ui.mPapersL.classList.add('active'); ui.quizApp.classList.add('papers-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); ensurePapersLoaded();
+            ui.quizApp.classList.add('papers-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); ensurePapersLoaded();
         }
         try { localStorage.setItem(KEY_MODE, mode); } catch (e) { /* ignore */ }
         if (!silent) {
@@ -1185,14 +1230,23 @@
         }
     }
 
-    ui.mMcqL.onclick = (e) => { if (e.target.tagName !== 'INPUT') setMode('mcq'); };
-    ui.mReadL.onclick = (e) => { if (e.target.tagName !== 'INPUT') setMode('read'); };
-    ui.mFactsL.onclick = (e) => { if (e.target.tagName !== 'INPUT') setMode('facts'); };
-    ui.mPapersL.onclick = (e) => { if (e.target.tagName !== 'INPUT') setMode('papers'); };
-    ui.mMcqR.onchange = () => setMode('mcq');
-    ui.mReadR.onchange = () => setMode('read');
-    ui.mFactsR.onchange = () => setMode('facts');
-    ui.mPapersR.onchange = () => setMode('papers');
+    // Mode pill dropdown toggle
+    ui.modePillBtn.onclick = (e) => {
+        e.stopPropagation();
+        ui.modePillWrap.classList.toggle('open');
+    };
+    document.querySelectorAll('.mode-pill-item').forEach((item) => {
+        item.onclick = (e) => {
+            e.stopPropagation();
+            setMode(item.dataset.mode);
+        };
+    });
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!ui.modePillWrap.contains(e.target)) {
+            ui.modePillWrap.classList.remove('open');
+        }
+    });
 
     /* ---------- Read mode ---------- */
     function readItemMatchesSearch(q, query) { if (!query) return true; const nq = query.toLowerCase(); if (q.question && q.question.toLowerCase().includes(nq)) return true; if (q.subject && q.subject.toLowerCase().includes(nq)) return true; if (q.topic && q.topic.toLowerCase().includes(nq)) return true; if (q.job && q.job.toLowerCase().includes(nq)) return true; if (Array.isArray(q.options)) for (const opt of q.options) if (opt && String(opt).toLowerCase().includes(nq)) return true; return false; }
@@ -1341,7 +1395,7 @@
     ui.refresh.onclick = openModal; ui.mCancel.onclick = closeModal; ui.mConfirm.onclick = confirmAndRefresh; ui.mReset.onclick = resetFilters; ui.modal.onclick = (e) => { if (e.target === ui.modal) closeModal(); };
     ui.drawerBtn.onclick = openDrawer; ui.drawerCloseBtn.onclick = closeDrawer; ui.drawerOverlay.onclick = closeDrawer; ui.dCancel.onclick = closeDrawer; ui.dConfirm.onclick = confirmAndRefresh; ui.dReset.onclick = resetFilters;
 
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (ui.drawer.classList.contains('open')) closeDrawer(); else if (ui.modal.classList.contains('active')) closeModal(); else if (ui.jobsitesOverlay.classList.contains('active')) closeJobSitesModal(); } });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (ui.drawer.classList.contains('open')) closeDrawer(); else if (ui.modal.classList.contains('active')) closeModal(); else if (ui.jobsitesOverlay.classList.contains('active')) closeJobSitesModal(); else if (ui.modePillWrap.classList.contains('open')) ui.modePillWrap.classList.remove('open'); } });
 
     async function doLogout() { const ok = await confirmBox('🚪', 'Logout?', 'Your quiz progress will NOT be saved.', 'Logout'); if (!ok) return; triggerLogout(); }
     ui.mLogout.onclick = doLogout; ui.dLogout.onclick = doLogout;
@@ -1411,8 +1465,19 @@
             user = d.user || null;
             isGuest = !!d.isGuest;
             if (user) updateUserLabels();
+            // Fresh login — clear any leftover overlay state
+            closeBothPanels();
+            if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
+            if (ui.modePillWrap) ui.modePillWrap.classList.remove('open');
+            document.body.style.overflow = '';
         } else if (d.type === 'SL_SET_MODE') {
-            setMode(d.mode, true); // silent — don't bounce back to parent
+            setMode(d.mode, true);
+        } else if (d.type === 'SL_FORCE_CLOSE_OVERLAYS') {
+            closeBothPanels();
+            if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
+            if (ui.cOverlay) ui.cOverlay.classList.remove('active');
+            if (ui.modePillWrap) ui.modePillWrap.classList.remove('open');
+            document.body.style.overflow = '';
         }
     });
 
@@ -1422,7 +1487,6 @@
     function init() {
         updateUserLabels();
         try { const saved = JSON.parse(localStorage.getItem(KEY_FACTS_READ) || '[]'); factsReadSet = new Set(saved); } catch (e) { factsReadSet = new Set(); }
-        // Load user from storage (parent may not send SL_USER if same page persists)
         try { const savedUser = JSON.parse(localStorage.getItem(KEY_USER) || 'null'); if (savedUser) { user = savedUser; isGuest = savedUser.user === 'Guest'; updateUserLabels(); } } catch (e) { /* ignore */ }
         fetchQuestions(false);
         let savedMode = 'mcq';
