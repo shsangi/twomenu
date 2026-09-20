@@ -153,11 +153,34 @@
             background: var(--sky);
         }
 
+        /* ============================================================
+           NAV VISIBILITY RULES
+           ------------------------------------------------------------
+           Desktop (>768px):
+             - Pre-login:  Menu 1 top toggle bar visible
+             - Post-login: NO outer menu at all (Edu has its own toggle)
+           Mobile (<=768px):
+             - Pre-login:  Menu 1 bottom nav visible
+             - Post-login: Menu 2 bottom nav visible
+           ============================================================ */
+
+        /* Hide Post-login top toggle bar — always. Edu has its own toggle. */
+        #topToggleBarPostLogin { display: none !important; }
+
         @media (max-width: 768px) {
-            .toggle-bar { display: none; }
-            .bottom-nav { display: block; }
+            .toggle-bar { display: none !important; }
+            #bottomNavPreLogin { display: block; }
+            #bottomNavPostLogin { display: block; }
             body { padding: .6rem .6rem calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 16px); }
         }
+
+        @media (min-width: 769px) {
+            /* Desktop: only Menu 1's top bar (pre-login) shows.
+               All bottom navs and Menu 2's top bar stay hidden. */
+            #bottomNavPreLogin { display: none !important; }
+            #bottomNavPostLogin { display: none !important; }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
         }
@@ -165,7 +188,7 @@
 </head>
 <body>
 <div class="app-wrapper">
-    <!-- MENU 1: Pre-login (top toggle bar) -->
+    <!-- MENU 1: Pre-login (top toggle bar — desktop only) -->
     <div class="toggle-bar" id="topToggleBarPreLogin">
         <button class="toggle-btn active" data-page="login" data-src="page-login.html">
             <span class="emoji">🔐</span> Login
@@ -181,8 +204,8 @@
         </button>
     </div>
 
-    <!-- MENU 2: Post-login (top toggle bar) -->
-    <div class="toggle-bar" id="topToggleBarPostLogin" style="display:none">
+    <!-- MENU 2: Post-login (top toggle bar) — HIDDEN VIA CSS, kept in DOM for logic -->
+    <div class="toggle-bar" id="topToggleBarPostLogin">
         <button class="toggle-btn active" data-mode="mcq">
             <span class="emoji">📝</span> MCQs
         </button>
@@ -200,7 +223,7 @@
     <div class="page-stage" id="pageStage"></div>
 </div>
 
-<!-- MENU 1: Pre-login bottom nav -->
+<!-- MENU 1: Pre-login bottom nav (mobile) -->
 <nav class="bottom-nav" id="bottomNavPreLogin" role="navigation">
     <div class="bottom-nav-inner">
         <button class="bottom-nav-btn active" data-page="login" data-src="page-login.html">
@@ -222,7 +245,7 @@
     </div>
 </nav>
 
-<!-- MENU 2: Post-login bottom nav -->
+<!-- MENU 2: Post-login bottom nav (mobile) -->
 <nav class="bottom-nav" id="bottomNavPostLogin" role="navigation" style="display:none">
     <div class="bottom-nav-inner">
         <button class="bottom-nav-btn active" data-mode="mcq">
@@ -248,14 +271,13 @@
     (function () {
         const stage = document.getElementById('pageStage');
         const topBarPre = document.getElementById('topToggleBarPreLogin');
-        const topBarPost = document.getElementById('topToggleBarPostLogin');
         const bottomNavPre = document.getElementById('bottomNavPreLogin');
         const bottomNavPost = document.getElementById('bottomNavPostLogin');
 
         const preLoginButtons = () => document.querySelectorAll('#topToggleBarPreLogin .toggle-btn, #bottomNavPreLogin .bottom-nav-btn');
-        const postLoginButtons = () => document.querySelectorAll('#topToggleBarPostLogin .toggle-btn, #bottomNavPostLogin .bottom-nav-btn');
+        const postLoginButtons = () => document.querySelectorAll('#bottomNavPostLogin .bottom-nav-btn');
 
-        const frames = new Map(); // pageId -> wrapper div
+        const frames = new Map();
         let activePage = null;
 
         const THEME = {
@@ -270,9 +292,9 @@
 
         const KEY_USER = 'slUser';
         const KEY_POST_LOGIN = 'slPostLogin';
-        let eduFrameRef = null; // reference to the edu iframe for postMessage
+        let eduFrameRef = null;
 
-        /* ---------- Page management (outer shell iframes) ---------- */
+        /* ---------- Pre-login page management ---------- */
         function showPage(pageId, src) {
             if (activePage === pageId) return;
             activePage = pageId;
@@ -339,25 +361,19 @@
         /* ---------- Login-state swapping ---------- */
         function enterPostLogin(opts) {
             opts = opts || {};
-            // Save state
-            try {
-                const savedUser = JSON.parse(localStorage.getItem(KEY_USER) || 'null');
-                if (savedUser) localStorage.setItem(KEY_POST_LOGIN, '1');
-            } catch (e) { /* ignore */ }
+            try { localStorage.setItem(KEY_POST_LOGIN, '1'); } catch (e) { /* ignore */ }
 
             topBarPre.style.display = 'none';
             bottomNavPre.style.display = 'none';
-            topBarPost.style.display = '';
             bottomNavPost.style.display = '';
 
             // Hide all pre-login frames
-            frames.forEach((wrap, id) => {
+            frames.forEach((wrap) => {
                 wrap.style.display = 'none';
                 wrap.style.opacity = '0';
                 wrap.style.pointerEvents = 'none';
             });
 
-            // Load Edu iframe (only once)
             if (!eduFrameRef) {
                 const wrap = document.createElement('div');
                 wrap.className = 'page-frame active';
@@ -406,14 +422,12 @@
                 eduFrameRef.wrap.style.opacity = '1';
                 eduFrameRef.wrap.style.pointerEvents = 'auto';
                 eduFrameRef.wrap.classList.add('active');
-                // Notify iframe of user/mode
                 try {
                     if (opts.user) eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_USER', user: opts.user, isGuest: opts.isGuest }, '*');
                     if (opts.mode) eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_SET_MODE', mode: opts.mode }, '*');
                 } catch (e) { /* ignore */ }
             }
 
-            // Mark MCQs active
             setActivePostLoginButton('mcq');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -421,7 +435,6 @@
         function exitToLogin() {
             try { localStorage.removeItem(KEY_POST_LOGIN); } catch (e) { /* ignore */ }
 
-            topBarPost.style.display = 'none';
             bottomNavPost.style.display = 'none';
             topBarPre.style.display = '';
             bottomNavPre.style.display = '';
@@ -432,6 +445,10 @@
                 eduFrameRef.wrap.style.opacity = '0';
                 eduFrameRef.wrap.style.pointerEvents = 'none';
                 eduFrameRef.wrap.classList.remove('active');
+                // Ask Edu to close any open overlays
+                try {
+                    eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_FORCE_CLOSE_OVERLAYS' }, '*');
+                } catch (e) { /* ignore */ }
             }
 
             // Remove cached login frame so it reloads fresh
@@ -442,7 +459,6 @@
             }
             activePage = null;
 
-            // Show login page
             showPage('login', 'page-login.html');
         }
 
@@ -479,17 +495,14 @@
             if (!d || typeof d !== 'object') return;
 
             if (d.type === 'SL_LOGIN') {
-                // Login succeeded (from page-login.html)
                 try {
                     if (d.user) localStorage.setItem(KEY_USER, JSON.stringify(d.user));
                 } catch (err) { /* ignore */ }
                 enterPostLogin({ user: d.user, isGuest: d.isGuest, mode: 'mcq' });
             } else if (d.type === 'SL_LOGOUT') {
-                // Logout (from page-edu.html)
                 try { localStorage.removeItem(KEY_USER); } catch (err) { /* ignore */ }
                 exitToLogin();
             } else if (d.type === 'SL_SET_MODE_FROM_EDU') {
-                // Edu internally changed mode (e.g. user tapped a mode inside the page)
                 setActivePostLoginButton(d.mode);
             }
         });
