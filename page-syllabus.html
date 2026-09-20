@@ -47,6 +47,20 @@
         .subject-select { padding: 12px 40px 12px 18px; border: 1.5px solid var(--border); border-radius: var(--radius-full); background: var(--card); font-size: .9rem; color: var(--text); cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230ea5e9' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px; min-width: 160px; font-weight: 600; box-shadow: var(--shadow-sm); }
         .subject-select:focus { outline: none; border-color: var(--sky); box-shadow: 0 0 0 4px rgba(14,165,233,.1); }
 
+        .filter-check {
+            display: flex; align-items: center; gap: 6px;
+            background: var(--card); border: 1.5px solid var(--border);
+            border-radius: var(--radius-full); padding: 10px 16px;
+            font-size: .8rem; font-weight: 600; color: var(--text-soft);
+            cursor: pointer; box-shadow: var(--shadow-sm);
+            transition: all .15s; white-space: nowrap; user-select: none;
+        }
+        .filter-check:hover { background: var(--sky-soft); border-color: var(--sky); }
+        .filter-check input[type="checkbox"] {
+            accent-color: var(--sky); width: 16px; height: 16px;
+            cursor: pointer; flex-shrink: 0;
+        }
+
         .toggle-all-btn {
             background: var(--card); border: 1.5px solid var(--border);
             border-radius: var(--radius-full); padding: 10px 18px;
@@ -62,7 +76,7 @@
         /* ===== SUBJECT BLOCK ===== */
         .paper-block {
             background: var(--card); border-radius: var(--radius-lg);
-            padding: 14px 14px 10px; margin-bottom: 12px;
+            padding: 16px 16px 12px; margin-bottom: 14px;
             border: 1px solid var(--border); box-shadow: var(--shadow-sm);
             transition: box-shadow .2s;
             width: 100%; overflow: hidden;
@@ -75,39 +89,26 @@
             padding-bottom: 4px;
         }
         .paper-header-left {
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; gap: 10px;
             min-width: 0; flex: 1;
         }
-        .paper-header-left .check-badge {
-            font-size: .9rem; flex-shrink: 0;
-            width: 22px; height: 22px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-            background: var(--sky-soft);
-            color: var(--sky-dark);
-            font-weight: 800;
-            border: 1.5px solid var(--sky-light);
-        }
-        .paper-header-left .check-badge.compulsory {
-            background: var(--yellow-soft);
-            color: #92400e;
-            border-color: rgba(245,184,0,.5);
-        }
+        .paper-header-left .subj-emoji { font-size: 1.15rem; flex-shrink: 0; }
         .paper-header-left .subj-name {
-            font-size: 1rem; font-weight: 800; color: var(--navy);
+            font-size: 1.02rem; font-weight: 800; color: var(--navy);
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             min-width: 0;
-            text-transform: capitalize;
         }
+        .paper-header-left .subj-emoji,
+        .paper-header-left .subj-name { pointer-events: none; }
         .paper-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
         .topic-badge {
             background: var(--sky); color: #fff;
-            font-size: .66rem; font-weight: 700;
+            font-size: .68rem; font-weight: 700;
             padding: 4px 11px; border-radius: var(--radius-full);
             white-space: nowrap;
         }
         .collapse-arrow {
-            font-size: .68rem; color: var(--sky-dark);
+            font-size: .7rem; color: var(--sky-dark);
             transition: transform .3s ease; flex-shrink: 0;
             width: 22px; height: 22px;
             display: flex; align-items: center; justify-content: center;
@@ -116,7 +117,7 @@
         .paper-block.collapsed .collapse-arrow { transform: rotate(-90deg); }
 
         .paper-meta {
-            font-size: .66rem; color: var(--sky-dark);
+            font-size: .68rem; color: var(--sky-dark);
             background: var(--sky-soft); padding: 4px 12px;
             border-radius: var(--radius-full); display: inline-block;
             margin: 6px 0 10px 0; font-weight: 600;
@@ -142,7 +143,7 @@
         /* ===== MODULE GROUP ===== */
         .module-group { margin-bottom: 12px; }
         .module-head {
-            font-weight: 700; font-size: .84rem; color: var(--black);
+            font-weight: 700; font-size: .85rem; color: var(--black);
             display: flex; align-items: center; gap: 8px;
             padding: 8px 4px; cursor: pointer; user-select: none;
             border-bottom: 1px solid var(--border);
@@ -158,9 +159,9 @@
             background: var(--sky-soft); border-radius: 50%;
         }
         .module-group.collapsed .module-arrow { transform: rotate(-90deg); }
-        .module-head .module-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: capitalize; }
+        .module-head .module-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .module-head .module-count {
-            font-size: .6rem; font-weight: 700;
+            font-size: .62rem; font-weight: 700;
             background: var(--sky-soft); color: var(--sky-dark);
             padding: 2px 8px; border-radius: var(--radius-full);
             flex-shrink: 0;
@@ -184,7 +185,7 @@
             border-radius: 0 10px 10px 0;
             overflow-wrap: break-word; word-break: break-word;
         }
-        .topic-item .topic-label { font-weight: 700; font-size: .85rem; color: var(--navy); line-height: 1.5; }
+        .topic-item .topic-label { font-weight: 700; font-size: .86rem; color: var(--navy); line-height: 1.5; }
         .topic-item .topic-label .topic-link {
             color: var(--navy); cursor: pointer;
             display: inline; word-break: break-word;
@@ -198,7 +199,7 @@
         }
         .subtopic-list li {
             counter-increment: sub-counter;
-            font-size: .81rem; color: var(--text-soft);
+            font-size: .82rem; color: var(--text-soft);
             line-height: 1.55; padding: 3px 0 3px 26px;
             position: relative; margin-bottom: 2px;
             overflow-wrap: break-word; word-break: break-word;
@@ -207,7 +208,7 @@
             content: counter(sub-counter);
             position: absolute; left: 0; top: 3px;
             width: 18px; height: 18px; background: var(--sky);
-            color: #fff; border-radius: 50%; font-size: .6rem;
+            color: #fff; border-radius: 50%; font-size: .62rem;
             font-weight: 700; display: flex; align-items: center; justify-content: center;
         }
         .subtopic-list li .sub-link { color: var(--text-soft); cursor: pointer; }
@@ -216,7 +217,7 @@
 
         .sub-subtopic-list { margin: 4px 0 4px 18px; padding-left: 2px; list-style: none; }
         .sub-subtopic-list li {
-            font-size: .78rem; color: var(--text-soft);
+            font-size: .79rem; color: var(--text-soft);
             line-height: 1.55; padding: 2px 0 2px 20px;
             position: relative;
             overflow-wrap: break-word; word-break: break-word;
@@ -231,7 +232,7 @@
         .sub-subtopic-list li .sub-link::after { content: " ↗"; font-size: .5rem; opacity: .35; margin-left: 2px; }
 
         .topic-item .book-ref {
-            font-size: .75rem; color: var(--text-soft);
+            font-size: .76rem; color: var(--text-soft);
             margin-top: 6px; padding: 6px 12px;
             background: var(--sky-soft); border-radius: 10px;
             border-left: 3px solid var(--sky);
@@ -247,13 +248,12 @@
 
         @media (max-width: 480px) {
             body { padding: .6rem; }
-            .paper-block { padding: 12px 12px 8px; }
-            .paper-header-left .subj-name { font-size: .9rem; }
-            .paper-header-left .check-badge { width: 20px; height: 20px; font-size: .8rem; }
+            .paper-block { padding: 12px 12px 10px; }
+            .paper-header-left .subj-name { font-size: .92rem; }
             .topic-item .topic-label { font-size: .8rem; }
-            .subtopic-list li { font-size: .77rem; padding-left: 24px; }
-            .sub-subtopic-list li { font-size: .74rem; }
-            .topic-item .book-ref { font-size: .71rem; }
+            .subtopic-list li { font-size: .78rem; padding-left: 24px; }
+            .sub-subtopic-list li { font-size: .75rem; }
+            .topic-item .book-ref { font-size: .72rem; }
         }
     </style>
 </head>
@@ -267,6 +267,12 @@
         <div class="controls-row">
             <div class="search-box"><input type="text" id="searchInput" placeholder="Search topic, book…" /></div>
             <select id="subjectSelect" class="subject-select"><option value="">All subjects</option></select>
+            <label class="filter-check" title="Show only Compulsory subjects">
+                <input type="checkbox" id="compulsoryCheck"> Compulsory
+            </label>
+            <label class="filter-check" title="Show only Optional subjects">
+                <input type="checkbox" id="optionalCheck"> Optional
+            </label>
             <button class="toggle-all-btn" id="toggleAllBtn">📂 Collapse All</button>
         </div>
     </div>
@@ -283,6 +289,8 @@
     const subjectSelect = document.getElementById('subjectSelect');
     const countDisplay = document.getElementById('countDisplay');
     const toggleAllBtn = document.getElementById('toggleAllBtn');
+    const compulsoryCheck = document.getElementById('compulsoryCheck');
+    const optionalCheck = document.getElementById('optionalCheck');
 
     let allRecords = [], filtered = [];
     let allCollapsed = false;
@@ -410,16 +418,26 @@
         } catch (e) { return dateStr; }
     }
 
-    // Clean subject name: remove "compulsory_" or "optional_" prefix
-    function cleanSubjectName(raw) {
-        if (!raw) return 'Uncategorized';
-        return raw.replace(/^(compulsory|optional)_/i, '').replace(/_/g, ' ');
+    // Clean subject name: remove prefix like "compulsory_" or "optional_"
+    function cleanSubjectName(rawName) {
+        if (!rawName) return '';
+        let cleaned = rawName;
+        // Remove leading "compulsory_" or "optional_" (case-insensitive)
+        cleaned = cleaned.replace(/^(compulsory|optional)_/i, '');
+        // Replace underscores with spaces
+        cleaned = cleaned.replace(/_/g, ' ');
+        // Title case
+        cleaned = cleaned.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        return cleaned.trim() || rawName;
     }
 
-    // Check if subject is compulsory
-    function isCompulsory(raw) {
-        if (!raw) return false;
-        return /^compulsory_/i.test(raw);
+    // Determine if subject is compulsory or optional
+    function getSubjectType(rawName) {
+        if (!rawName) return 'unknown';
+        const lower = rawName.toLowerCase();
+        if (lower.startsWith('compulsory')) return 'compulsory';
+        if (lower.startsWith('optional')) return 'optional';
+        return 'unknown';
     }
 
     function render(records) {
@@ -429,9 +447,11 @@
             return;
         }
 
+        // Group records by cleaned subject name
         const groups = {};
         for (const r of records) {
-            const key = r.subject || 'Uncategorized';
+            const cleanedName = cleanSubjectName(r.subject);
+            const key = cleanedName || 'Uncategorized';
             if (!groups[key]) groups[key] = [];
             groups[key].push(r);
         }
@@ -439,7 +459,7 @@
         let html = '';
         let subjectIndex = 0;
 
-        for (const [subjectRaw, items] of Object.entries(groups)) {
+        for (const [subject, items] of Object.entries(groups)) {
             items.sort((a, b) => parseFloat(a.srno) - parseFloat(b.srno));
             let latestDate = '';
             for (const item of items) {
@@ -451,20 +471,17 @@
                 }
             }
 
-            const displayName = cleanSubjectName(subjectRaw);
-            const isComp = isCompulsory(subjectRaw);
+            // Get raw subject to determine type
+            const rawSubj = items[0]?.subject || subject;
+            const subjType = getSubjectType(rawSubj);
+            const typeIcon = subjType === 'compulsory' ? '📘' : (subjType === 'optional' ? '📚' : '📄');
 
             // Subject block
             html += `<div class="paper-block" data-subject-index="${subjectIndex}">`;
             html += `<div class="paper-header" data-toggle="subject" data-subject-index="${subjectIndex}">`;
             html += `<div class="paper-header-left">`;
-            // Checkmark badge
-            if (isComp) {
-                html += `<span class="check-badge compulsory" title="Compulsory">✓</span>`;
-            } else {
-                html += `<span class="check-badge" title="Optional">✓</span>`;
-            }
-            html += `<span class="subj-name">${escapeHtml(displayName)}</span>`;
+            html += `<span class="subj-emoji">${typeIcon}</span>`;
+            html += `<span class="subj-name">${escapeHtml(subject)}</span>`;
             html += `</div>`;
             html += `<div class="paper-header-right">`;
             html += `<span class="topic-badge">${items.length} topic${items.length !== 1 ? 's' : ''}</span>`;
@@ -582,7 +599,6 @@
     }
 
     function bindCollapseEvents() {
-        // Subject toggle
         document.querySelectorAll('.paper-header').forEach(header => {
             header.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -592,7 +608,6 @@
             });
         });
 
-        // Module toggle
         document.querySelectorAll('.module-head').forEach(head => {
             head.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -635,26 +650,48 @@
     function applyFilters() {
         const search = searchInput.value.trim().toLowerCase();
         const subject = subjectSelect.value;
+        const showCompulsory = compulsoryCheck.checked;
+        const showOptional = optionalCheck.checked;
+
         filtered = allRecords.filter(r => {
+            // Type filter
+            const subjType = getSubjectType(r.subject);
+            if (showCompulsory && !showOptional && subjType !== 'compulsory') return false;
+            if (showOptional && !showCompulsory && subjType !== 'optional') return false;
+            if (showCompulsory && showOptional && subjType === 'unknown') {
+                // If both checked, show only compulsory and optional (hide unknown)
+                return false;
+            }
+
+            // Subject dropdown filter (compare cleaned names)
+            if (subject) {
+                const cleanedSubj = cleanSubjectName(r.subject);
+                if (cleanedSubj !== subject) return false;
+            }
+
+            // Search filter
             if (search) {
                 const all = `${r.srno} ${r.subject} ${r.Module} ${r.topicNumber} ${r.topicName} ${r.book} ${r.subtopics}`.toLowerCase();
                 if (!all.includes(search)) return false;
             }
-            if (subject && r.subject !== subject) return false;
             return true;
         });
         render(filtered);
     }
 
     function updateSubjects(records) {
+        // Build unique cleaned subject names
         const subs = new Set();
-        records.forEach(r => { if (r.subject) subs.add(r.subject); });
+        records.forEach(r => {
+            const cleaned = cleanSubjectName(r.subject);
+            if (cleaned) subs.add(cleaned);
+        });
         const current = subjectSelect.value;
         subjectSelect.innerHTML = `<option value="">All subjects</option>`;
         [...subs].sort().forEach(s => {
             const opt = document.createElement('option');
             opt.value = s;
-            opt.textContent = cleanSubjectName(s);
+            opt.textContent = s;
             subjectSelect.appendChild(opt);
         });
         if ([...subs].includes(current)) subjectSelect.value = current;
@@ -684,6 +721,8 @@
     window.googleSearch = googleSearch;
     searchInput.addEventListener('input', applyFilters);
     subjectSelect.addEventListener('change', applyFilters);
+    compulsoryCheck.addEventListener('change', applyFilters);
+    optionalCheck.addEventListener('change', applyFilters);
     loadSyllabus();
 })();
 </script>
