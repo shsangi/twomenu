@@ -122,7 +122,7 @@
             border: 1px solid var(--border);
         }
 
-        /* TOP BAR — 2 ROWS ONLY (brand + pills). No mode toggle row. */
+        /* TOP BAR */
         .top-bar {
             display: flex; flex-direction: column; gap: .65rem;
             padding: .5rem 0 1rem; margin-bottom: .5rem;
@@ -171,15 +171,29 @@
         .btn-icon:disabled { opacity: .4; cursor: not-allowed; }
         .btn-icon .refresh-spin { display: inline-block; animation: spin .9s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* ==================== UPDATED DRAWER BUTTON ==================== */
         .btn-drawer {
-            display: none; background: var(--sf2);
-            border: 1.5px solid var(--border); font-size: 1.05rem;
-            cursor: pointer; padding: .3rem; border-radius: 10px;
-            width: 34px; height: 34px;
-            align-items: center; justify-content: center;
-            color: var(--text-soft); transition: all .15s;
+            display: none;
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            border: none;
+            font-size: .75rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: .45rem .85rem;
+            border-radius: var(--rf);
+            color: #fff;
+            align-items: center;
+            justify-content: center;
+            gap: .35rem;
+            box-shadow: 0 4px 12px -4px rgba(14,165,233,.5);
+            transition: all .15s;
+            white-space: nowrap;
+            font-family: inherit;
+            line-height: 1;
         }
-        .btn-drawer:hover { background: var(--sky); border-color: var(--sky); color: #fff; }
+        .btn-drawer:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(14,165,233,.6); }
+        .btn-drawer .emoji { font-size: .9rem; }
 
         /* TOP ROW 3 — PILLS ONLY */
         .top-row-3 { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
@@ -216,7 +230,7 @@
         .papers-mode-active .timer-pill,
         .papers-mode-active .facts-pill { display: none !important; }
 
-        /* MODE PILL — a single dropdown button replacing the 4-button toggle */
+        /* MODE PILL */
         .mode-pill-wrap { position: relative; display: inline-block; }
         .mode-pill-btn {
             display: inline-flex; align-items: center; gap: .4rem;
@@ -550,7 +564,7 @@
         }
         @media (max-width: 560px) {
             body { padding: 0; }
-            .btn-drawer { display: flex; }
+            .btn-drawer { display: inline-flex; }
             .btn-icon#refreshBtn { display: none; }
             .quiz-wrapper { padding: 1.1rem .9rem 1.2rem; border-radius: 22px; }
             .question-card { padding: 1.2rem 1.1rem .8rem; }
@@ -624,7 +638,9 @@
                     <button class="btn-icon" id="refreshBtn" title="Filter &amp; Refresh">
                         <span id="refreshIcon">⚙️</span>
                     </button>
-                    <button class="btn-drawer" id="drawerBtn" title="Filters &amp; options">☰</button>
+                    <button class="btn-drawer" id="drawerBtn" title="MCQs for Job">
+                        <span class="emoji">🎯</span> MCQs for Job
+                    </button>
                 </div>
             </div>
 
@@ -1063,7 +1079,6 @@
     /* ---------- Logout → notify parent + close overlays ---------- */
     function triggerLogout() {
         if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
-        // Force-close any open overlays
         closeBothPanels();
         if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
         if (ui.cOverlay) ui.cOverlay.classList.remove('active');
@@ -1180,7 +1195,7 @@
         saveState(); window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* ---------- Mode switching (via dropdown pill) ---------- */
+    /* ---------- Mode switching ---------- */
     function ensurePapersLoaded() {
         if (papersFrameLoaded) return;
         const src = ui.papersFrame.getAttribute('data-src');
@@ -1230,7 +1245,6 @@
         }
     }
 
-    // Mode pill dropdown toggle
     ui.modePillBtn.onclick = (e) => {
         e.stopPropagation();
         ui.modePillWrap.classList.toggle('open');
@@ -1241,7 +1255,6 @@
             setMode(item.dataset.mode);
         };
     });
-    // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
         if (!ui.modePillWrap.contains(e.target)) {
             ui.modePillWrap.classList.remove('open');
@@ -1465,7 +1478,6 @@
             user = d.user || null;
             isGuest = !!d.isGuest;
             if (user) updateUserLabels();
-            // Fresh login — clear any leftover overlay state
             closeBothPanels();
             if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
             if (ui.modePillWrap) ui.modePillWrap.classList.remove('open');
