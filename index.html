@@ -153,11 +153,36 @@
             background: var(--sky);
         }
 
+        /* ==================== INSTALL BUTTON ==================== */
+        #pwaInstallBtn {
+            display: none;
+            position: fixed;
+            bottom: 84px;
+            right: 16px;
+            z-index: 9998;
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: #fff;
+            border: none;
+            font-weight: 800;
+            padding: .75rem 1.2rem;
+            border-radius: 9999px;
+            box-shadow: 0 8px 24px -6px rgba(14,165,233,.5);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: .85rem;
+            align-items: center;
+            gap: .4rem;
+            transition: all .2s;
+        }
+        #pwaInstallBtn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -6px rgba(14,165,233,.6); }
+        #pwaInstallBtn.show { display: inline-flex; }
+        @media (min-width: 769px) {
+            #pwaInstallBtn { bottom: 24px; right: 24px; }
+        }
+
         /* ============================================================
            NAV VISIBILITY RULES
            ============================================================ */
-
-        /* Hide Post-login top toggle bar — always. Edu has its own toggle. */
         #topToggleBarPostLogin { display: none !important; }
 
         @media (max-width: 768px) {
@@ -179,7 +204,6 @@
 </head>
 <body>
 <div class="app-wrapper">
-    <!-- MENU 1: Pre-login (top toggle bar — desktop only) -->
     <div class="toggle-bar" id="topToggleBarPreLogin">
         <button class="toggle-btn active" data-page="login" data-src="page-login.html">
             <span class="emoji">🔐</span> Login
@@ -195,7 +219,6 @@
         </button>
     </div>
 
-    <!-- MENU 2: Post-login (top toggle bar) — HIDDEN VIA CSS, kept in DOM for logic -->
     <div class="toggle-bar" id="topToggleBarPostLogin">
         <button class="toggle-btn active" data-mode="mcq">
             <span class="emoji">📝</span> MCQs
@@ -214,7 +237,6 @@
     <div class="page-stage" id="pageStage"></div>
 </div>
 
-<!-- MENU 1: Pre-login bottom nav (mobile) -->
 <nav class="bottom-nav" id="bottomNavPreLogin" role="navigation">
     <div class="bottom-nav-inner">
         <button class="bottom-nav-btn active" data-page="login" data-src="page-login.html">
@@ -236,7 +258,6 @@
     </div>
 </nav>
 
-<!-- MENU 2: Post-login bottom nav (mobile) -->
 <nav class="bottom-nav" id="bottomNavPostLogin" role="navigation" style="display:none">
     <div class="bottom-nav-inner">
         <button class="bottom-nav-btn active" data-mode="mcq">
@@ -257,6 +278,11 @@
         </button>
     </div>
 </nav>
+
+<!-- ==================== PWA INSTALL BUTTON ==================== -->
+<button id="pwaInstallBtn" aria-label="Install app">
+    📲 Install App
+</button>
 
 <script>
     (function () {
@@ -286,7 +312,6 @@
         const KEY_LAST_PAGE = 'slLastPage';
         let eduFrameRef = null;
 
-        /* ---------- Pre-login page management ---------- */
         function showPage(pageId, src) {
             if (activePage === pageId) return;
             activePage = pageId;
@@ -349,7 +374,6 @@
                 wrap.style.display = isActive ? 'block' : 'none';
             });
 
-            // Ask data pages to refresh their content
             if (pageId === 'syllabus' || pageId === 'schedule' || pageId === 'eligibility') {
                 const frame = frames.get(pageId);
                 if (frame) {
@@ -365,7 +389,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        /* ---------- Login-state swapping ---------- */
         function enterPostLogin(opts) {
             opts = opts || {};
             try { localStorage.setItem(KEY_POST_LOGIN, '1'); } catch (e) { /* ignore */ }
@@ -471,7 +494,6 @@
             });
         }
 
-        /* ---------- Button wiring ---------- */
         preLoginButtons().forEach(btn => {
             btn.addEventListener('click', () => {
                 if (btn.dataset.page && btn.dataset.src) {
@@ -492,14 +514,12 @@
             });
         });
 
-        /* ---------- postMessage from inner pages ---------- */
         window.addEventListener('message', (e) => {
             const d = e.data;
             if (!d || typeof d !== 'object') return;
 
             if (d.type === 'SL_LOGIN') {
                 if (activePage !== 'login') return;
-
                 try {
                     if (d.user) localStorage.setItem(KEY_USER, JSON.stringify(d.user));
                 } catch (err) { /* ignore */ }
@@ -512,7 +532,6 @@
             }
         });
 
-        /* ---------- Initial load ---------- */
         function boot() {
             let loggedIn = false;
             let savedUser = null;
@@ -554,6 +573,55 @@ if ('serviceWorker' in navigator) {
             .catch((e) => console.warn('[PWA] SW failed', e));
     });
 }
+</script>
+
+<script>
+/* ==================== PWA INSTALL BUTTON ==================== */
+(function () {
+    const btn = document.getElementById('pwaInstallBtn');
+    let deferredPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (btn) btn.classList.add('show');
+    });
+
+    window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        if (btn) btn.classList.remove('show');
+    });
+
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        if (btn) btn.classList.remove('show');
+    }
+
+    if (btn) {
+        btn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const choice = await deferredPrompt.userChoice;
+                if (choice.outcome === 'accepted') {
+                    btn.classList.remove('show');
+                }
+                deferredPrompt = null;
+            } else {
+                const ua = navigator.userAgent || '';
+                const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+                const isAndroid = /Android/.test(ua);
+                let msg = '📲 To install this app:\n\n';
+                if (isIOS) {
+                    msg += '1. Tap the Share button (⬆️)\n2. Scroll and tap "Add to Home Screen"\n3. Tap "Add"';
+                } else if (isAndroid) {
+                    msg += '1. Tap the menu (⋮) in your browser\n2. Tap "Install app" or "Add to Home Screen"\n3. Confirm install';
+                } else {
+                    msg += '1. Look for the install icon in the address bar\n2. Or open browser menu → "Install App"\n3. Confirm install';
+                }
+                alert(msg);
+            }
+        });
+    }
+})();
 </script>
 </body>
 </html>
