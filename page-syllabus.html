@@ -419,39 +419,49 @@
     }
 
     /* ============================================================
-       BOTH SPELLINGS HANDLED:
-       - compulsory / compulsary  (typo-safe)
-       - optional
+       SUBJECT NAME CLEANER
+       - Removes the first prefix segment (e.g. "compulsory_")
+       - Replaces remaining underscores with spaces
+       - Converts to Title Case
        ============================================================ */
-    function getSubjectType(rawName) {
-        if (!rawName) return 'unknown';
-        const lower = rawName.toLowerCase().trim();
-        // Match any prefix containing "compuls" (covers compulsory, compulsary, compulsery...)
-        if (/^compuls/i.test(lower) || /[\s_\-]compuls/i.test(lower)) return 'compulsory';
-        // Match any prefix containing "option"
-        if (/^option/i.test(lower) || /[\s_\-]option/i.test(lower)) return 'optional';
-        return 'unknown';
-    }
-
     function cleanSubjectName(rawName) {
         if (!rawName) return '';
         let cleaned = rawName;
-        // Remove leading "compulsory_" / "compulsary_" / "optional_" (any spelling)
-        cleaned = cleaned.replace(/^\s*(compuls\w*|option\w*)\s*[_\-–:.]\s*/i, '');
-        // Remove any leading numbering like "1. " or "1 - "
-        cleaned = cleaned.replace(/^\d+[\.\)\-]\s*/, '');
-        // Underscores to spaces
+
+        // Remove everything up to and including the FIRST underscore
+        // Example: "compulsory_english" → "english"
+        //          "optional_computer_science" → "computer_science"
+        const firstUnderscore = cleaned.indexOf('_');
+        if (firstUnderscore !== -1) {
+            cleaned = cleaned.substring(firstUnderscore + 1);
+        }
+
+        // Underscores → spaces
         cleaned = cleaned.replace(/_/g, ' ');
+
         // Collapse whitespace
         cleaned = cleaned.replace(/\s+/g, ' ').trim();
-        // Title case (keep short words like "of", "and", "in" lowercase)
+
+        // Title Case (keep small words lowercase except first)
         const smallWords = ['of', 'and', 'in', 'the', 'a', 'an', 'to', 'for', 'on', 'at', 'by', 'or', 'as', 'is'];
         cleaned = cleaned.split(' ').map((w, i) => {
             if (w.length === 0) return w;
             if (i > 0 && smallWords.includes(w.toLowerCase())) return w.toLowerCase();
             return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
         }).join(' ');
+
         return cleaned || rawName;
+    }
+
+    /* ============================================================
+       SUBJECT TYPE DETECTION (handles both "compulsory" and "compulsary")
+       ============================================================ */
+    function getSubjectType(rawName) {
+        if (!rawName) return 'unknown';
+        const lower = rawName.toLowerCase().trim();
+        if (lower.startsWith('compuls') || lower.includes(' compuls')) return 'compulsory';
+        if (lower.startsWith('option') || lower.includes(' option')) return 'optional';
+        return 'unknown';
     }
 
     function render(records) {
