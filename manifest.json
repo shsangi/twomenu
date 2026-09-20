@@ -1,7 +1,7 @@
 {
-  "name": "Self Learners · CSS 2027 Hub",
+  "name": "Self Learners · Jobs Exam Hub",
   "short_name": "Self Learners",
-  "description": "MCQs, past papers, syllabus & eligibility for CSS 2027.",
+  "description": "MCQs, past papers, syllabus & eligibility for all jobs exams.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
