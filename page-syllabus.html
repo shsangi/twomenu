@@ -62,7 +62,7 @@
         /* ===== SUBJECT BLOCK ===== */
         .paper-block {
             background: var(--card); border-radius: var(--radius-lg);
-            padding: 16px 16px 12px; margin-bottom: 14px;
+            padding: 14px 14px 10px; margin-bottom: 12px;
             border: 1px solid var(--border); box-shadow: var(--shadow-sm);
             transition: box-shadow .2s;
             width: 100%; overflow: hidden;
@@ -75,26 +75,39 @@
             padding-bottom: 4px;
         }
         .paper-header-left {
-            display: flex; align-items: center; gap: 10px;
+            display: flex; align-items: center; gap: 8px;
             min-width: 0; flex: 1;
         }
-        .paper-header-left .subj-emoji { font-size: 1.15rem; flex-shrink: 0; }
+        .paper-header-left .check-badge {
+            font-size: .9rem; flex-shrink: 0;
+            width: 22px; height: 22px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            background: var(--sky-soft);
+            color: var(--sky-dark);
+            font-weight: 800;
+            border: 1.5px solid var(--sky-light);
+        }
+        .paper-header-left .check-badge.compulsory {
+            background: var(--yellow-soft);
+            color: #92400e;
+            border-color: rgba(245,184,0,.5);
+        }
         .paper-header-left .subj-name {
-            font-size: 1.02rem; font-weight: 800; color: var(--navy);
+            font-size: 1rem; font-weight: 800; color: var(--navy);
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             min-width: 0;
+            text-transform: capitalize;
         }
-        .paper-header-left .subj-emoji,
-        .paper-header-left .subj-name { pointer-events: none; }
         .paper-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
         .topic-badge {
             background: var(--sky); color: #fff;
-            font-size: .68rem; font-weight: 700;
+            font-size: .66rem; font-weight: 700;
             padding: 4px 11px; border-radius: var(--radius-full);
             white-space: nowrap;
         }
         .collapse-arrow {
-            font-size: .7rem; color: var(--sky-dark);
+            font-size: .68rem; color: var(--sky-dark);
             transition: transform .3s ease; flex-shrink: 0;
             width: 22px; height: 22px;
             display: flex; align-items: center; justify-content: center;
@@ -103,7 +116,7 @@
         .paper-block.collapsed .collapse-arrow { transform: rotate(-90deg); }
 
         .paper-meta {
-            font-size: .68rem; color: var(--sky-dark);
+            font-size: .66rem; color: var(--sky-dark);
             background: var(--sky-soft); padding: 4px 12px;
             border-radius: var(--radius-full); display: inline-block;
             margin: 6px 0 10px 0; font-weight: 600;
@@ -129,7 +142,7 @@
         /* ===== MODULE GROUP ===== */
         .module-group { margin-bottom: 12px; }
         .module-head {
-            font-weight: 700; font-size: .85rem; color: var(--black);
+            font-weight: 700; font-size: .84rem; color: var(--black);
             display: flex; align-items: center; gap: 8px;
             padding: 8px 4px; cursor: pointer; user-select: none;
             border-bottom: 1px solid var(--border);
@@ -145,9 +158,9 @@
             background: var(--sky-soft); border-radius: 50%;
         }
         .module-group.collapsed .module-arrow { transform: rotate(-90deg); }
-        .module-head .module-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .module-head .module-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: capitalize; }
         .module-head .module-count {
-            font-size: .62rem; font-weight: 700;
+            font-size: .6rem; font-weight: 700;
             background: var(--sky-soft); color: var(--sky-dark);
             padding: 2px 8px; border-radius: var(--radius-full);
             flex-shrink: 0;
@@ -171,7 +184,7 @@
             border-radius: 0 10px 10px 0;
             overflow-wrap: break-word; word-break: break-word;
         }
-        .topic-item .topic-label { font-weight: 700; font-size: .86rem; color: var(--navy); line-height: 1.5; }
+        .topic-item .topic-label { font-weight: 700; font-size: .85rem; color: var(--navy); line-height: 1.5; }
         .topic-item .topic-label .topic-link {
             color: var(--navy); cursor: pointer;
             display: inline; word-break: break-word;
@@ -185,7 +198,7 @@
         }
         .subtopic-list li {
             counter-increment: sub-counter;
-            font-size: .82rem; color: var(--text-soft);
+            font-size: .81rem; color: var(--text-soft);
             line-height: 1.55; padding: 3px 0 3px 26px;
             position: relative; margin-bottom: 2px;
             overflow-wrap: break-word; word-break: break-word;
@@ -194,7 +207,7 @@
             content: counter(sub-counter);
             position: absolute; left: 0; top: 3px;
             width: 18px; height: 18px; background: var(--sky);
-            color: #fff; border-radius: 50%; font-size: .62rem;
+            color: #fff; border-radius: 50%; font-size: .6rem;
             font-weight: 700; display: flex; align-items: center; justify-content: center;
         }
         .subtopic-list li .sub-link { color: var(--text-soft); cursor: pointer; }
@@ -203,7 +216,7 @@
 
         .sub-subtopic-list { margin: 4px 0 4px 18px; padding-left: 2px; list-style: none; }
         .sub-subtopic-list li {
-            font-size: .79rem; color: var(--text-soft);
+            font-size: .78rem; color: var(--text-soft);
             line-height: 1.55; padding: 2px 0 2px 20px;
             position: relative;
             overflow-wrap: break-word; word-break: break-word;
@@ -218,7 +231,7 @@
         .sub-subtopic-list li .sub-link::after { content: " ↗"; font-size: .5rem; opacity: .35; margin-left: 2px; }
 
         .topic-item .book-ref {
-            font-size: .76rem; color: var(--text-soft);
+            font-size: .75rem; color: var(--text-soft);
             margin-top: 6px; padding: 6px 12px;
             background: var(--sky-soft); border-radius: 10px;
             border-left: 3px solid var(--sky);
@@ -231,16 +244,16 @@
         .loading { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 48px 0; color: var(--text-soft); font-size: .9rem; font-weight: 600; }
         .spinner { width: 24px; height: 24px; border: 3px solid var(--border); border-top: 3px solid var(--sky); border-radius: 50%; animation: spin .8s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        .footer { margin-top: 20px; font-size: .72rem; color: var(--text-muted); text-align: center; border-top: 1px solid var(--border); padding-top: 16px; font-weight: 500; }
 
         @media (max-width: 480px) {
             body { padding: .6rem; }
-            .paper-block { padding: 12px 12px 10px; }
-            .paper-header-left .subj-name { font-size: .92rem; }
+            .paper-block { padding: 12px 12px 8px; }
+            .paper-header-left .subj-name { font-size: .9rem; }
+            .paper-header-left .check-badge { width: 20px; height: 20px; font-size: .8rem; }
             .topic-item .topic-label { font-size: .8rem; }
-            .subtopic-list li { font-size: .78rem; padding-left: 24px; }
-            .sub-subtopic-list li { font-size: .75rem; }
-            .topic-item .book-ref { font-size: .72rem; }
+            .subtopic-list li { font-size: .77rem; padding-left: 24px; }
+            .sub-subtopic-list li { font-size: .74rem; }
+            .topic-item .book-ref { font-size: .71rem; }
         }
     </style>
 </head>
@@ -260,7 +273,6 @@
     <div class="syllabus" id="syllabusContainer">
         <div class="loading"><span class="spinner"></span> Loading syllabus…</div>
     </div>
-    <div class="footer">FPSC syllabus · live from Google Sheets</div>
 </div>
 
 <script>
@@ -398,6 +410,18 @@
         } catch (e) { return dateStr; }
     }
 
+    // Clean subject name: remove "compulsory_" or "optional_" prefix
+    function cleanSubjectName(raw) {
+        if (!raw) return 'Uncategorized';
+        return raw.replace(/^(compulsory|optional)_/i, '').replace(/_/g, ' ');
+    }
+
+    // Check if subject is compulsory
+    function isCompulsory(raw) {
+        if (!raw) return false;
+        return /^compulsory_/i.test(raw);
+    }
+
     function render(records) {
         if (!records || records.length === 0) {
             container.innerHTML = `<div class="empty-state">✨ No topics match your search</div>`;
@@ -415,7 +439,7 @@
         let html = '';
         let subjectIndex = 0;
 
-        for (const [subject, items] of Object.entries(groups)) {
+        for (const [subjectRaw, items] of Object.entries(groups)) {
             items.sort((a, b) => parseFloat(a.srno) - parseFloat(b.srno));
             let latestDate = '';
             for (const item of items) {
@@ -427,12 +451,20 @@
                 }
             }
 
+            const displayName = cleanSubjectName(subjectRaw);
+            const isComp = isCompulsory(subjectRaw);
+
             // Subject block
             html += `<div class="paper-block" data-subject-index="${subjectIndex}">`;
             html += `<div class="paper-header" data-toggle="subject" data-subject-index="${subjectIndex}">`;
             html += `<div class="paper-header-left">`;
-            html += `<span class="subj-emoji">📄</span>`;
-            html += `<span class="subj-name">${escapeHtml(subject)}</span>`;
+            // Checkmark badge
+            if (isComp) {
+                html += `<span class="check-badge compulsory" title="Compulsory">✓</span>`;
+            } else {
+                html += `<span class="check-badge" title="Optional">✓</span>`;
+            }
+            html += `<span class="subj-name">${escapeHtml(displayName)}</span>`;
             html += `</div>`;
             html += `<div class="paper-header-right">`;
             html += `<span class="topic-badge">${items.length} topic${items.length !== 1 ? 's' : ''}</span>`;
@@ -591,11 +623,9 @@
         const blocks = document.querySelectorAll('.paper-block');
         const moduleGroups = document.querySelectorAll('.module-group');
         if (allCollapsed) {
-            // Expand all
             blocks.forEach(b => b.classList.remove('collapsed'));
             moduleGroups.forEach(g => g.classList.remove('collapsed'));
         } else {
-            // Collapse all
             blocks.forEach(b => b.classList.add('collapsed'));
             moduleGroups.forEach(g => g.classList.add('collapsed'));
         }
@@ -624,7 +654,7 @@
         [...subs].sort().forEach(s => {
             const opt = document.createElement('option');
             opt.value = s;
-            opt.textContent = s;
+            opt.textContent = cleanSubjectName(s);
             subjectSelect.appendChild(opt);
         });
         if ([...subs].includes(current)) subjectSelect.value = current;
