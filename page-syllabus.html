@@ -177,45 +177,6 @@
         } catch (e) { return dateStr; }
     }
 
-    // Helper to render subtopics with proper nested lettering
-    function renderSubtopics(subItems) {
-        if (!subItems || subItems.length === 0) return '';
-        let html = '<ul class="subtopic-list">';
-        for (let i = 0; i < subItems.length; i++) {
-            const sub = subItems[i];
-            // Check if this subtopic contains nested lettered items (a), b), c) ...)
-            if (hasSubLetters(sub)) {
-                const subLetters = extractSubLetters(sub);
-                // Remove the lettered parts to get the main heading
-                const mainPart = sub.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
-                const cleanMain = mainPart.replace(/[:–-]\s*$/, '').trim();
-                if (cleanMain) {
-                    html += `<li><span class="sub-link" onclick="googleSearch('${cleanMain.replace(/'/g, "\\'")}')">${cleanMain}</span>`;
-                }
-                // Render nested letters
-                if (subLetters.length > 0) {
-                    html += '<ul class="sub-subtopic-list">';
-                    const letters = 'abcdefghijklmnopqrstuvwxyz';
-                    for (let j = 0; j < subLetters.length; j++) {
-                        const letter = letters[j] || '?';
-                        const cleanSub = subLetters[j].replace(/^[a-z]\)\s*/, '').trim();
-                        html += `<li data-letter="${letter}"><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
-                    }
-                    html += '</ul>';
-                }
-                if (cleanMain) html += '</li>';
-            } else if (isNumbered(sub)) {
-                const numClean = sub.replace(/^\d+\.\s*/, '').trim();
-                html += `<li><span class="sub-link" onclick="googleSearch('${numClean.replace(/'/g, "\\'")}')">${numClean}</span></li>`;
-            } else {
-                let cleanSub = sub.replace(/^\d+\.\s*/, '').replace(/[;,:]\s*$/, '').trim();
-                if (cleanSub) html += `<li><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`;
-            }
-        }
-        html += '</ul>';
-        return html;
-    }
-
     function render(records) {
         if (!records || records.length === 0) { container.innerHTML = `<div class="empty-state">✨ No topics match your search</div>`; countDisplay.textContent = '0'; return; }
         const groups = {};
@@ -238,7 +199,25 @@
                     const topicNum = t.topicNumber ? `${t.topicNumber}` : '';
                     html += `<div class="topic-item"><div class="topic-label"><span class="topic-link" onclick="googleSearch('${(t.topicName || '').replace(/'/g, "\\'")}')">${topicNum} ${t.topicName || '—'}</span></div>`;
                     const subItems = smartSplit(t.subtopics || t.topicName || '');
-                    html += renderSubtopics(subItems);
+                    if (subItems.length > 0) {
+                        html += `<ul class="subtopic-list">`;
+                        for (const sub of subItems) {
+                            if (hasSubLetters(sub)) {
+                                const subLetters = extractSubLetters(sub);
+                                const mainPart = sub.replace(/[a-z]\)\s*[^,;.]*?(?:[.,;]\s*(?=[a-z]\))|$)/gi, '').trim();
+                                const cleanMain = mainPart.replace(/[:–-]\s*$/, '').trim();
+                                if (cleanMain) html += `<li><span class="sub-link" onclick="googleSearch('${cleanMain.replace(/'/g, "\\'")}')">${cleanMain}</span></li>`;
+                                if (subLetters.length > 0) {
+                                    html += `<ul class="sub-subtopic-list">`;
+                                    const letters = 'abcdefghijklmnopqrstuvwxyz';
+                                    for (let i = 0; i < subLetters.length; i++) { const letter = letters[i] || '?'; const cleanSub = subLetters[i].replace(/^[a-z]\)\s*/, '').trim(); html += `<li data-letter="${letter}"><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`; }
+                                    html += `</ul>`;
+                                }
+                            } else if (isNumbered(sub)) { const numClean = sub.replace(/^\d+\.\s*/, '').trim(); html += `<li><span class="sub-link" onclick="googleSearch('${numClean.replace(/'/g, "\\'")}')">${numClean}</span></li>`; }
+                            else { let cleanSub = sub.replace(/^\d+\.\s*/, '').replace(/[;,:]\s*$/, '').trim(); if (cleanSub) html += `<li><span class="sub-link" onclick="googleSearch('${cleanSub.replace(/'/g, "\\'")}')">${cleanSub}</span></li>`; }
+                        }
+                        html += `</ul>`;
+                    }
                     if (t.book && t.book !== '—') html += `<div class="book-ref">📖 <span class="book-link" onclick="googleSearch('${t.book.replace(/'/g, "\\'")}')">${t.book}</span></div>`;
                     html += `</div>`;
                 }
@@ -247,7 +226,8 @@
             html += `</div>`;
         }
         container.innerHTML = html;
-        countDisplay.textContent = records.length;
+        // Counter shows total topics (records) displayed
+        countDisplay.textContent = records.length + ' topics';
     }
 
     function applyFilters() {
