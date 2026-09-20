@@ -18,6 +18,8 @@
             --text: #0f1419; --text-soft: #475569; --text-muted: #94a3b8;
             --border: #e2e8f0;
             --danger: #dc2626;
+            --whatsapp: #25d366;
+            --whatsapp-dark: #128c7e;
             --r: 20px; --rf: 9999px;
             --shadow-lg: 0 20px 40px -12px rgba(10,30,63,.18);
             --shadow-xl: 0 30px 60px -15px rgba(10,30,63,.25);
@@ -124,6 +126,79 @@
             text-align: center; font-size: .8rem; color: var(--text-muted);
             margin-top: 1.4rem; font-weight: 500;
         }
+
+        /* ==================== WHATSAPP CONTACT SECTION ==================== */
+        .wa-section {
+            margin-top: 1.5rem;
+            padding-top: 1.4rem;
+            border-top: 2px dashed var(--border);
+            text-align: center;
+        }
+        .wa-section .wa-label {
+            font-size: .78rem;
+            color: var(--text-soft);
+            font-weight: 600;
+            margin-bottom: .7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .4rem;
+        }
+        .wa-section .wa-label .wa-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--whatsapp);
+            box-shadow: 0 0 0 3px rgba(37,211,102,.2);
+            animation: waPulse 2s infinite;
+        }
+        @keyframes waPulse {
+            0%, 100% { box-shadow: 0 0 0 3px rgba(37,211,102,.2); }
+            50% { box-shadow: 0 0 0 6px rgba(37,211,102,.08); }
+        }
+        .wa-section .wa-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            width: 100%;
+            background: linear-gradient(135deg, var(--whatsapp), var(--whatsapp-dark));
+            color: #fff;
+            font-weight: 800;
+            font-size: .92rem;
+            padding: .9rem 1.2rem;
+            border-radius: var(--rf);
+            text-decoration: none;
+            box-shadow: 0 8px 20px -6px rgba(37,211,102,.5);
+            transition: all .2s;
+            min-height: 50px;
+            font-family: inherit;
+            border: none;
+            cursor: pointer;
+        }
+        .wa-section .wa-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -6px rgba(37,211,102,.6);
+        }
+        .wa-section .wa-btn:active { transform: translateY(0); }
+        .wa-section .wa-btn .wa-icon {
+            font-size: 1.25rem;
+            display: inline-flex;
+        }
+        .wa-section .wa-number {
+            display: block;
+            margin-top: .55rem;
+            font-size: .72rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: .02em;
+        }
+        .wa-section .wa-hint {
+            margin-top: .8rem;
+            font-size: .7rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
         @media (max-width: 560px) {
             body { padding: 1rem .9rem; }
             .login-wrapper { padding: 2rem 1.4rem; border-radius: 22px; }
@@ -161,6 +236,26 @@
             <span style="font-size:.75rem;font-weight:500;color:#92400e;">(15 MCQs only)</span>
         </button>
         <div class="login-footer"><span id="loginStatus">Loading...</span></div>
+
+        <!-- ==================== WHATSAPP CONTACT ==================== -->
+        <div class="wa-section">
+            <div class="wa-label">
+                <span class="wa-dot"></span>
+                Need an account? Register via WhatsApp
+            </div>
+            <a class="wa-btn"
+               id="waRegisterBtn"
+               href="https://wa.me/923070508401?text=Hi%21%20I%20want%20to%20register%20for%20Self%20Learners%20CSS%20Hub.%20Please%20guide%20me."
+               target="_blank"
+               rel="noopener noreferrer">
+                <span class="wa-icon">💬</span>
+                Register on WhatsApp
+            </a>
+            <span class="wa-number">+92 307 0508401</span>
+            <p class="wa-hint">
+                Send us a message with your name and we'll set up your account.
+            </p>
+        </div>
     </div>
 </div>
 
@@ -172,11 +267,15 @@
     const LOGIN_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
     const KEY_USER = 'slUser';
 
+    const WHATSAPP_NUMBER = '923070508401';
+    const WHATSAPP_DISPLAY = '+92 307 0508401';
+
     const $ = (id) => document.getElementById(id);
     const ui = {
         logo: $('loginLogo'), email: $('emailInput'), pass: $('passwordInput'),
         tglPw: $('togglePasswordBtn'), loginBtn: $('loginBtn'),
-        guestBtn: $('guestBtn'), loginStat: $('loginStatus')
+        guestBtn: $('guestBtn'), loginStat: $('loginStatus'),
+        waRegisterBtn: $('waRegisterBtn')
     };
 
     let users = [];
@@ -286,6 +385,24 @@
         toast('Welcome, Guest! Limited to 15 MCQs.', 'info', 2500, true);
         try { localStorage.setItem(KEY_USER, JSON.stringify(guestUser)); } catch (e) { /* ignore */ }
         setTimeout(() => notifyParent(guestUser, true), 400);
+    }
+
+    /* ---------- WhatsApp register button ---------- */
+    function buildWhatsAppLink() {
+        const msg = "Hi! I want to register for Self Learners CSS Hub. Please guide me.";
+        return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
+    }
+
+    if (ui.waRegisterBtn) {
+        // Ensure the href is always correct, even if user edits
+        ui.waRegisterBtn.href = buildWhatsAppLink();
+        ui.waRegisterBtn.addEventListener('click', (e) => {
+            // Ensure correct link on click (in case browser blocked earlier)
+            if (!ui.waRegisterBtn.href || ui.waRegisterBtn.href === '#' || !/wa\.me/.test(ui.waRegisterBtn.href)) {
+                ui.waRegisterBtn.href = buildWhatsAppLink();
+            }
+            // Let the browser open normally
+        });
     }
 
     ui.loginBtn.onclick = handleLogin;
