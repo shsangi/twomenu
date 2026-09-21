@@ -124,8 +124,8 @@
 
         /* TOP BAR */
         .top-bar {
-            display: flex; flex-direction: column; gap: .5rem;
-            padding: .4rem 0 .6rem; margin-bottom: .4rem;
+            display: flex; flex-direction: column; gap: .65rem;
+            padding: .5rem 0 1rem; margin-bottom: .5rem;
             position: sticky; top: 0; z-index: 50;
             background: var(--sf); border-bottom: 1px solid transparent;
             transition: border-color .2s, box-shadow .2s;
@@ -172,44 +172,49 @@
         .btn-icon .refresh-spin { display: inline-block; animation: spin .9s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* ==================== DRAWER ICON BUTTON (small) ==================== */
+        /* ==================== UPDATED DRAWER BUTTON ==================== */
         .btn-drawer {
             display: none;
-            background: var(--sf2);
-            border: 1.5px solid var(--border);
-            font-size: 1.05rem;
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            border: none;
+            font-size: .75rem;
+            font-weight: 700;
             cursor: pointer;
-            padding: .3rem;
-            border-radius: 10px;
-            width: 34px;
-            height: 34px;
+            padding: .45rem .85rem;
+            border-radius: var(--rf);
+            color: #fff;
             align-items: center;
             justify-content: center;
-            color: var(--text-soft);
+            gap: .35rem;
+            box-shadow: 0 4px 12px -4px rgba(14,165,233,.5);
             transition: all .15s;
+            white-space: nowrap;
             font-family: inherit;
-        }
-        .btn-drawer:hover { background: var(--sky); border-color: var(--sky); color: #fff; }
-
-        /* ==================== COMPACT PILLS (no emojis) ==================== */
-        .top-row-3 { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
-        .attempted-pill, .timer-pill, .facts-pill {
-            display: inline-flex; align-items: center; gap: .25rem;
-            padding: .3rem .6rem; border-radius: var(--rf);
-            font-size: .68rem; font-weight: 800;
-            white-space: nowrap; border: 1.5px solid;
             line-height: 1;
         }
+        .btn-drawer:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(14,165,233,.6); }
+        .btn-drawer .emoji { font-size: .9rem; }
+
+        /* TOP ROW 3 — PILLS ONLY */
+        .top-row-3 { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+        .attempted-pill, .timer-pill, .facts-pill {
+            display: inline-flex; align-items: center; gap: .35rem;
+            padding: .5rem .95rem; border-radius: var(--rf);
+            font-size: .76rem; font-weight: 800;
+            white-space: nowrap; border: 1.5px solid;
+            box-shadow: 0 2px 6px -2px rgba(14,165,233,.2);
+        }
         .attempted-pill {
-            background: var(--sky-soft);
+            background: linear-gradient(135deg, var(--sky-soft), #f0f9ff);
             border-color: var(--sky-light); color: var(--sky-dark);
         }
-        .attempted-pill .attempted { color: var(--navy); font-weight: 900; font-size: .72rem; }
+        .attempted-pill .attempted { color: var(--navy); font-weight: 900; font-size: .82rem; }
         .timer-pill {
             background: linear-gradient(135deg, var(--sky), var(--sky-dark));
             border-color: var(--sky-dark); color: #fff;
+            box-shadow: 0 4px 12px -4px rgba(14,165,233,.5);
         }
-        .timer-pill .timer { color: #fff; font-weight: 900; font-size: .72rem; letter-spacing: .02em; }
+        .timer-pill .timer { color: #fff; font-weight: 900; font-size: .82rem; letter-spacing: .02em; }
         .timer-pill.warning { background: linear-gradient(135deg, var(--warning), #b45309); border-color: var(--warning); }
         .timer-pill.danger { background: linear-gradient(135deg, var(--danger), #991b1b); border-color: var(--danger); animation: pulse 1s infinite; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .6; } }
@@ -225,33 +230,33 @@
         .papers-mode-active .timer-pill,
         .papers-mode-active .facts-pill { display: none !important; }
 
-        /* MODE PILL (compact) */
+        /* MODE PILL */
         .mode-pill-wrap { position: relative; display: inline-block; }
         .mode-pill-btn {
-            display: inline-flex; align-items: center; gap: .3rem;
-            padding: .3rem .65rem; border-radius: var(--rf);
-            font-size: .68rem; font-weight: 800;
+            display: inline-flex; align-items: center; gap: .4rem;
+            padding: .5rem .95rem; border-radius: var(--rf);
+            font-size: .76rem; font-weight: 800;
             background: linear-gradient(135deg, var(--navy), var(--navy-light));
             color: #fff; border: 1.5px solid var(--navy);
             cursor: pointer; font-family: inherit;
+            box-shadow: 0 4px 12px -4px rgba(10,30,63,.4);
             transition: all .18s; white-space: nowrap;
-            line-height: 1;
         }
         .mode-pill-btn:hover { transform: translateY(-1px); }
-        .mode-pill-btn .arrow { font-size: .55rem; transition: transform .2s; }
+        .mode-pill-btn .arrow { font-size: .6rem; transition: transform .2s; }
         .mode-pill-wrap.open .mode-pill-btn .arrow { transform: rotate(180deg); }
         .mode-pill-menu {
             position: absolute; top: calc(100% + 6px); left: 0;
             background: #fff; border: 1.5px solid var(--border);
             border-radius: var(--r); box-shadow: 0 16px 40px -10px rgba(10,30,63,.25);
-            min-width: 160px; padding: .35rem; z-index: 300;
-            display: none; flex-direction: column; gap: .1rem;
+            min-width: 180px; padding: .4rem; z-index: 300;
+            display: none; flex-direction: column; gap: .15rem;
         }
         .mode-pill-wrap.open .mode-pill-menu { display: flex; }
         .mode-pill-item {
             display: flex; align-items: center; gap: .5rem;
-            padding: .55rem .7rem; border-radius: 12px;
-            font-size: .8rem; font-weight: 700;
+            padding: .6rem .75rem; border-radius: 12px;
+            font-size: .82rem; font-weight: 700;
             color: var(--text); background: transparent;
             border: none; cursor: pointer; font-family: inherit;
             text-align: left; width: 100%;
@@ -262,28 +267,28 @@
             background: linear-gradient(135deg, var(--sky), var(--sky-dark));
             color: #fff;
         }
-        .mode-pill-item .emoji { font-size: .95rem; }
+        .mode-pill-item .emoji { font-size: 1rem; }
 
         /* PROGRESS */
-        .progress-block { background: var(--border); height: 5px; border-radius: var(--rf); margin: .4rem 0 .4rem; overflow: hidden; }
+        .progress-block { background: var(--border); height: 6px; border-radius: var(--rf); margin: .6rem 0 .6rem; overflow: hidden; }
         .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--sky), var(--yellow)); border-radius: var(--rf); transition: width .4s cubic-bezier(.4,0,.2,1); }
 
-        /* QUESTION CARD — taller now (was 52vh, now 72vh) */
+        /* QUESTION CARD */
         .question-card {
             background: var(--sf2); border: 1.5px solid var(--border);
-            border-radius: var(--r); padding: 1.5rem 1.5rem 1rem;
-            margin: .6rem 0 1rem; position: relative;
+            border-radius: var(--r); padding: 1.75rem 1.75rem 1rem;
+            margin: .8rem 0 1.1rem; position: relative;
         }
-        .question-body { max-height: 72vh; overflow-y: auto; padding-right: .7rem; padding-bottom: .6rem; }
+        .question-body { max-height: 52vh; overflow-y: auto; padding-right: .7rem; padding-bottom: .6rem; }
         .question-body::-webkit-scrollbar { width: 8px; }
         .question-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; border: 2px solid var(--sf2); }
-        .question-card .q-text { font-weight: 700; font-size: 1.12rem; margin-bottom: 1rem; color: var(--navy); line-height: 1.55; cursor: pointer; }
+        .question-card .q-text { font-weight: 700; font-size: 1.15rem; margin-bottom: 1.1rem; color: var(--navy); line-height: 1.55; cursor: pointer; }
         .question-card .q-text:hover { color: var(--sky-dark); text-decoration: underline; text-underline-offset: 3px; }
 
-        .options-list { display: flex; flex-direction: column; gap: .6rem; }
+        .options-list { display: flex; flex-direction: column; gap: .65rem; }
         .options-list .option-btn {
             background: #fff; border: 1.5px solid var(--border);
-            border-radius: var(--rf); padding: .8rem 1.2rem;
+            border-radius: var(--rf); padding: .85rem 1.3rem;
             font-size: .95rem; font-weight: 600; color: var(--text);
             text-align: left; cursor: pointer;
             display: flex; align-items: center; gap: .8rem;
@@ -305,16 +310,16 @@
         .options-list .option-btn:disabled { cursor: default; opacity: .88; }
         .options-list .option-btn .icon-indicator { margin-left: auto; font-size: 1.2rem; font-weight: 800; }
 
-        .feedback-box { margin-top: 1rem; padding: .9rem 1rem; border-radius: var(--r); font-weight: 700; font-size: .9rem; }
+        .feedback-box { margin-top: 1.1rem; padding: .95rem 1.1rem; border-radius: var(--r); font-weight: 700; font-size: .9rem; }
         .feedback-box.correct-fb { background: var(--success-bg); border: 1.5px solid var(--success); color: #065f46; }
         .feedback-box.wrong-fb { background: var(--danger-bg); border: 1.5px solid var(--danger); color: #991b1b; }
-        .q-meta-block { margin-top: .8rem; display: flex; flex-wrap: wrap; gap: .4rem; }
+        .q-meta-block { margin-top: .85rem; display: flex; flex-wrap: wrap; gap: .45rem; }
         .meta-chip { display: inline-flex; align-items: center; gap: .35rem; background: #fff; border: 1.5px solid var(--border); padding: .3rem .75rem; border-radius: var(--rf); font-size: .7rem; font-weight: 700; color: var(--text-soft); }
         .meta-chip.subject-chip { background: var(--sky-soft); color: var(--sky-dark); border-color: var(--sky-light); }
         .meta-chip.topic-chip { background: var(--yellow-soft); color: #92400e; border-color: rgba(245,184,0,.4); }
         .meta-chip.job-chip { background: var(--navy); color: var(--yellow); border-color: var(--navy); }
 
-        .action-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .9rem; margin: .8rem 0 .2rem; }
+        .action-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .9rem; margin: 1rem 0 .2rem; }
         .action-bar .left-buttons { display: flex; gap: .6rem; }
         .btn-primary {
             background: linear-gradient(135deg, var(--sky), var(--sky-dark));
@@ -336,7 +341,7 @@
         }
         .btn-success:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(5,150,105,.4); }
         .btn-success:disabled { opacity: .4; cursor: not-allowed; }
-        .end-quiz-bottom { margin-top: 1.5rem; padding-top: 1.2rem; border-top: 2px dashed var(--border); display: flex; justify-content: center; }
+        .end-quiz-bottom { margin-top: 1.75rem; padding-top: 1.4rem; border-top: 2px dashed var(--border); display: flex; justify-content: center; }
         .end-quiz-bottom .btn-success { padding: .85rem 2.8rem; font-size: 1.05rem; }
         .result-active .end-quiz-bottom { display: none !important; }
 
@@ -526,11 +531,6 @@
         .drawer-actions .btn-secondary { background: var(--sf2); border: 1.5px solid var(--border); color: var(--text-soft); border-radius: var(--rf); cursor: pointer; font-family: inherit; }
         .drawer-actions .btn-cancel-full { background: 0 0; border: 1.5px solid var(--border); color: var(--text-soft); border-radius: var(--rf); cursor: pointer; font-family: inherit; }
 
-        /* DRAWER HEADER */
-        .drawer-header { padding: .9rem 1.4rem .8rem; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--sf2); }
-        .drawer-header h3 { font-size: 1rem; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: .5rem; }
-        .drawer-header .drawer-header-close { background: var(--sf); border: 1.5px solid var(--border); width: 32px; height: 32px; border-radius: 50%; font-size: .95rem; cursor: pointer; color: var(--text-soft); display: flex; align-items: center; justify-content: center; }
-
         .m-col-badge { position: absolute; top: 8px; right: 10px; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,.9); z-index: 5; pointer-events: none; box-shadow: 0 2px 6px rgba(10,30,63,.12); }
         .m-col-badge svg { width: 12px; height: 12px; }
         .m-col-badge .q-mark { font-size: .8rem; font-weight: 800; color: var(--text-muted); }
@@ -564,12 +564,12 @@
         }
         @media (max-width: 560px) {
             body { padding: 0; }
-            .btn-drawer { display: flex; }
+            .btn-drawer { display: inline-flex; }
             .btn-icon#refreshBtn { display: none; }
-            .quiz-wrapper { padding: 1rem .85rem 1.1rem; border-radius: 22px; }
-            .question-card { padding: 1.1rem 1rem .8rem; }
+            .quiz-wrapper { padding: 1.1rem .9rem 1.2rem; border-radius: 22px; }
+            .question-card { padding: 1.2rem 1.1rem .8rem; }
             .question-card .q-text { font-size: 1rem; }
-            .options-list .option-btn { padding: .7rem .95rem; font-size: .88rem; }
+            .options-list .option-btn { padding: .75rem 1rem; font-size: .88rem; }
             .grid-dot { width: 28px; height: 28px; font-size: .66rem; }
             .action-bar { flex-direction: column; align-items: stretch; gap: .7rem; }
             .action-bar .left-buttons { justify-content: center; }
@@ -579,15 +579,14 @@
             .confirm-box { padding: 1.7rem 1.6rem; }
             .confirm-box .btn-group { flex-direction: column; }
             .confirm-box .btn-group button { width: 100%; }
-            .question-body { max-height: 68vh; }
+            .question-body { max-height: 46vh; }
             .read-item .read-q { font-size: .88rem; }
             .read-item .read-opt { font-size: .8rem; }
             .read-container, .facts-container { max-height: 72vh; min-height: 50vh; }
             .fact-card .fact-head { font-size: .88rem; }
             .fact-card .fact-answer { font-size: .8rem; }
             .mode-search-bar input { font-size: .82rem; }
-            .attempted-pill, .timer-pill, .facts-pill { font-size: .64rem; padding: .28rem .55rem; }
-            .mode-pill-btn { font-size: .64rem; padding: .28rem .6rem; }
+            .attempted-pill, .timer-pill, .facts-pill { font-size: .7rem; padding: .45rem .75rem; }
             .install-banner { padding: .9rem 1rem; gap: .7rem; }
             .install-banner .ib-icon { width: 44px; height: 44px; }
             .install-banner .ib-text strong { font-size: .85rem; }
@@ -639,11 +638,13 @@
                     <button class="btn-icon" id="refreshBtn" title="Filter &amp; Refresh">
                         <span id="refreshIcon">⚙️</span>
                     </button>
-                    <button class="btn-drawer" id="drawerBtn" title="Select job for MCQs">☰</button>
+                    <button class="btn-drawer" id="drawerBtn" title="MCQs for Job">
+                        <span class="emoji">🎯</span> MCQs for Job
+                    </button>
                 </div>
             </div>
 
-            <!-- ROW 2: Mode pill (dropdown) + compact pills -->
+            <!-- ROW 2: Mode pill (dropdown) + Pills (attempted / timer / facts) -->
             <div class="top-row-3">
                 <div class="mode-pill-wrap" id="modePillWrap">
                     <button class="mode-pill-btn" id="modePillBtn" type="button">
@@ -668,15 +669,17 @@
                 </div>
 
                 <span class="attempted-pill" id="attemptedPill">
+                    <span>📊</span>
                     <span class="attempted" id="attemptedCount">0</span>
                     <span>/</span>
                     <span id="totalCount">0</span>
                 </span>
                 <span class="timer-pill" id="timerPill">
+                    <span>⏱️</span>
                     <span class="timer" id="timerDisplay">00:00</span>
                 </span>
                 <span class="facts-pill" id="factsPill">
-                    <span class="facts-done" id="factsDoneCount">0</span>
+                    💡 <span class="facts-done" id="factsDoneCount">0</span>
                     <span>/</span>
                     <span id="factsTotalCount">0</span>
                 </span>
@@ -802,10 +805,6 @@
 
         <div class="drawer-overlay" id="drawerOverlay"></div>
         <aside class="drawer" id="drawer" aria-hidden="true">
-            <div class="drawer-header">
-                <h3><span>💼</span> Select job for MCQs</h3>
-                <button class="drawer-header-close" id="drawerHeaderCloseBtn" aria-label="Close">✕</button>
-            </div>
             <div class="drawer-body filter-panel">
                 <label class="panel-label">💼 Jobs</label>
                 <div class="ms-container" id="drawerJobMsContainer">
@@ -841,6 +840,10 @@
                             <span class="panel-user-name" id="drawerUserName">User</span>
                         </div>
                         <button class="panel-logout-btn" id="drawerLogoutBtn">🚪 Logout</button>
+                    </div>
+                    <div class="drawer-footer">
+                        <h3><span>⚙️</span> Filters &amp; Options</h3>
+                        <button class="drawer-close" id="drawerCloseBtn" aria-label="Close">✕</button>
                     </div>
                 </div>
             </div>
@@ -887,7 +890,7 @@
         dots: $('dotGrid'), doneC: $('doneCount'), pendC: $('pendingCount'), corrC: $('correctCount'), wrongC: $('wrongCount'), invC: $('invalidCount'), invLeg: $('invalidLegend'),
         result: $('resultArea'), score: $('finalScore'), rmsg: $('resultMessage'), rdetails: $('resultDetails'), restart: $('restartFromResult'),
         modal: $('refreshModal'), mCancel: $('modalCancel'), mConfirm: $('modalConfirm'), mReset: $('modalResetBtn'), mUserAv: $('modalUserAvatar'), mUserName: $('modalUserName'), mLogout: $('modalLogoutBtn'),
-        drawer: $('drawer'), drawerOverlay: $('drawerOverlay'), drawerCloseBtn: $('drawerCloseBtn'), drawerHeaderCloseBtn: $('drawerHeaderCloseBtn'), dCancel: $('drawerCancel'), dConfirm: $('drawerConfirm'), dReset: $('drawerResetBtn'), dUserAv: $('drawerUserAvatar'), dUserName: $('drawerUserName'), dLogout: $('drawerLogoutBtn'),
+        drawer: $('drawer'), drawerOverlay: $('drawerOverlay'), drawerCloseBtn: $('drawerCloseBtn'), dCancel: $('drawerCancel'), dConfirm: $('drawerConfirm'), dReset: $('drawerResetBtn'), dUserAv: $('drawerUserAvatar'), dUserName: $('drawerUserName'), dLogout: $('drawerLogoutBtn'),
         cOverlay: $('confirmOverlay'), cIcon: $('confirmIcon'), cTitle: $('confirmTitle'), cMsg: $('confirmMessage'), cOk: $('confirmOk'), cCancel: $('confirmCancel'),
         installBanner: $('installBanner'), installBtn: $('installBtn'), installClose: $('installClose'),
         jobSitesBtn: $('jobSitesBtn'), jobsitesOverlay: $('jobsitesOverlay'), jobsitesClose: $('jobsitesClose'), jobsitesSearchInput: $('jobsitesSearchInput'), jobsitesList: $('jobsitesList'),
@@ -1311,44 +1314,11 @@
             html += `<div class="fact-card${isRead ? ' read-flag' : ''}" data-key="${encodeURIComponent(key)}" data-q="${encodeURIComponent(f.question)}" data-c="${encodeURIComponent(f.subject || f.topic || '')}">${cornerHtml}<div class="fact-head"><span class="fact-srno">${escapeHtml(f.srno)}</span><span class="fact-question">${escapeHtml(f.question)} <span class="fact-search-hint">🔍</span></span></div><div class="fact-answer${hasAnswer ? '' : ' empty'}"><strong>Answer:</strong> ${hasAnswer ? escapeHtml(f.answer) : '—'}</div>${metaChips.length ? '<div class="fact-meta">' + metaChips.join('') + '</div>' : ''}</div>`;
         });
         if (shownCount === 0) { ui.factsBox.innerHTML = '<div class="read-empty">🔍 No facts match "' + escapeHtml(factsSearchQuery) + '"</div>'; ui.factsSearchCount.textContent = '0'; }
-        else {
-            ui.factsBox.innerHTML = html;
-            ui.factsSearchCount.textContent = factsSearchQuery ? (shownCount + ' found') : '';
-            /* ==================== FIXED CLICK HANDLER (increments once) ==================== */
-            ui.factsBox.querySelectorAll('.fact-card').forEach((card) => {
-                card.onclick = (e) => {
-                    e.stopPropagation();
-                    const key = decodeURIComponent(card.dataset.key);
-                    const q = decodeURIComponent(card.dataset.q);
-                    const c = decodeURIComponent(card.dataset.c);
-                    // Only mark as read if not already marked
-                    if (!factsReadSet.has(key)) {
-                        factsReadSet.add(key);
-                        saveFactsReadSet();
-                        card.classList.add('read-flag');
-                    }
-                    updateFactsCounter();   // updates counter to correct value (no +3 bug)
-                    openGoogleSearch(q, c, '');
-                };
-            });
-        }
+        else { ui.factsBox.innerHTML = html; ui.factsSearchCount.textContent = factsSearchQuery ? (shownCount + ' found') : ''; ui.factsBox.querySelectorAll('.fact-card').forEach((card) => { card.onclick = (e) => { e.stopPropagation(); const key = decodeURIComponent(card.dataset.key); const q = decodeURIComponent(card.dataset.q); const c = decodeURIComponent(card.dataset.c); if (!factsReadSet.has(key)) { factsReadSet.add(key); saveFactsReadSet(); card.classList.add('read-flag'); updateFactsCounter(); } openGoogleSearch(q, c, ''); }; }); }
         updateFactsCounter(); updateSearchBarState(ui.factsSearchBar, ui.factsSearchInput);
     }
 
-    /* ==================== FIXED COUNTER (counts unique, uses facts array properly) ==================== */
-    function updateFactsCounter() {
-        const limit = isGuest ? Math.min(GUEST_LIMIT, facts.length) : facts.length;
-        let done = 0;
-        const seenKeys = new Set();
-        for (let i = 0; i < limit; i++) {
-            const key = String(facts[i].srno || facts[i].question).trim();
-            if (seenKeys.has(key)) continue;   // dedupe in case of duplicate srno
-            seenKeys.add(key);
-            if (factsReadSet.has(key)) done++;
-        }
-        ui.factsDone.textContent = done;
-        ui.factsTotal.textContent = limit;
-    }
+    function updateFactsCounter() { const limit = isGuest ? Math.min(GUEST_LIMIT, facts.length) : facts.length; let done = 0; for (let i = 0; i < limit; i++) { const key = String(facts[i].srno || facts[i].question).trim(); if (factsReadSet.has(key)) done++; } ui.factsDone.textContent = done; ui.factsTotal.textContent = limit; }
     ui.factsSearchInput.addEventListener('input', () => { factsSearchQuery = ui.factsSearchInput.value.trim(); renderFactsMode(); });
     ui.factsSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.factsSearchInput.value = ''; factsSearchQuery = ''; renderFactsMode(); ui.factsSearchInput.blur(); } });
     ui.factsSearchClear.onclick = () => { ui.factsSearchInput.value = ''; factsSearchQuery = ''; renderFactsMode(); ui.factsSearchInput.focus(); };
@@ -1436,7 +1406,7 @@
     function closeBothPanels() { closeModal(); closeDrawer(); }
 
     ui.refresh.onclick = openModal; ui.mCancel.onclick = closeModal; ui.mConfirm.onclick = confirmAndRefresh; ui.mReset.onclick = resetFilters; ui.modal.onclick = (e) => { if (e.target === ui.modal) closeModal(); };
-    ui.drawerBtn.onclick = openDrawer; ui.drawerHeaderCloseBtn.onclick = closeDrawer; ui.drawerCloseBtn.onclick = closeDrawer; ui.drawerOverlay.onclick = closeDrawer; ui.dCancel.onclick = closeDrawer; ui.dConfirm.onclick = confirmAndRefresh; ui.dReset.onclick = resetFilters;
+    ui.drawerBtn.onclick = openDrawer; ui.drawerCloseBtn.onclick = closeDrawer; ui.drawerOverlay.onclick = closeDrawer; ui.dCancel.onclick = closeDrawer; ui.dConfirm.onclick = confirmAndRefresh; ui.dReset.onclick = resetFilters;
 
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (ui.drawer.classList.contains('open')) closeDrawer(); else if (ui.modal.classList.contains('active')) closeModal(); else if (ui.jobsitesOverlay.classList.contains('active')) closeJobSitesModal(); else if (ui.modePillWrap.classList.contains('open')) ui.modePillWrap.classList.remove('open'); } });
 
