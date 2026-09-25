@@ -422,12 +422,18 @@
         .verify-corner.unknown { background: var(--border-strong); color: var(--text-muted); }
 
         /* ============================================================
-           PAPERS — INLINE (no iframe, cards on outer layer)
+           PAPERS — FLAT LAYOUT (no nested cards)
            ============================================================ */
         #papersView { display: none; }
-        .papers-inline-wrap { margin-top: .7rem; }
 
-        .papers-search-bar { display: flex; align-items: center; gap: .55rem; margin: .7rem 0 .5rem; background: var(--sf2); border: 1.5px solid var(--border); border-radius: var(--rf); padding: .45rem .9rem; }
+        .papers-search-bar {
+            display: flex; align-items: center; gap: .55rem;
+            margin: .7rem 0 .5rem;
+            background: var(--sf2);
+            border: 1.5px solid var(--border);
+            border-radius: var(--rf);
+            padding: .45rem .9rem;
+        }
         .papers-search-bar:focus-within { border-color: var(--sky); background: #fff; box-shadow: 0 0 0 4px rgba(14,165,233,.1); }
         .papers-search-bar .psb-icon { font-size: .85rem; color: var(--text-muted); }
         .papers-search-bar input { flex: 1; border: none; background: 0 0; outline: 0; font-family: inherit; font-size: .86rem; color: var(--text); padding: .35rem .2rem; min-width: 60px; font-weight: 500; }
@@ -435,9 +441,13 @@
         .papers-search-bar.has-text .psb-clear { display: block; }
         .papers-search-bar .psb-count { font-size: .68rem; font-weight: 800; color: var(--sky-dark); background: var(--sky-soft); padding: .18rem .5rem; border-radius: var(--rf); white-space: nowrap; }
 
-        .papers-filter-row { display: flex; gap: .45rem; margin-bottom: .8rem; flex-wrap: wrap; }
+        .papers-filter-row {
+            display: flex; gap: .45rem;
+            margin-bottom: .8rem;
+            flex-wrap: wrap;
+        }
         .papers-filter-row select {
-            flex: 1 1 0; min-width: 100px;
+            flex: 1 1 0; min-width: 110px;
             border: 1.5px solid var(--border);
             background: var(--sf2);
             border-radius: var(--rf);
@@ -749,22 +759,20 @@
                 <div class="facts-container" id="factsContainer"></div>
             </div>
 
-            <!-- PAPERS — INLINE, cards on the outer layer, no iframe -->
+            <!-- PAPERS — flat layout, no nested cards, no duplicate heading -->
             <div id="papersView">
-                <div class="papers-inline-wrap">
-                    <div class="papers-search-bar" id="papersSearchBar">
-                        <span class="psb-icon">🔍</span>
-                        <input type="text" id="papersSearchInput" placeholder="Search past papers…" autocomplete="off"/>
-                        <span class="psb-count" id="papersSearchCount"></span>
-                        <button class="psb-clear" id="papersSearchClear">✕</button>
-                    </div>
-                    <div class="papers-filter-row">
-                        <select id="papersYearFilter"><option value="">All years</option></select>
-                        <select id="papersSubjectFilter"><option value="">All subjects</option></select>
-                    </div>
-                    <div class="papers-cards-grid" id="papersCardsGrid">
-                        <div class="read-empty">🔄 Loading past papers…</div>
-                    </div>
+                <div class="papers-search-bar" id="papersSearchBar">
+                    <span class="psb-icon">🔍</span>
+                    <input type="text" id="papersSearchInput" placeholder="Search past papers…" autocomplete="off"/>
+                    <span class="psb-count" id="papersSearchCount"></span>
+                    <button class="psb-clear" id="papersSearchClear">✕</button>
+                </div>
+                <div class="papers-filter-row">
+                    <select id="papersYearFilter"><option value="">All years</option></select>
+                    <select id="papersSubjectFilter"><option value="">All subjects</option></select>
+                </div>
+                <div class="papers-cards-grid" id="papersCardsGrid">
+                    <div class="read-empty">🔄 Loading past papers…</div>
                 </div>
             </div>
 
@@ -970,6 +978,8 @@
     function interpretVerify(raw) { if (raw === undefined || raw === null) return 'unknown'; const v = String(raw).trim().toLowerCase(); if (v === '') return 'unknown'; if (v === 'true' || v === 'yes' || v === '1' || v === 'y' || v === 't') return 'true'; if (v === 'false' || v === 'no' || v === '0' || v === 'n' || v === 'f') return 'false'; return 'unknown'; }
     function resolveCorrectIndex(raw, options) { if (!raw) return -1; const r = clean(raw); for (let i = 0; i < options.length; i++) if (clean(options[i]) === r) return i; const rl = r.toLowerCase(); for (let i = 0; i < options.length; i++) if (clean(options[i]).toLowerCase() === rl) return i; if (/^[A-Da-d]$/.test(r)) return 'abcd'.indexOf(r.toLowerCase()); if (/^[1-4]$/.test(r)) return parseInt(r, 10) - 1; const m = r.match(/^(?:option\s*|opt\.?\s*)?[\(\[\{\-]?\s*([A-Da-d])\s*[\)\]\}\.\-:]?/i); if (m && m[1]) return 'abcd'.indexOf(m[1].toLowerCase()); return -1; }
     function isValidLink(link) { if (!link) return false; const t = link.trim(); return t !== '' && t !== '#' && /^https?:\/\//i.test(t); }
+    // Helper: append `_t=` cache-buster with correct separator
+    function withCacheBust(url) { const sep = url.includes('?') ? '&' : '?'; return url + sep + '_t=' + Date.now(); }
 
     function toast(message, type = 'info', duration = 4000, showIcon = true) { if (toastTimer) clearTimeout(toastTimer); const container = $('toastContainer'); while (container.firstChild) container.removeChild(container.firstChild); const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' }; const t = document.createElement('div'); t.className = 'toast ' + type; t.innerHTML = (showIcon ? `<span class="toast-icon">${icons[type]}</span>` : '') + `<span>${message}</span>` + `<button class="toast-close">✕</button>`; container.appendChild(t); const remove = () => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); }; t.querySelector('.toast-close').onclick = remove; toastTimer = setTimeout(remove, duration); }
     function confirmBox(icon, title, message, okText) { return new Promise((resolve) => { ui.cIcon.textContent = icon || '❓'; ui.cTitle.textContent = title; ui.cMsg.textContent = message; if (okText) ui.cOk.textContent = okText; ui.cOverlay.classList.add('active'); confirmResolve = resolve; }); }
@@ -1048,7 +1058,7 @@
             }
         }
         if (forceRefresh) { clearSavedState(); if (timerHandle) clearInterval(timerHandle); }
-        fetch(QUIZ_URL + (QUIZ_URL.includes('?') ? '&' : '?') + '_t=' + Date.now(), { cache: 'no-store' }).then((r) => r.text()).then((text) => {
+        fetch(withCacheBust(QUIZ_URL), { cache: 'no-store' }).then((r) => r.text()).then((text) => {
             const lines = text.split('\n').filter((l) => l.trim());
             originalQuestions = [];
             for (let i = 1; i < lines.length; i++) {
@@ -1087,7 +1097,7 @@
         if (factsLoading) return;
         factsLoading = true;
         ui.factsBox.innerHTML = '<div class="read-empty">🔄 Loading facts...</div>';
-        fetch(FACTS_URL + (FACTS_URL.includes('?') ? '&' : '?') + '_t=' + Date.now(), { cache: 'no-store' }).then((r) => r.text()).then((text) => {
+        fetch(withCacheBust(FACTS_URL), { cache: 'no-store' }).then((r) => r.text()).then((text) => {
             const lines = text.split('\n').filter((l) => l.trim());
             facts = [];
             if (lines.length < 2) { factsLoaded = true; factsLoading = false; if (callback) callback(); return; }
@@ -1112,10 +1122,10 @@
         }).catch((err) => { console.error('Facts fetch error:', err); factsLoading = false; ui.factsBox.innerHTML = '<div class="read-empty" style="color:#dc2626;">❌ Failed to load facts</div>'; });
     }
 
-    /* ============ PAPERS — INLINE FETCH + RENDER ============ */
+    /* ============ PAPERS — INLINE FETCH + RENDER (FLAT) ============ */
     async function fetchPapersWithCache() {
         try {
-            const r = await fetch(PAPERS_URL + '?_t=' + Date.now(), { cache: 'no-store' });
+            const r = await fetch(withCacheBust(PAPERS_URL), { cache: 'no-store' });
             if (!r.ok) throw new Error('HTTP ' + r.status);
             const text = await r.text();
             try { localStorage.setItem(KEY_PAPERS_CACHE, text); } catch (e) {}
@@ -1178,6 +1188,7 @@
             papersLoading = false;
             populatePapersFilters();
             renderPapersCards();
+            renderSelectedSubjectsLine();
         } catch (err) {
             papersLoading = false;
             ui.papersCardsGrid.innerHTML = '<div class="read-empty" style="color:#dc2626;">❌ Could not load past papers (offline?)</div>';
@@ -1269,21 +1280,21 @@
 
         ui.papersCardsGrid.innerHTML = html;
         ui.papersCardsGrid.querySelectorAll('.expand-toggle').forEach(toggle => {
-            const handler = function (e) {
+            toggle.addEventListener('click', function (e) {
                 e.preventDefault(); e.stopPropagation();
                 const extra = document.getElementById(this.dataset.target);
                 if (!extra) return;
                 const open = extra.classList.contains('show');
                 extra.classList.toggle('show', !open);
                 this.classList.toggle('open', !open);
-            };
-            toggle.addEventListener('click', handler);
+            });
         });
         ui.papersSearchCount.textContent = q ? (filtered.length + ' found') : '';
         ui.papersSearchBar.classList.toggle('has-text', ui.papersSearchInput.value.length > 0);
     }
 
     ui.papersSearchInput.addEventListener('input', () => { papersSearchQuery = ui.papersSearchInput.value.trim(); renderPapersCards(); });
+    ui.papersSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.papersSearchInput.value = ''; papersSearchQuery = ''; renderPapersCards(); ui.papersSearchInput.blur(); } });
     ui.papersSearchClear.onclick = () => { ui.papersSearchInput.value = ''; papersSearchQuery = ''; renderPapersCards(); ui.papersSearchInput.focus(); };
     ui.papersYearFilter.addEventListener('change', renderPapersCards);
     ui.papersSubjectFilter.addEventListener('change', renderPapersCards);
@@ -1662,7 +1673,7 @@
         if (jobSitesLoading) return;
         jobSitesLoading = true;
         ui.jobsitesList.innerHTML = '<div class="jobsites-loading"><div class="spinner"></div><br>Loading job sites...</div>';
-        fetch(JOBSITES_URL + (JOBSITES_URL.includes('?') ? '&' : '?') + '_t=' + Date.now(), { cache: 'no-store' }).then((r) => r.text()).then((text) => {
+        fetch(withCacheBust(JOBSITES_URL), { cache: 'no-store' }).then((r) => r.text()).then((text) => {
             const lines = text.split('\n').filter((l) => l.trim());
             jobSites = [];
             if (lines.length < 2) { jobSitesLoaded = true; jobSitesLoading = false; if (callback) callback(); return; }
