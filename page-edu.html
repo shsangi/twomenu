@@ -41,7 +41,6 @@
         .edu-page * { -webkit-user-select: none; user-select: none; }
         .edu-page input, .edu-page textarea { -webkit-user-select: text; user-select: text; }
 
-        /* INSTALL BANNER */
         .install-banner {
             position: fixed; bottom: 1.2rem; left: 50%;
             transform: translateX(-50%) translateY(200%);
@@ -86,7 +85,6 @@
         }
         .install-banner .ib-close:hover { background: var(--bg); color: var(--text); }
 
-        /* TOASTS */
         .toast-container { position: fixed; top: 1.3rem; right: 1.3rem; z-index: 9999; display: flex; flex-direction: column; gap: .7rem; max-width: 380px; width: 100%; }
         .toast { padding: 1rem 1.2rem; border-radius: var(--r); font-size: .88rem; font-weight: 600; box-shadow: var(--shadow-xl); animation: slideInToast .35s cubic-bezier(.16,1,.3,1); display: flex; align-items: center; gap: .7rem; border-left: 4px solid; }
         .toast.success { background: var(--success-bg); color: #065f46; border-left-color: var(--success); }
@@ -98,7 +96,6 @@
         @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-8px); } }
         .toast.removing { animation: fadeOutToast .25s ease forwards; }
 
-        /* CONFIRM */
         .confirm-overlay { position: fixed; inset: 0; background: rgba(10,30,63,.55); backdrop-filter: blur(8px); z-index: 10000; display: none; align-items: center; justify-content: center; }
         .confirm-overlay.active { display: flex; }
         .confirm-box { background: var(--sf); border-radius: 28px; padding: 2.2rem 2.4rem; max-width: 440px; width: 90%; box-shadow: var(--shadow-xl); animation: scaleIn .3s cubic-bezier(.16,1,.3,1); border: 1px solid var(--border); }
@@ -113,7 +110,6 @@
         .confirm-box .btn-confirm { background: var(--danger); color: #fff; }
         .confirm-box .btn-primary { background: linear-gradient(135deg,var(--sky),var(--sky-dark)); color: #fff; }
 
-        /* QUIZ WRAPPER */
         .quiz-wrapper {
             max-width: 920px; width: 100%; margin: 0 auto;
             background: var(--sf); border-radius: 28px;
@@ -122,7 +118,6 @@
             border: 1px solid var(--border);
         }
 
-        /* TOP BAR */
         .top-bar {
             display: flex; flex-direction: column; gap: .4rem;
             padding: .35rem 0 .6rem; margin-bottom: .35rem;
@@ -172,7 +167,6 @@
         .btn-icon .refresh-spin { display: inline-block; animation: spin .9s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* ==================== DRAWER ICON BUTTON ==================== */
         .btn-drawer {
             display: none;
             background: var(--sf2);
@@ -190,7 +184,6 @@
         }
         .btn-drawer:hover { background: var(--sky); border-color: var(--sky); color: #fff; }
 
-        /* TOP ROW 3 — PILLS (SMALLER) */
         .top-row-3 { display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; }
         .attempted-pill, .timer-pill, .facts-pill {
             display: inline-flex; align-items: center; gap: .25rem;
@@ -225,7 +218,6 @@
         .papers-mode-active .timer-pill,
         .papers-mode-active .facts-pill { display: none !important; }
 
-        /* MODE PILL — SMALLER */
         .mode-pill-wrap { position: relative; display: inline-block; }
         .mode-pill-btn {
             display: inline-flex; align-items: center; gap: .3rem;
@@ -265,11 +257,9 @@
         }
         .mode-pill-item .emoji { font-size: .95rem; }
 
-        /* PROGRESS */
         .progress-block { background: var(--border); height: 5px; border-radius: var(--rf); margin: .35rem 0 .5rem; overflow: hidden; }
         .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--sky), var(--yellow)); border-radius: var(--rf); transition: width .4s cubic-bezier(.4,0,.2,1); }
 
-        /* QUESTION CARD — LARGER */
         .question-card {
             background: var(--sf2); border: 1.5px solid var(--border);
             border-radius: var(--r); padding: 1.5rem 1.5rem 1rem;
@@ -341,7 +331,6 @@
         .end-quiz-bottom .btn-success { padding: .8rem 2.5rem; font-size: 1rem; }
         .result-active .end-quiz-bottom { display: none !important; }
 
-        /* OVERVIEW */
         .overview-section { margin-top: 1.2rem; border-top: 1px solid var(--border); padding-top: .9rem; }
         .overview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .6rem; flex-wrap: wrap; gap: .5rem; }
         .overview-header > span { font-weight: 800; font-size: .78rem; color: var(--navy); letter-spacing: .08em; text-transform: uppercase; }
@@ -367,7 +356,6 @@
         .grid-dot.locked-dot::after { content: '🔒'; position: absolute; font-size: .55rem; bottom: -3px; right: -3px; }
         .grid-dot.active-dot { border-color: var(--sky-dark); transform: scale(1.15); box-shadow: 0 0 0 3px rgba(14,165,233,.25); }
 
-        /* RESULT */
         .result-card { text-align: center; padding: .6rem; display: none; }
         .result-card h2 { font-size: 1.8rem; font-weight: 800; color: var(--navy); }
         .result-score { font-size: 3.2rem; font-weight: 900; color: var(--sky-dark); margin: .4rem 0 .3rem; letter-spacing: -.03em; }
@@ -383,7 +371,6 @@
         .result-details .detail-answer .correct-ans { color: var(--success); font-weight: 700; }
         .submitted-header { text-align: center; padding: .65rem 1.2rem; background: var(--success-bg); border-radius: var(--rf); margin-bottom: .9rem; font-weight: 700; color: #065f46; font-size: .85rem; }
 
-        /* READ MODE */
         .read-container { margin-top: .7rem; display: flex; flex-direction: column; gap: .8rem; max-height: 78vh; min-height: 55vh; overflow-y: auto; padding-right: .5rem; }
         .read-item { background: var(--sf2); border: 1.5px solid var(--border); border-left: 4px solid var(--sky); border-radius: var(--r); padding: .95rem 1.15rem .85rem; position: relative; }
         .read-item .read-q { font-size: .93rem; line-height: 1.55; color: var(--navy); font-weight: 700; word-break: break-word; cursor: pointer; padding-right: 1.8rem; }
@@ -407,7 +394,6 @@
         .read-item .read-mcol.empty { background: var(--bg); }
         .read-empty { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: .95rem; font-style: italic; }
 
-        /* SEARCH BAR */
         .mode-search-bar { display: flex; align-items: center; gap: .55rem; margin: .7rem 0 .35rem; background: var(--sf2); border: 1.5px solid var(--border); border-radius: var(--rf); padding: .45rem .9rem; }
         .mode-search-bar:focus-within { border-color: var(--sky); background: #fff; box-shadow: 0 0 0 4px rgba(14,165,233,.1); }
         .mode-search-bar .msb-icon { font-size: .85rem; color: var(--text-muted); }
@@ -417,7 +403,6 @@
         .mode-search-bar .msb-count { font-size: .68rem; font-weight: 800; color: var(--sky-dark); background: var(--sky-soft); padding: .18rem .5rem; border-radius: var(--rf); white-space: nowrap; }
         .mode-search-bar .msb-count:empty { display: none; }
 
-        /* FACTS */
         .facts-container { margin-top: .7rem; display: flex; flex-direction: column; gap: .7rem; max-height: 78vh; min-height: 55vh; overflow-y: auto; padding-right: .5rem; }
         .fact-card { background: var(--sf2); border: 1.5px solid var(--border); border-left: 4px solid var(--sky); border-radius: var(--r); padding: .9rem 1.1rem .8rem; position: relative; cursor: pointer; transition: all .18s; }
         .fact-card:hover { background: var(--sky-soft); border-left-color: var(--yellow); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
@@ -436,7 +421,6 @@
         .verify-corner.false { background: var(--danger); color: #fff; }
         .verify-corner.unknown { background: var(--border-strong); color: var(--text-muted); }
 
-        /* PAPERS VIEW */
         #papersView { display: none; }
         .papers-container {
             margin-top: .7rem; min-height: 75vh;
@@ -448,7 +432,6 @@
             border: none; display: block; background: #fff;
         }
 
-        /* VIEW TOGGLES */
         .read-mode-active #singleQuestionView,
         .read-mode-active .progress-block,
         .read-mode-active .overview-section,
@@ -475,7 +458,6 @@
         .papers-mode-active #resultArea { display: none !important; }
         .papers-mode-active #papersView { display: block !important; }
 
-        /* FILTER PANEL */
         .filter-panel h3 { font-size: 1.05rem; margin-bottom: .8rem; font-weight: 800; color: var(--navy); }
         .filter-panel .panel-user-info { display: flex; align-items: center; justify-content: space-between; background: var(--sky-soft); border-radius: var(--r); padding: .7rem 1rem; margin-bottom: .9rem; border: 1px solid var(--sky-light); }
         .filter-panel .panel-user-left { display: flex; align-items: center; gap: .6rem; }
@@ -619,7 +601,6 @@
 
     <div class="quiz-wrapper" id="quizApp">
         <div class="top-bar" id="topBar">
-            <!-- ROW 1: Brand + actions -->
             <div class="top-row-1">
                 <div class="brand">
                     <img class="brand-logo" id="brandLogo"
@@ -638,7 +619,6 @@
                 </div>
             </div>
 
-            <!-- ROW 2: Mode pill (dropdown) + Pills (attempted / timer / facts) -->
             <div class="top-row-3">
                 <div class="mode-pill-wrap" id="modePillWrap">
                     <button class="mode-pill-btn" id="modePillBtn" type="button">
@@ -915,7 +895,6 @@
     function closeConfirm(result) { ui.cOverlay.classList.remove('active'); if (confirmResolve) { confirmResolve(result); confirmResolve = null; } }
     ui.cCancel.onclick = () => closeConfirm(false); ui.cOk.onclick = () => closeConfirm(true); ui.cOverlay.onclick = (e) => { if (e.target === ui.cOverlay) closeConfirm(false); };
 
-    /* ---------- Install banner ---------- */
     function showInstallBanner() { setTimeout(() => { if (ui.installBanner) ui.installBanner.classList.add('show'); }, 1500); }
     function hideInstallBanner(persistDismiss) {
         if (!ui.installBanner) return;
@@ -957,17 +936,14 @@
 
     [ui.brandLogo].forEach((img) => { const probe = new Image(); probe.onload = () => (img.src = LOGO); probe.src = LOGO; });
 
-    /* ---------- Persistence ---------- */
     function saveState() { if (isGuest) return; try { localStorage.setItem(KEY_QUIZ, JSON.stringify({ questions, answers, status, submitted, finished, score, total, locked, originalQuestions, currentQ, timeLeft, invalidQs, selJobs, selSubjs })); } catch (e) { /* ignore */ } }
     function loadState() { try { const raw = JSON.parse(localStorage.getItem(KEY_QUIZ) || 'null'); if (raw && raw.questions && raw.questions.length) return raw; } catch (e) { /* ignore */ } return null; }
     function clearSavedState() { localStorage.removeItem(KEY_QUIZ); }
     function saveFactsReadSet() { try { localStorage.setItem(KEY_FACTS_READ, JSON.stringify([...factsReadSet])); } catch (e) { /* ignore */ } }
 
-    /* ---------- Timer ---------- */
     function startTimer() { if (timerHandle) clearInterval(timerHandle); timerHandle = setInterval(() => { if (finished || submitted) return; timeLeft--; updateTimerDisplay(); if (timeLeft <= 0) { clearInterval(timerHandle); timerHandle = null; gradeQuiz(); finished = true; ui.endBtn.disabled = true; showResult(); } saveState(); }, 1000); }
     function updateTimerDisplay() { const m = Math.floor(timeLeft / 60); const s = timeLeft % 60; ui.timer.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); ui.timerPill.classList.remove('warning', 'danger'); if (timeLeft < 60) ui.timerPill.classList.add('danger'); else if (timeLeft < 300) ui.timerPill.classList.add('warning'); }
 
-    /* ---------- Fetch questions ---------- */
     function fetchQuestions(forceRefresh) {
         ui.qCard.innerHTML = '<div style="padding:2rem;text-align:center;color:#475569;font-weight:600;">🔄 Loading questions…</div>';
         ui.prev.disabled = ui.next.disabled = ui.endBtn.disabled = true;
@@ -1025,7 +1001,6 @@
         }).catch((err) => { console.error(err); ui.qCard.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;font-weight:600;">❌ Failed to load questions</div>'; ui.refresh.disabled = false; ui.refreshIcon.textContent = '⚙️'; ui.refreshIcon.classList.remove('refresh-spin'); closeBothPanels(); toast('Failed to load questions', 'error'); });
     }
 
-    /* ---------- Fetch facts ---------- */
     function fetchFacts(callback) {
         if (factsLoaded) { if (callback) callback(); return; }
         if (factsLoading) return;
@@ -1056,7 +1031,6 @@
         }).catch((err) => { console.error('Facts fetch error:', err); factsLoading = false; ui.factsBox.innerHTML = '<div class="read-empty" style="color:#dc2626;">❌ Failed to load facts</div>'; });
     }
 
-    /* ---------- Title / subtitle ---------- */
     function applyQuizTitle() { if (mode === 'facts') { ui.qTitle.textContent = '💡 Facts'; return; } if (mode === 'papers') { ui.qTitle.textContent = '📄 Solved Papers'; return; } let title = 'All Jobs MCQs'; if (selJobs.length === 1) title = titleCase(selJobs[0]) + ' MCQs'; else if (selJobs.length > 1) title = selJobs.length + ' Jobs MCQs'; ui.qTitle.textContent = title; }
     function renderSelectedSubjectsLine() {
         if (mode === 'facts') { ui.subjLine.innerHTML = '<span class="subj-label">💡</span> <span class="subj-list">Random facts &amp; general knowledge</span>'; ui.subjLine.style.display = '-webkit-box'; return; }
@@ -1068,7 +1042,6 @@
 
     function promptGuestLock() { confirmBox('🔒', 'Login Required', `You have reached the ${GUEST_LIMIT}-MCQ guest limit. Please login to unlock all questions.`, '🔐 Login Now').then((ok) => { if (ok) triggerLogout(); }); }
 
-    /* ---------- Logout → notify parent + close overlays ---------- */
     function triggerLogout() {
         if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
         closeBothPanels();
@@ -1084,7 +1057,6 @@
         } catch (e) { /* ignore */ }
     }
 
-    /* ---------- Render question ---------- */
     function renderQuestion() {
         if (!questions.length) return;
         const q = questions[currentQ];
@@ -1187,11 +1159,34 @@
         saveState(); window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* ---------- Mode switching ---------- */
+    /* ============================================================
+       ★★★ THIS IS THE KEY FIX FOR PAPERS ★★★
+       When papers iframe loads, tell it who's logged in + filters
+       ============================================================ */
     function ensurePapersLoaded() {
         if (papersFrameLoaded) return;
         const src = ui.papersFrame.getAttribute('data-src');
-        if (src) { ui.papersFrame.src = src; papersFrameLoaded = true; }
+        if (src) {
+            ui.papersFrame.src = src;
+            papersFrameLoaded = true;
+
+            // When the papers iframe finishes loading, send it:
+            //   - SL_USER: so it knows we're logged in (no lock screen)
+            //   - SL_FILTERS_CHANGED: so it can filter by current subjects
+            ui.papersFrame.addEventListener('load', function () {
+                try {
+                    ui.papersFrame.contentWindow.postMessage({
+                        type: 'SL_USER',
+                        user: user,
+                        isGuest: isGuest
+                    }, '*');
+                    ui.papersFrame.contentWindow.postMessage({
+                        type: 'SL_FILTERS_CHANGED',
+                        filters: { jobs: selJobs, subjs: selSubjs }
+                    }, '*');
+                } catch (e) { /* ignore */ }
+            }, { once: true });
+        }
     }
 
     const MODE_META = {
@@ -1253,7 +1248,6 @@
         }
     });
 
-    /* ---------- Read mode ---------- */
     function readItemMatchesSearch(q, query) { if (!query) return true; const nq = query.toLowerCase(); if (q.question && q.question.toLowerCase().includes(nq)) return true; if (q.subject && q.subject.toLowerCase().includes(nq)) return true; if (q.topic && q.topic.toLowerCase().includes(nq)) return true; if (q.job && q.job.toLowerCase().includes(nq)) return true; if (Array.isArray(q.options)) for (const opt of q.options) if (opt && String(opt).toLowerCase().includes(nq)) return true; return false; }
 
     function renderReadMode() {
@@ -1282,10 +1276,8 @@
     ui.readSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.readSearchInput.value = ''; readSearchQuery = ''; renderReadMode(); ui.readSearchInput.blur(); } });
     ui.readSearchClear.onclick = () => { ui.readSearchInput.value = ''; readSearchQuery = ''; renderReadMode(); ui.readSearchInput.focus(); };
 
-    /* ---------- Facts mode ---------- */
     function factMatchesSearch(f, query) { if (!query) return true; const nq = query.toLowerCase(); if (f.question && f.question.toLowerCase().includes(nq)) return true; if (f.answer && f.answer.toLowerCase().includes(nq)) return true; if (f.topic && f.topic.toLowerCase().includes(nq)) return true; if (f.subject && f.subject.toLowerCase().includes(nq)) return true; return false; }
 
-    // FIX: Use unique index for counter, not srno (which may repeat)
     function getFactKey(f, i) {
         return String(i) + '::' + String(f.srno || f.question || '').trim().substring(0, 80);
     }
@@ -1320,7 +1312,6 @@
                     const key = decodeURIComponent(card.dataset.key);
                     const q = decodeURIComponent(card.dataset.q);
                     const c = decodeURIComponent(card.dataset.c);
-                    // FIX: Add unique key once, then update counter
                     if (!factsReadSet.has(key)) {
                         factsReadSet.add(key);
                         saveFactsReadSet();
@@ -1334,7 +1325,6 @@
         updateFactsCounter(); updateSearchBarState(ui.factsSearchBar, ui.factsSearchInput);
     }
 
-    // FIX: Count unique facts actually marked as read within the visible limit
     function updateFactsCounter() {
         const limit = isGuest ? Math.min(GUEST_LIMIT, facts.length) : facts.length;
         let done = 0;
@@ -1350,7 +1340,6 @@
     ui.factsSearchClear.onclick = () => { ui.factsSearchInput.value = ''; factsSearchQuery = ''; renderFactsMode(); ui.factsSearchInput.focus(); };
     function updateSearchBarState(bar, input) { if (!bar || !input) return; bar.classList.toggle('has-text', input.value.length > 0); }
 
-    /* ---------- Filters / panels ---------- */
     const panels = {
         modal: { root: ui.modal, jobC: $('modalJobMsContainer'), jobW: $('modalJobMsWrapper'), jobChips: $('modalJobMsChips'), jobSearch: $('modalJobMsSearch'), jobDrop: $('modalJobMsDropdown'), subjC: $('modalSubjMsContainer'), subjW: $('modalSubjMsWrapper'), subjChips: $('modalSubjMsChips'), subjSearch: $('modalSubjMsSearch'), subjDrop: $('modalSubjMsDropdown') },
         drawer: { root: ui.drawer, jobC: $('drawerJobMsContainer'), jobW: $('drawerJobMsWrapper'), jobChips: $('drawerJobMsChips'), jobSearch: $('drawerJobMsSearch'), jobDrop: $('drawerJobMsDropdown'), subjC: $('drawerSubjMsContainer'), subjW: $('drawerSubjMsWrapper'), subjChips: $('drawerSubjMsChips'), subjSearch: $('drawerSubjMsSearch'), subjDrop: $('drawerSubjMsDropdown') },
@@ -1446,7 +1435,6 @@
 
     window.addEventListener('scroll', () => { ui.topBar.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
 
-    /* ---------- Job sites ---------- */
     function openJobSitesModal() { ui.jobsitesOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; ui.jobsitesSearchInput.value = ''; jobSitesSearchQuery = ''; if (!jobSitesLoaded && !jobSitesLoading) fetchJobSites(() => renderJobSites()); else renderJobSites(); }
     function closeJobSitesModal() { ui.jobsitesOverlay.classList.remove('active'); document.body.style.overflow = ''; }
     function fetchJobSites(callback) {
@@ -1494,7 +1482,6 @@
     ui.jobsitesOverlay.addEventListener('click', (e) => { if (e.target === ui.jobsitesOverlay) closeJobSitesModal(); });
     ui.jobsitesSearchInput.addEventListener('input', () => { jobSitesSearchQuery = ui.jobsitesSearchInput.value; renderJobSites(); });
 
-    /* ---------- Parent messaging ---------- */
     window.addEventListener('message', (e) => {
         const d = e.data;
         if (!d || typeof d !== 'object') return;
@@ -1521,7 +1508,6 @@
 
     function updateUserLabels() { const name = user ? user.user : 'User'; const initial = name[0].toUpperCase(); ui.mUserAv.textContent = initial; ui.mUserName.textContent = name; ui.dUserAv.textContent = initial; ui.dUserName.textContent = name; }
 
-    /* ---------- Init ---------- */
     function init() {
         updateUserLabels();
         try { const saved = JSON.parse(localStorage.getItem(KEY_FACTS_READ) || '[]'); factsReadSet = new Set(saved); } catch (e) { factsReadSet = new Set(); }
