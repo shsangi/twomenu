@@ -634,6 +634,51 @@
             .install-banner .ib-btn { font-size: .78rem; padding: .6rem 1rem; }
             .papers-cards-grid { max-height: 72vh; min-height: 50vh; }
         }
+
+        /* ============================================================
+           ★★★ MODE VISIBILITY — HIGH SPECIFICITY OVERRIDE ★★★
+           This block guarantees only the active mode's view is shown.
+           Prefixed with #quizApp to beat all other rules.
+           Keep this block LAST in the stylesheet.
+           ============================================================ */
+
+        #quizApp #readView,
+        #quizApp #factsView,
+        #quizApp #papersView { display: none !important; }
+
+        /* READ MODE */
+        #quizApp.read-mode-active #singleQuestionView,
+        #quizApp.read-mode-active .progress-block,
+        #quizApp.read-mode-active .overview-section,
+        #quizApp.read-mode-active .end-quiz-bottom,
+        #quizApp.read-mode-active #resultArea,
+        #quizApp.read-mode-active #factsView,
+        #quizApp.read-mode-active #papersView { display: none !important; }
+        #quizApp.read-mode-active #readView { display: block !important; }
+
+        /* FACTS MODE */
+        #quizApp.facts-mode-active #singleQuestionView,
+        #quizApp.facts-mode-active .progress-block,
+        #quizApp.facts-mode-active .overview-section,
+        #quizApp.facts-mode-active .end-quiz-bottom,
+        #quizApp.facts-mode-active #resultArea,
+        #quizApp.facts-mode-active #readView,
+        #quizApp.facts-mode-active #papersView { display: none !important; }
+        #quizApp.facts-mode-active #factsView { display: block !important; }
+
+        /* PAPERS MODE */
+        #quizApp.papers-mode-active #singleQuestionView,
+        #quizApp.papers-mode-active .progress-block,
+        #quizApp.papers-mode-active .overview-section,
+        #quizApp.papers-mode-active .end-quiz-bottom,
+        #quizApp.papers-mode-active #resultArea,
+        #quizApp.papers-mode-active #readView,
+        #quizApp.papers-mode-active #factsView { display: none !important; }
+        #quizApp.papers-mode-active #papersView { display: block !important; }
+
+        /* RESULT MODE */
+        #quizApp.result-active #singleQuestionView { display: none !important; }
+        #quizApp.result-active #resultArea { display: block !important; }
     </style>
 </head>
 <body>
@@ -759,7 +804,6 @@
                 <div class="facts-container" id="factsContainer"></div>
             </div>
 
-            <!-- PAPERS — flat layout, no nested cards, no duplicate heading -->
             <div id="papersView">
                 <div class="papers-search-bar" id="papersSearchBar">
                     <span class="psb-icon">🔍</span>
@@ -978,7 +1022,6 @@
     function interpretVerify(raw) { if (raw === undefined || raw === null) return 'unknown'; const v = String(raw).trim().toLowerCase(); if (v === '') return 'unknown'; if (v === 'true' || v === 'yes' || v === '1' || v === 'y' || v === 't') return 'true'; if (v === 'false' || v === 'no' || v === '0' || v === 'n' || v === 'f') return 'false'; return 'unknown'; }
     function resolveCorrectIndex(raw, options) { if (!raw) return -1; const r = clean(raw); for (let i = 0; i < options.length; i++) if (clean(options[i]) === r) return i; const rl = r.toLowerCase(); for (let i = 0; i < options.length; i++) if (clean(options[i]).toLowerCase() === rl) return i; if (/^[A-Da-d]$/.test(r)) return 'abcd'.indexOf(r.toLowerCase()); if (/^[1-4]$/.test(r)) return parseInt(r, 10) - 1; const m = r.match(/^(?:option\s*|opt\.?\s*)?[\(\[\{\-]?\s*([A-Da-d])\s*[\)\]\}\.\-:]?/i); if (m && m[1]) return 'abcd'.indexOf(m[1].toLowerCase()); return -1; }
     function isValidLink(link) { if (!link) return false; const t = link.trim(); return t !== '' && t !== '#' && /^https?:\/\//i.test(t); }
-    // Helper: append `_t=` cache-buster with correct separator
     function withCacheBust(url) { const sep = url.includes('?') ? '&' : '?'; return url + sep + '_t=' + Date.now(); }
 
     function toast(message, type = 'info', duration = 4000, showIcon = true) { if (toastTimer) clearTimeout(toastTimer); const container = $('toastContainer'); while (container.firstChild) container.removeChild(container.firstChild); const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' }; const t = document.createElement('div'); t.className = 'toast ' + type; t.innerHTML = (showIcon ? `<span class="toast-icon">${icons[type]}</span>` : '') + `<span>${message}</span>` + `<button class="toast-close">✕</button>`; container.appendChild(t); const remove = () => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); }; t.querySelector('.toast-close').onclick = remove; toastTimer = setTimeout(remove, duration); }
@@ -1122,7 +1165,6 @@
         }).catch((err) => { console.error('Facts fetch error:', err); factsLoading = false; ui.factsBox.innerHTML = '<div class="read-empty" style="color:#dc2626;">❌ Failed to load facts</div>'; });
     }
 
-    /* ============ PAPERS — INLINE FETCH + RENDER (FLAT) ============ */
     async function fetchPapersWithCache() {
         try {
             const r = await fetch(withCacheBust(PAPERS_URL), { cache: 'no-store' });
