@@ -23,7 +23,6 @@
             --shadow-lg: 0 20px 40px -12px rgba(10,30,63,.18);
             --shadow-xl: 0 30px 60px -15px rgba(10,30,63,.25);
             --radius: 18px; --radius-sm: 12px; --radius-full: 9999px;
-            --nav-h: 56px;
         }
         html, body { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         body {
@@ -39,97 +38,6 @@
         }
         .papers-page { width: 100%; max-width: 1100px; }
 
-        /* ==================== LOCK SCREEN ==================== */
-        .papers-lock {
-            max-width: 440px;
-            margin: 2rem auto;
-            background: var(--card);
-            border-radius: 24px;
-            padding: 2.4rem 1.75rem 2rem;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            display: none;
-        }
-        .papers-lock.show { display: block; animation: fadeInUp .4s ease; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .papers-lock::before {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
-            background: linear-gradient(90deg, var(--sky), var(--sky-dark), var(--yellow));
-        }
-        .papers-lock .lock-badge {
-            width: 84px; height: 84px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--sky-soft), #f0f9ff);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2.6rem;
-            margin: 0 auto 1.2rem;
-            border: 2px solid var(--sky-light);
-            box-shadow: 0 8px 24px -8px rgba(14,165,233,.35);
-        }
-        .papers-lock h2 {
-            font-size: 1.4rem; font-weight: 800;
-            color: var(--navy); margin-bottom: .5rem;
-            letter-spacing: -.02em;
-            line-height: 1.3;
-        }
-        .papers-lock .lock-sub {
-            color: var(--text-soft);
-            font-size: .9rem;
-            line-height: 1.55;
-            margin-bottom: 1.6rem;
-        }
-        .papers-lock .lock-features {
-            text-align: left;
-            background: var(--sky-soft);
-            border-radius: var(--radius-sm);
-            padding: 1rem 1.1rem;
-            margin-bottom: 1.6rem;
-            border: 1px solid var(--sky-light);
-        }
-        .papers-lock .lock-features .lf-item {
-            display: flex; align-items: flex-start; gap: .55rem;
-            font-size: .85rem; font-weight: 600;
-            color: var(--navy);
-            padding: .3rem 0;
-            line-height: 1.4;
-        }
-        .papers-lock .lock-features .lf-item .lf-icon {
-            flex-shrink: 0;
-            font-size: 1rem;
-            width: 20px;
-            text-align: center;
-        }
-        .papers-lock .lock-login-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
-            color: #fff; border: none;
-            font-weight: 800; font-size: 1rem;
-            padding: 1rem 1.5rem;
-            border-radius: var(--radius-full);
-            cursor: pointer; font-family: inherit;
-            box-shadow: 0 8px 20px -6px rgba(14,165,233,.5);
-            transition: all .2s;
-            display: flex; align-items: center; justify-content: center; gap: .5rem;
-            min-height: 52px;
-        }
-        .papers-lock .lock-login-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -6px rgba(14,165,233,.6); }
-        .papers-lock .lock-login-btn:active { transform: translateY(0); }
-        .papers-lock .lock-guest-hint {
-            margin-top: .9rem;
-            font-size: .75rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        /* ==================== MAIN CONTENT ==================== */
-        .papers-content { display: none; }
-        .papers-content.show { display: block; animation: fadeIn .3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Header */
         .page-header {
             margin-bottom: 1rem;
             display: flex; flex-direction: column; gap: .6rem;
@@ -160,7 +68,6 @@
         }
         .header-stat-pill .num { color: var(--navy); font-weight: 800; }
 
-        /* Sticky Filter Bar */
         .filter-bar-wrap {
             position: sticky;
             top: 0;
@@ -243,7 +150,6 @@
             box-shadow: 0 4px 12px -4px rgba(14,165,233,.4);
         }
 
-        /* Cards Grid */
         .cards-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -445,7 +351,6 @@
             border: 1px solid var(--border);
         }
 
-        /* Empty / error states */
         .no-results {
             grid-column: 1 / -1;
             text-align: center;
@@ -460,7 +365,6 @@
         .no-results .emoji { font-size: 2rem; display: block; margin-bottom: .5rem; }
         .no-results small { color: var(--text-muted); font-size: .8rem; display: block; margin-top: .3rem; }
 
-        /* Skeletons */
         .skeleton-card {
             background: var(--card);
             border-radius: var(--radius);
@@ -484,7 +388,6 @@
         .skeleton-line.short { width: 55%; }
         .skeleton-line.medium { width: 80%; }
 
-        /* ==================== RESPONSIVE ==================== */
         @media (min-width: 560px) {
             .page-header {
                 flex-direction: row;
@@ -505,23 +408,16 @@
             .filter-bar-wrap { margin: 0 0 .9rem; padding: .5rem 0; }
         }
 
-        /* Small phones */
         @media (max-width: 400px) {
             body { padding: .75rem .65rem 1.75rem; }
             .page-header h1 { font-size: 1.3rem; }
             .essay-title { font-size: .9rem; }
             .urdu-meaning { font-size: .84rem; }
-            .papers-lock { padding: 2rem 1.4rem 1.7rem; }
-            .papers-lock .lock-badge { width: 72px; height: 72px; font-size: 2.2rem; }
-            .papers-lock h2 { font-size: 1.2rem; }
-            .papers-lock .lock-sub { font-size: .85rem; }
-            .papers-lock .lock-features .lf-item { font-size: .8rem; }
             .filter-bar-wrap { margin: 0 -.65rem .75rem; padding: .5rem .65rem; }
             .card-body { padding: .75rem .85rem .85rem; }
             .card-head { padding: .85rem .85rem .65rem; }
         }
 
-        /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: .01ms !important;
@@ -533,59 +429,33 @@
 <body>
 <div class="papers-page">
 
-    <!-- ==================== LOCK SCREEN ==================== -->
-    <div class="papers-lock" id="papersLock">
-        <div class="lock-badge">🔒</div>
-        <h2>Login to Access Past Papers</h2>
-        <p class="lock-sub">
-            Solved FPSC past papers are available to registered members only.
-            Sign in to unlock the complete archive.
-        </p>
-
-        <div class="lock-features">
-            <div class="lf-item"><span class="lf-icon">📄</span> Complete solved essay papers archive</div>
-            <div class="lf-item"><span class="lf-icon">📅</span> Filter by year &amp; subject</div>
-            <div class="lf-item"><span class="lf-icon">🇵🇰</span> Urdu meanings + full exam context</div>
-            <div class="lf-item"><span class="lf-icon">🔗</span> Direct solution links</div>
-        </div>
-
-        <button class="lock-login-btn" id="papersLoginBtn">
-            🔐 Login to Continue
-        </button>
-        <div class="lock-guest-hint">
-            Free for registered users · Takes 10 seconds
+    <!-- NO LOCK SCREEN — always renders content -->
+    <div class="page-header">
+        <h1>Solved Papers</h1>
+        <div class="header-stats">
+            <span class="header-stat-pill" id="headerTotalRecords">📄 <span class="num">0</span> records</span>
+            <span class="header-stat-pill" id="headerTotalYears">📅 <span class="num">0</span> years</span>
         </div>
     </div>
 
-    <!-- ==================== MAIN CONTENT ==================== -->
-    <div class="papers-content" id="papersContent">
-        <div class="page-header">
-            <h1>Solved Papers</h1>
-            <div class="header-stats">
-                <span class="header-stat-pill" id="headerTotalRecords">📄 <span class="num">0</span> records</span>
-                <span class="header-stat-pill" id="headerTotalYears">📅 <span class="num">0</span> years</span>
+    <div class="filter-bar-wrap">
+        <div class="filter-bar">
+            <div class="filter-search">
+                <input type="text" id="searchInputPapers" placeholder="Search in past papers…" autocomplete="off">
             </div>
-        </div>
-
-        <div class="filter-bar-wrap">
-            <div class="filter-bar">
-                <div class="filter-search">
-                    <input type="text" id="searchInputPapers" placeholder="Search in past papers…" autocomplete="off">
-                </div>
-                <div class="filter-selects">
-                    <select id="yearFilter"><option value="">All years</option></select>
-                    <select id="subjectFilter"><option value="">All subjects</option></select>
-                </div>
-                <span id="statsCount" class="filter-count">0 records</span>
+            <div class="filter-selects">
+                <select id="yearFilter"><option value="">All years</option></select>
+                <select id="subjectFilter"><option value="">All subjects</option></select>
             </div>
+            <span id="statsCount" class="filter-count">0 records</span>
         </div>
+    </div>
 
-        <div id="cardsContainer" class="cards-grid">
-            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
-            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
-            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
-            <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
-        </div>
+    <div id="cardsContainer" class="cards-grid">
+        <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line short"></div><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
     </div>
 
 </div>
@@ -593,10 +463,7 @@
 <script>
 (function () {
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTarve67hHynjJ0GzHY4IUl5ip1GnDgc2kyRyun5psdUN2IeSUcktBWWl7qEVFmMEM9x4TiPIyrcLzh/pub?output=csv";
-
-    const papersLock = document.getElementById("papersLock");
-    const papersContent = document.getElementById("papersContent");
-    const papersLoginBtn = document.getElementById("papersLoginBtn");
+    const CACHE_KEY = 'slPapersCache';
 
     const cardsContainer = document.getElementById("cardsContainer");
     const searchInput = document.getElementById("searchInputPapers");
@@ -608,40 +475,6 @@
 
     let allEssays = [], filteredEssays = [];
     let hasLoaded = false;
-
-    /* ============ AUTH CHECK ============ */
-    function getUser() {
-        try {
-            const u = JSON.parse(localStorage.getItem('slUser') || 'null');
-            if (!u) return null;
-            if (u.user === 'Guest') return { user: 'Guest', isGuest: true };
-            return { user: u.user, pass: u.pass, isGuest: false };
-        } catch (e) { return null; }
-    }
-
-    function isLoggedInUser() {
-        const u = getUser();
-        return u && !u.isGuest;
-    }
-
-    function showLock() {
-        papersLock.classList.add('show');
-        papersContent.classList.remove('show');
-    }
-
-    function showContent() {
-        papersLock.classList.remove('show');
-        papersContent.classList.add('show');
-        if (!hasLoaded) {
-            hasLoaded = true;
-            init();
-        }
-    }
-
-    /* ============ LOGIN REDIRECT ============ */
-    papersLoginBtn.onclick = function () {
-        window.location.href = 'page-edu.html';
-    };
 
     /* ============ CSV PARSER ============ */
     function parseCSV(text) {
@@ -799,11 +632,27 @@
         headerTotalYears.innerHTML = `📅 <span class="num">${totalYears}</span> years`;
     }
 
+    /* ============ OFFLINE-SAFE FETCH ============ */
+    async function fetchWithCache(url, cacheKey) {
+        try {
+            const r = await fetch(url + '?_t=' + Date.now(), { cache: 'no-store' });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            const text = await r.text();
+            try { localStorage.setItem(cacheKey, text); } catch (e) {}
+            return text;
+        } catch (err) {
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                console.warn('[Papers] Offline — using cached CSV');
+                return cached;
+            }
+            throw err;
+        }
+    }
+
     async function init() {
         try {
-            const response = await fetch(CSV_URL, { cache: 'no-store' });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const csvText = await response.text();
+            const csvText = await fetchWithCache(CSV_URL, CACHE_KEY);
             const parsed = parseCSV(csvText);
             if (parsed.length < 2) throw new Error('No data rows found');
             allEssays = buildEssaysFromRows(parsed);
@@ -815,39 +664,47 @@
             searchInput.addEventListener('input', applyFilters);
             yearFilter.addEventListener('change', applyFilters);
             subjectFilter.addEventListener('change', applyFilters);
+            hasLoaded = true;
         } catch (error) {
             cardsContainer.innerHTML = `<div class="no-results"><span class="emoji">⚠️</span>Could not load past papers.<small>${escapeHtml(error.message)}</small></div>`;
             statsCount.textContent = '0 records';
         }
     }
 
-    /* ============ INITIAL ROUTING ============ */
-    if (isLoggedInUser()) {
-        showContent();
-    } else {
-        showLock();
-    }
-
-    /* Re-check auth when tab regains focus */
-    window.addEventListener('focus', function () {
-        if (isLoggedInUser() && !hasLoaded) {
-            showContent();
-        }
-    });
-
-    /* Storage events from other tabs/iframes */
-    window.addEventListener('storage', function (e) {
-        if (e.key === 'slUser' && isLoggedInUser() && !hasLoaded) {
-            showContent();
-        }
-    });
-
-    /* Messages from parent (index.html) */
+    /* ============ LISTEN TO PARENT MESSAGES ============ */
     window.addEventListener('message', function (e) {
-        if (e.data && e.data.type === 'SL_AUTH_CHANGED' && isLoggedInUser() && !hasLoaded) {
-            showContent();
+        const d = e.data;
+        if (!d || typeof d !== 'object') return;
+
+        // Parent tells us who is logged in — we don't gate on auth anymore,
+        // but this is where you'd show a guest notice if needed.
+        if (d.type === 'SL_USER') {
+            // no-op: papers is always visible now
+        }
+
+        // Parent tells us the Jobs/Subjects filters changed
+        if (d.type === 'SL_FILTERS_CHANGED') {
+            const subjs = (d.filters && d.filters.subjs) || [];
+            if (subjs.length === 1) {
+                const match = [...subjectFilter.options].find(
+                    o => o.value.toLowerCase() === subjs[0].toLowerCase()
+                );
+                if (match) { subjectFilter.value = match.value; applyFilters(); }
+            } else if (subjs.length === 0) {
+                subjectFilter.value = '';
+                applyFilters();
+            }
+        }
+
+        // Parent asks us to refresh
+        if (d.type === 'SL_REFRESH_DATA') {
+            hasLoaded = false;
+            init();
         }
     });
+
+    /* ============ INITIAL LOAD — ALWAYS RUNS ============ */
+    init();
 
 })();
 </script>
