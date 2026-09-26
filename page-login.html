@@ -48,12 +48,12 @@
         .toast.removing { animation: fadeOutToast .25s ease forwards; }
 
         /* ============================================================
-           SINGLE CARD — nothing nested inside
+           SINGLE CARD
            ============================================================ */
         .login-wrapper {
             background: var(--sf);
             border-radius: 28px;
-            padding: 3rem 2.25rem;
+            padding: 2.5rem 2.25rem 3rem;
             box-shadow: var(--shadow-xl);
             border: 1px solid var(--border);
             position: relative;
@@ -86,7 +86,7 @@
             position: relative;
             width: 80px;
             height: 80px;
-            margin: 0 auto 1.4rem;
+            margin: 0 auto .9rem;
         }
         .login-wrapper .logo {
             width: 80px; height: 80px; border-radius: var(--r); object-fit: contain;
@@ -102,8 +102,6 @@
             border-radius: 24px;
             z-index: 3;
             pointer-events: none;
-            opacity: 0;
-            transition: opacity .5s ease;
             padding: 3px;
             background:
                 conic-gradient(
@@ -121,9 +119,6 @@
                 linear-gradient(#000 0 0);
             -webkit-mask-composite: xor;
                     mask-composite: exclude;
-        }
-        .logo-ring.run {
-            opacity: 1;
             animation: ringSpin 3.2s linear infinite;
         }
         @property --ring-angle {
@@ -135,7 +130,7 @@
             to { --ring-angle: 360deg; }
         }
         @supports not (background: conic-gradient(from var(--ring-angle, 0deg), red, blue)) {
-            .logo-ring.run {
+            .logo-ring {
                 background: conic-gradient(from 0deg, rgba(245,184,0,0) 0deg, #f5b800 90deg, rgba(245,184,0,0) 180deg, rgba(245,184,0,0) 360deg);
                 animation: ringSpinFallback 3.2s linear infinite;
             }
@@ -143,11 +138,48 @@
         }
 
         /* ============================================================
+           FLAGS ROW — below logo, single-line marquee left → right
+           ============================================================ */
+        .flags-row {
+            position: relative;
+            overflow: hidden;
+            height: 28px;
+            margin: 0 -.5rem .9rem;
+            border-radius: 6px;
+            mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+        }
+        .flags-track {
+            display: inline-flex;
+            align-items: center;
+            gap: .55rem;
+            white-space: nowrap;
+            height: 100%;
+            animation: flagScroll 30s linear infinite;
+            will-change: transform;
+        }
+        .flags-track span {
+            font-size: 1.05rem;
+            line-height: 1;
+            display: inline-block;
+            filter: drop-shadow(0 1px 2px rgba(10,30,63,.12));
+        }
+        @keyframes flagScroll {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .flags-track { animation: none !important; }
+            .logo-ring { animation: none !important; opacity: .5; }
+        }
+
+        /* ============================================================
            TITLE + FLOATING MATH FORMULAS
            ============================================================ */
         .title-wrap {
             position: relative;
-            margin-bottom: 2rem;
+            margin-bottom: 1.8rem;
         }
         .login-wrapper h1 {
             font-size: 2rem; font-weight: 800; letter-spacing: -.03em;
@@ -191,14 +223,14 @@
         .formula.f7 { top: 12px; left: 88%;  font-size: .75rem; color: rgba(245,184,0,.55); }
         .formula.f8 { top: 28px; left: 12%;  font-size: .7rem;  color: rgba(2,132,199,.50); }
 
-        .login-wrapper.run-intro .formula.f1 { animation: formulaReveal .8s ease 0s forwards, floatA 9s linear .8s infinite; }
-        .login-wrapper.run-intro .formula.f2 { animation: formulaReveal .8s ease .35s forwards, floatB 11s linear 1.15s infinite; }
-        .login-wrapper.run-intro .formula.f3 { animation: formulaReveal .8s ease .7s forwards, floatA 10s linear 1.5s infinite; }
-        .login-wrapper.run-intro .formula.f4 { animation: formulaReveal .8s ease 1.05s forwards, floatC 12s linear 1.85s infinite; }
-        .login-wrapper.run-intro .formula.f5 { animation: formulaReveal .8s ease 1.4s forwards, floatB 10s linear 2.2s infinite; }
-        .login-wrapper.run-intro .formula.f6 { animation: formulaReveal .8s ease 1.75s forwards, floatA 13s linear 2.55s infinite; }
-        .login-wrapper.run-intro .formula.f7 { animation: formulaReveal .8s ease 2.1s forwards, floatC 11s linear 2.9s infinite; }
-        .login-wrapper.run-intro .formula.f8 { animation: formulaReveal .8s ease 2.45s forwards, floatB 8.5s linear 3.25s infinite; }
+        .formula.f1 { animation: formulaReveal .8s ease 0s forwards, floatA 9s linear .8s infinite; }
+        .formula.f2 { animation: formulaReveal .8s ease .12s forwards, floatB 11s linear .92s infinite; }
+        .formula.f3 { animation: formulaReveal .8s ease .24s forwards, floatA 10s linear 1.04s infinite; }
+        .formula.f4 { animation: formulaReveal .8s ease .36s forwards, floatC 12s linear 1.16s infinite; }
+        .formula.f5 { animation: formulaReveal .8s ease .48s forwards, floatB 10s linear 1.28s infinite; }
+        .formula.f6 { animation: formulaReveal .8s ease .6s forwards, floatA 13s linear 1.4s infinite; }
+        .formula.f7 { animation: formulaReveal .8s ease .72s forwards, floatC 11s linear 1.52s infinite; }
+        .formula.f8 { animation: formulaReveal .8s ease .84s forwards, floatB 8.5s linear 1.64s infinite; }
 
         @keyframes formulaReveal {
             from { opacity: 0; transform: scale(.6); }
@@ -222,19 +254,10 @@
 
         @media (prefers-reduced-motion: reduce) {
             .formula { animation: none !important; opacity: .35; }
-            .login-wrapper.run-intro .formula.f1,
-            .login-wrapper.run-intro .formula.f2,
-            .login-wrapper.run-intro .formula.f3,
-            .login-wrapper.run-intro .formula.f4,
-            .login-wrapper.run-intro .formula.f5,
-            .login-wrapper.run-intro .formula.f6,
-            .login-wrapper.run-intro .formula.f7,
-            .login-wrapper.run-intro .formula.f8 { animation: none !important; opacity: .35 !important; }
-            .logo-ring.run { animation: none !important; }
         }
 
         /* ============================================================
-           FORM FIELDS — flat, no cards
+           FORM FIELDS
            ============================================================ */
         .login-wrapper label {
             display: block; font-weight: 700; font-size: .82rem;
@@ -268,7 +291,7 @@
         .login-wrapper .btn-login:disabled { opacity: .5; cursor: not-allowed; }
 
         /* ============================================================
-           FLAT WhatsApp BUTTON — no outer container box
+           WHATSAPP — flat button
            ============================================================ */
         .wa-label {
             display: flex;
@@ -328,7 +351,7 @@
         }
 
         /* ============================================================
-           DIVIDER + GUEST BUTTON — flat, no cards
+           DIVIDER + GUEST
            ============================================================ */
         .login-wrapper .divider {
             display: flex; align-items: center; gap: .8rem;
@@ -368,12 +391,14 @@
 
         @media (max-width: 560px) {
             body { padding: 1rem .9rem; }
-            .login-wrapper { padding: 2rem 1.4rem; border-radius: 22px; }
-            .logo-wrap { width: 64px; height: 64px; margin-bottom: 1rem; }
+            .login-wrapper { padding: 2rem 1.4rem 2.4rem; border-radius: 22px; }
+            .logo-wrap { width: 64px; height: 64px; margin-bottom: .7rem; }
             .login-wrapper .logo { width: 64px; height: 64px; padding: 10px; }
             .login-wrapper h1 { font-size: 1.65rem; }
             .version-label { top: 12px; right: 14px; font-size: .55rem; padding: 2px 7px; }
             .formula.f3, .formula.f6 { display: none; }
+            .flags-row { height: 24px; margin-bottom: .7rem; }
+            .flags-track span { font-size: .95rem; }
         }
     </style>
 </head>
@@ -388,7 +413,12 @@
             <img class="logo" id="loginLogo"
                  src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230a1e3f'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter,sans-serif' font-size='38' font-weight='800' fill='%23f5b800'%3ESL%3C/text%3E%3C/svg%3E"
                  alt="Logo"/>
-            <span class="logo-ring" id="logoRing" aria-hidden="true"></span>
+            <span class="logo-ring" aria-hidden="true"></span>
+        </div>
+
+        <!-- Flags row — single line marquee -->
+        <div class="flags-row" aria-hidden="true">
+            <div class="flags-track" id="flagsTrack"></div>
         </div>
 
         <div class="title-wrap">
@@ -419,7 +449,7 @@
 
         <button class="btn-login" id="loginBtn">Sign In</button>
 
-        <!-- WhatsApp signup — flat green button, no outer card -->
+        <!-- WhatsApp signup — flat green button -->
         <div class="wa-label">
             <span class="wa-dot"></span>
             New here? Sign up on WhatsApp
@@ -457,13 +487,22 @@
     const WHATSAPP_NUMBER = '923070508401';
     const WHATSAPP_DISPLAY = '+92 307 0508401';
 
+    /* ============================================================
+       FLAG LIST — 30 top flags including Pakistan
+       ============================================================ */
+    const FLAGS = [
+        '🇨🇭','🇳🇴','🇮🇸','🇭🇰','🇩🇰','🇸🇪','🇩🇪','🇮🇪','🇸🇬','🇦🇺',
+        '🇳🇱','🇧🇪','🇫🇮','🇬🇧','🇳🇿','🇨🇦','🇰🇷','🇱🇺','🇯🇵','🇮🇱',
+        '🇲🇹','🇸🇮','🇦🇹','🇦🇪','🇱🇹','🇪🇸','🇨🇿','🇫🇷','🇮🇹','🇵🇰'
+    ];
+
     const $ = (id) => document.getElementById(id);
     const ui = {
         logo: $('loginLogo'), email: $('emailInput'), pass: $('passwordInput'),
         tglPw: $('togglePasswordBtn'), loginBtn: $('loginBtn'),
         guestBtn: $('guestBtn'), loginStat: $('loginStatus'),
         waRegisterBtn: $('waRegisterBtn'), versionLabel: $('versionLabel'),
-        loginWrapper: $('loginWrapper'), logoRing: $('logoRing')
+        flagsTrack: $('flagsTrack')
     };
 
     let users = [];
@@ -504,6 +543,21 @@
         const remove = () => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); };
         t.querySelector('.toast-close').onclick = remove;
         toastTimer = setTimeout(remove, duration);
+    }
+
+    /* ============================================================
+       BUILD FLAGS ROW — duplicate the list so it loops seamlessly
+       ============================================================ */
+    function buildFlagsRow() {
+        if (!ui.flagsTrack) return;
+        ui.flagsTrack.innerHTML = '';
+        // Two copies → scroll distance = -50% for a perfect loop
+        const doubled = FLAGS.concat(FLAGS);
+        doubled.forEach((f) => {
+            const s = document.createElement('span');
+            s.textContent = f;
+            ui.flagsTrack.appendChild(s);
+        });
     }
 
     (function () {
@@ -594,21 +648,7 @@
     ui.guestBtn.onclick = handleGuest;
     ui.email.onkeydown = ui.pass.onkeydown = (e) => { if (e.key === 'Enter') handleLogin(); };
 
-    /* ============================================================
-       INTRO SEQUENCE — same timing as edu page
-       3s: formulas reveal
-       9s: golden ring around logo
-       ============================================================ */
-    function buildIntroSequence() {
-        setTimeout(() => {
-            if (ui.loginWrapper) ui.loginWrapper.classList.add('run-intro');
-        }, 3000);
-        setTimeout(() => {
-            if (ui.logoRing) ui.logoRing.classList.add('run');
-        }, 9000);
-    }
-
-    buildIntroSequence();
+    buildFlagsRow();
     fetchUsers();
 })();
 </script>
