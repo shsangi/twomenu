@@ -41,9 +41,6 @@
         .edu-page * { -webkit-user-select: none; user-select: none; }
         .edu-page input, .edu-page textarea { -webkit-user-select: text; user-select: text; }
 
-        /* ============================================================
-           DESKTOP TOP NAV
-           ============================================================ */
         .desktop-nav {
             display: none;
             background: var(--sf);
@@ -169,7 +166,56 @@
         }
         .top-bar.scrolled { border-bottom-color: var(--border); box-shadow: 0 4px 16px -8px rgba(10,30,63,.15); }
 
-        .top-row-1 { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
+        .top-row-1 { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; position: relative; z-index: 2; }
+
+        /* ============================================================
+           FLYING FLAGS LAYER — behind header content
+           ============================================================ */
+        .flags-layer {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .flag-emoji {
+            position: absolute;
+            font-size: 1rem;
+            opacity: 0;
+            will-change: transform, opacity;
+            user-select: none;
+            filter: drop-shadow(0 1px 2px rgba(10,30,63,.15));
+        }
+        /* 3 different floating patterns, staggered starting positions/timings */
+        @keyframes flagFloat1 {
+            0%   { transform: translate(0, 0)    rotate(0);   opacity: 0; }
+            10%  { opacity: .85; }
+            50%  { transform: translate(30px, -8px) rotate(6deg); opacity: .7; }
+            90%  { opacity: .85; }
+            100% { transform: translate(60px, 0)   rotate(0);   opacity: 0; }
+        }
+        @keyframes flagFloat2 {
+            0%   { transform: translate(0, 0)     rotate(0);    opacity: 0; }
+            12%  { opacity: .8; }
+            50%  { transform: translate(-28px, 10px) rotate(-6deg); opacity: .65; }
+            88%  { opacity: .8; }
+            100% { transform: translate(-56px, 0)   rotate(0);    opacity: 0; }
+        }
+        @keyframes flagFloat3 {
+            0%   { transform: translate(0, 0)    scale(.9);   opacity: 0; }
+            15%  { opacity: .75; }
+            50%  { transform: translate(16px, -14px) scale(1.05); opacity: .85; }
+            85%  { opacity: .75; }
+            100% { transform: translate(32px, 0)   scale(.9);   opacity: 0; }
+        }
+        .flag-emoji.p1 { animation: flagFloat1 14s linear infinite; }
+        .flag-emoji.p2 { animation: flagFloat2 16s linear infinite; }
+        .flag-emoji.p3 { animation: flagFloat3 12s linear infinite; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .flag-emoji { animation: none !important; opacity: .25; }
+        }
+
         .brand { display: flex; align-items: flex-start; gap: .65rem; min-width: 0; flex: 1 1 auto; }
 
         /* ============================================================
@@ -187,7 +233,6 @@
             object-fit: contain; background: var(--sf2); padding: 3px;
             display: block;
         }
-        /* Bird SVG flying across the logo */
         .brand-bird {
             position: absolute;
             top: 0;
@@ -211,6 +256,10 @@
             100% { transform: translate(40px, 6px) scale(0.9); opacity: 0; }
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            .brand-bird { animation: none !important; display: none; }
+        }
+
         /* ============================================================
            BRAND TITLE + FLOATING MATH FORMULAS
            ============================================================ */
@@ -224,7 +273,6 @@
             z-index: 2;
         }
 
-        /* Floating formula layer sits between header background and title text */
         .formula-layer {
             position: absolute;
             inset: -6px -8px -4px -6px;
@@ -241,7 +289,6 @@
             white-space: nowrap;
             will-change: transform, opacity;
         }
-        /* Each formula gets its own position + animation timing */
         .formula.f1 { top: 4px;  left: 8%;   font-size: .85rem; color: rgba(2,132,199,.55); animation: floatA 9s linear infinite; animation-delay: 0s; }
         .formula.f2 { top: 22px; left: 22%;  font-size: .75rem; color: rgba(10,30,63,.45);  animation: floatB 11s linear infinite; animation-delay: 1.2s; }
         .formula.f3 { top: 6px;  left: 36%;  font-size: .9rem;  color: rgba(245,184,0,.65); animation: floatA 10s linear infinite; animation-delay: 2.6s; }
@@ -274,7 +321,6 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .brand-bird { animation: none !important; display: none; }
             .formula { animation: none !important; opacity: .35; }
         }
 
@@ -292,7 +338,7 @@
         }
         .selected-subjects .subj-list { color: var(--sky-dark); font-weight: 700; }
 
-        .top-actions { display: flex; align-items: center; gap: .4rem; flex-shrink: 0; }
+        .top-actions { display: flex; align-items: center; gap: .4rem; flex-shrink: 0; position: relative; z-index: 2; }
         .btn-icon {
             background: var(--sf2); border: 1.5px solid var(--border);
             font-size: .9rem; cursor: pointer; padding: .3rem;
@@ -324,7 +370,7 @@
         .facts-mode-active .btn-drawer,
         .papers-mode-active .btn-drawer { display: none !important; }
 
-        .top-row-3 { display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; }
+        .top-row-3 { display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; position: relative; z-index: 2; }
         .attempted-pill, .timer-pill, .facts-pill {
             display: inline-flex; align-items: center; gap: .25rem;
             padding: .3rem .65rem; border-radius: var(--rf);
@@ -381,9 +427,7 @@
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             max-width: 130px;
         }
-        .papers-filter-pill .pfp-arrow {
-            font-size: .5rem; transition: transform .2s;
-        }
+        .papers-filter-pill .pfp-arrow { font-size: .5rem; transition: transform .2s; }
         .papers-filter-pill-wrap.open .papers-filter-pill .pfp-arrow { transform: rotate(180deg); }
 
         .papers-filter-pill-menu {
@@ -748,6 +792,8 @@
             .btn-icon#refreshBtn { display: none; }
             .quiz-wrapper { padding: 1rem .85rem 1.15rem; border-radius: 22px; }
             .formula.f3, .formula.f6 { display: none; }
+            /* Fewer flags on very small screens to avoid clutter */
+            .flag-emoji.fk-mobile-hide { display: none; }
             .question-card { padding: 1.15rem 1rem .75rem; }
             .question-card .q-text { font-size: 1rem; }
             .options-list .option-btn { padding: .7rem .95rem; font-size: .87rem; }
@@ -776,6 +822,7 @@
             .papers-cards-grid { max-height: 72vh; min-height: 50vh; }
             .papers-filter-pill { font-size: .64rem; padding: .28rem .6rem; max-width: 140px; }
             .papers-filter-pill .pfp-label { max-width: 90px; }
+            .flag-emoji { font-size: .85rem; }
         }
 
         #quizApp #readView,
@@ -860,6 +907,9 @@
 
     <div class="quiz-wrapper" id="quizApp">
         <div class="top-bar" id="topBar">
+            <!-- FLAGS LAYER — populated by JS -->
+            <div class="flags-layer" id="flagsLayer" aria-hidden="true"></div>
+
             <div class="top-row-1">
                 <div class="brand">
                     <div class="brand-logo-wrap">
@@ -1128,6 +1178,24 @@
     const GUEST_LIMIT = 15;
     const PAGE_SIZE = 100;
 
+    /* ============================================================
+       TOP 100 DEVELOPED COUNTRIES (by HDI) — as flag emojis
+       Pakistan 🇵🇰 is included at the end with a special marker.
+       ============================================================ */
+    const TOP_COUNTRY_FLAGS = [
+        // Top ~100 by HDI / development index
+        '🇨🇭','🇳🇴','🇮🇸','🇭🇰','🇩🇰','🇸🇪','🇩🇪','🇮🇪','🇸🇬','🇦🇺',
+        '🇳🇱','🇧🇪','🇫🇮','🇬🇧','🇳🇿','🇨🇦','🇰🇷','🇱🇺','🇯🇵','🇮🇱',
+        '🇲🇹','🇸🇮','🇦🇹','🇦🇪','🇱🇹','🇪🇸','🇨🇿','🇫🇷','🇮🇹','🇪🇪',
+        '🇸🇦','🇨🇾','🇬🇷','🇵🇱','🇧🇭','🇦🇩','🇭🇷','🇱🇻','🇶🇦','🇨🇱',
+        '🇧🇳','🇸🇰','🇭🇺','🇧🇭','🇦🇷','🇰🇼','🇲🇪','🇷🇴','🇵🇹','🇧🇬',
+        '🇧🇭','🇰🇿','🇧🇾','🇷🇺','🇧🇦','🇺🇾','🇵🇦','🇧🇧','🇵🇱','🇴🇲',
+        '🇬🇪','🇨🇷','🇲🇾','🇷🇸','🇹🇭','🇱🇰','🇦🇱','🇧🇬','🇦🇲','🇲🇺',
+        '🇮🇷','🇦🇿','🇲🇰','🇹🇷','🇧🇷','🇲🇽','🇨🇳','🇨🇴','🇵🇪','🇲🇻',
+        '🇯🇴','🇹🇳','🇪🇨','🇿🇦','🇩🇴','🇱🇧','🇧🇹','🇩🇿','🇻🇪','🇲🇳',
+        '🇧🇼','🇸🇷','🇯🇲','🇵🇾','🇫🇯','🇧🇿','🇬🇦','🇬🇾','🇹🇴','🇵🇰'
+    ];
+
     const $ = (id) => document.getElementById(id);
     const ui = {
         quizApp: $('quizApp'), topBar: $('topBar'), brandLogo: $('brandLogo'), qTitle: $('quizTitle'), subjLine: $('selectedSubjectsLine'),
@@ -1151,6 +1219,7 @@
         installBanner: $('installBanner'), installBtn: $('installBtn'), installClose: $('installClose'),
         jobSitesBtn: $('jobSitesBtn'), jobsitesOverlay: $('jobsitesOverlay'), jobsitesClose: $('jobsitesClose'), jobsitesSearchInput: $('jobsitesSearchInput'), jobsitesList: $('jobsitesList'),
         desktopNav: $('desktopNav'),
+        flagsLayer: $('flagsLayer'),
     };
 
     let questions = [], originalQuestions = [], currentQ = 0, total = 0, answers = [], status = [], locked = [], invalidQs = [];
@@ -1194,6 +1263,33 @@
     function resolveCorrectIndex(raw, options) { if (!raw) return -1; const r = clean(raw); for (let i = 0; i < options.length; i++) if (clean(options[i]) === r) return i; const rl = r.toLowerCase(); for (let i = 0; i < options.length; i++) if (clean(options[i]).toLowerCase() === rl) return i; if (/^[A-Da-d]$/.test(r)) return 'abcd'.indexOf(r.toLowerCase()); if (/^[1-4]$/.test(r)) return parseInt(r, 10) - 1; const m = r.match(/^(?:option\s*|opt\.?\s*)?[\(\[\{\-]?\s*([A-Da-d])\s*[\)\]\}\.\-:]?/i); if (m && m[1]) return 'abcd'.indexOf(m[1].toLowerCase()); return -1; }
     function isValidLink(link) { if (!link) return false; const t = link.trim(); return t !== '' && t !== '#' && /^https?:\/\//i.test(t); }
     function withCacheBust(url) { const sep = url.includes('?') ? '&' : '?'; return url + sep + '_t=' + Date.now(); }
+
+    /* ============================================================
+       BUILD FLAG LAYER — 100 flags floating across the header
+       ============================================================ */
+    function buildFlagsLayer() {
+        if (!ui.flagsLayer) return;
+        ui.flagsLayer.innerHTML = '';
+        const total = TOP_COUNTRY_FLAGS.length;
+        TOP_COUNTRY_FLAGS.forEach((flag, i) => {
+            const span = document.createElement('span');
+            span.className = 'flag-emoji p' + ((i % 3) + 1);
+            span.textContent = flag;
+            // Spread flags across the header width (percent based)
+            const leftPct = (i / total) * 100;
+            const topPct = 4 + ((i * 37) % 74); // pseudo-random vertical spread 4%–78%
+            span.style.left = leftPct + '%';
+            span.style.top = topPct + '%';
+            // Stagger the start time so they don't all pop in together
+            span.style.animationDelay = ((i * 0.17) % 14).toFixed(2) + 's';
+            // Slight size variation for organic feel
+            const sizeVar = 0.85 + ((i * 7) % 5) * 0.08; // 0.85 – 1.17
+            span.style.fontSize = sizeVar.toFixed(2) + 'rem';
+            // Hide every 2nd flag on small screens to reduce clutter
+            if (i % 3 === 2) span.classList.add('fk-mobile-hide');
+            ui.flagsLayer.appendChild(span);
+        });
+    }
 
     function toast(message, type = 'info', duration = 4000, showIcon = true) { if (toastTimer) clearTimeout(toastTimer); const container = $('toastContainer'); while (container.firstChild) container.removeChild(container.firstChild); const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' }; const t = document.createElement('div'); t.className = 'toast ' + type; t.innerHTML = (showIcon ? `<span class="toast-icon">${icons[type]}</span>` : '') + `<span>${message}</span>` + `<button class="toast-close">✕</button>`; container.appendChild(t); const remove = () => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); }; t.querySelector('.toast-close').onclick = remove; toastTimer = setTimeout(remove, duration); }
     function confirmBox(icon, title, message, okText) { return new Promise((resolve) => { ui.cIcon.textContent = icon || '❓'; ui.cTitle.textContent = title; ui.cMsg.textContent = message; if (okText) ui.cOk.textContent = okText; ui.cOverlay.classList.add('active'); confirmResolve = resolve; }); }
@@ -2095,6 +2191,7 @@
 
     function init() {
         updateUserLabels();
+        buildFlagsLayer();
         try { const saved = JSON.parse(localStorage.getItem(KEY_FACTS_READ) || '[]'); factsReadSet = new Set(saved); } catch (e) { factsReadSet = new Set(); }
         try { const savedUser = JSON.parse(localStorage.getItem(KEY_USER) || 'null'); if (savedUser) { user = savedUser; isGuest = savedUser.user === 'Guest'; updateUserLabels(); } } catch (e) { /* ignore */ }
         fetchQuestions(false);
