@@ -170,9 +170,6 @@
 
         .brand { display: flex; align-items: flex-start; gap: .65rem; min-width: 0; flex: 1 1 auto; }
 
-        /* ============================================================
-           BRAND LOGO + GOLDEN RING
-           ============================================================ */
         .brand-logo-wrap {
             position: relative;
             flex-shrink: 0;
@@ -235,9 +232,6 @@
             @keyframes ringSpinFallback { to { transform: rotate(360deg); } }
         }
 
-        /* ============================================================
-           BRAND TITLE + MATH FORMULAS (reveal 3s+, drift forever)
-           ============================================================ */
         .brand-title { min-width: 0; flex: 1 1 auto; position: relative; }
         .brand-title h1 {
             font-size: 1rem; font-weight: 800; color: var(--navy);
@@ -273,7 +267,6 @@
         .formula.f7 { top: 8px;  left: 90%;  font-size: .7rem;  color: rgba(245,184,0,.55); }
         .formula.f8 { top: 18px; left: 14%;  font-size: .65rem; color: rgba(2,132,199,.50); }
 
-        /* Reveal + drift — triggered by .run-intro on .top-bar */
         .top-bar.run-intro .formula.f1 { animation: formulaReveal .8s ease 0s forwards, floatA 9s linear .8s infinite; }
         .top-bar.run-intro .formula.f2 { animation: formulaReveal .8s ease .35s forwards, floatB 11s linear 1.15s infinite; }
         .top-bar.run-intro .formula.f3 { animation: formulaReveal .8s ease .7s forwards, floatA 10s linear 1.5s infinite; }
@@ -772,6 +765,35 @@
         .jobsites-loading, .jobsites-empty { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: .9rem; font-weight: 500; }
         .jobsites-loading .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--sky); border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: .5rem; }
 
+        /* ============================================================
+           GUEST PAPERS LOCK BANNER
+           ============================================================ */
+        .guest-papers-lock {
+            margin-top: 1rem;
+            padding: 1.5rem 1.25rem;
+            background: linear-gradient(135deg, #e0f2fe 0%, #fff 100%);
+            border: 1.5px solid var(--sky-light);
+            border-radius: var(--r);
+            text-align: center;
+        }
+        .guest-papers-lock .gpl-icon { font-size: 2rem; margin-bottom: .4rem; }
+        .guest-papers-lock h3 {
+            font-size: 1rem; font-weight: 800; color: var(--navy);
+            margin-bottom: .35rem;
+        }
+        .guest-papers-lock p {
+            font-size: .85rem; color: var(--text-soft);
+            line-height: 1.5; margin-bottom: 1rem;
+        }
+        .guest-papers-lock .gpl-btn {
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            color: #fff; border: none; font-weight: 800;
+            font-size: .88rem; padding: .75rem 1.6rem;
+            border-radius: var(--rf); cursor: pointer; font-family: inherit;
+            box-shadow: 0 4px 12px -4px rgba(14,165,233,.5);
+        }
+        .guest-papers-lock .gpl-btn:hover { transform: translateY(-1px); }
+
         @media (max-width: 640px) {
             .brand-title h1 { font-size: .92rem; }
             .selected-subjects { font-size: .62rem; }
@@ -1012,6 +1034,12 @@
                 <div class="papers-cards-grid" id="papersCardsGrid">
                     <div class="read-empty">🔄 Loading past papers…</div>
                 </div>
+                <div class="guest-papers-lock" id="guestPapersLock" style="display:none">
+                    <div class="gpl-icon">🔒</div>
+                    <h3>Login to view all papers</h3>
+                    <p>Guests can only see the first 5 papers. Login to unlock the complete archive of solved past papers.</p>
+                    <button class="gpl-btn" id="guestPapersLoginBtn">🔐 Login Now</button>
+                </div>
             </div>
 
             <div class="overview-section">
@@ -1158,6 +1186,7 @@
     const KEY_INSTALL_DISMISSED = 'slInstallDismissed';
     const KEY_PAPERS_CACHE = 'slPapersCache';
     const GUEST_LIMIT = 15;
+    const GUEST_PAPERS_LIMIT = 5;
     const PAGE_SIZE = 100;
 
     const $ = (id) => document.getElementById(id);
@@ -1175,6 +1204,7 @@
         papersCardsGrid: $('papersCardsGrid'),
         papersYearPillWrap: $('papersYearPillWrap'), papersYearPill: $('papersYearPill'), papersYearPillLabel: $('papersYearPillLabel'), papersYearPillMenu: $('papersYearPillMenu'),
         papersSubjectPillWrap: $('papersSubjectPillWrap'), papersSubjectPill: $('papersSubjectPill'), papersSubjectPillLabel: $('papersSubjectPillLabel'), papersSubjectPillMenu: $('papersSubjectPillMenu'),
+        guestPapersLock: $('guestPapersLock'), guestPapersLoginBtn: $('guestPapersLoginBtn'),
         dots: $('dotGrid'), doneC: $('doneCount'), pendC: $('pendingCount'), corrC: $('correctCount'), wrongC: $('wrongCount'), invC: $('invalidCount'), invLeg: $('invalidLegend'),
         result: $('resultArea'), score: $('finalScore'), rmsg: $('resultMessage'), rdetails: $('resultDetails'), restart: $('restartFromResult'),
         modal: $('refreshModal'), mCancel: $('modalCancel'), mConfirm: $('modalConfirm'), mReset: $('modalResetBtn'), mUserAv: $('modalUserAvatar'), mUserName: $('modalUserName'), mLogout: $('modalLogoutBtn'),
@@ -1228,18 +1258,10 @@
     function isValidLink(link) { if (!link) return false; const t = link.trim(); return t !== '' && t !== '#' && /^https?:\/\//i.test(t); }
     function withCacheBust(url) { const sep = url.includes('?') ? '&' : '?'; return url + sep + '_t=' + Date.now(); }
 
-    /* ============================================================
-       INTRO SEQUENCE
-       Stage 2 (3s): formulas reveal + drift forever
-       Stage 4 (9s): golden ring chase around logo (permanent)
-       ============================================================ */
     function buildIntroSequence() {
-        // Stage 2: formulas start revealing — add .run-intro to header
         setTimeout(() => {
             if (ui.topBar) ui.topBar.classList.add('run-intro');
         }, 3000);
-
-        // Stage 4: golden ring chase around logo
         setTimeout(() => {
             if (ui.logoRing) ui.logoRing.classList.add('run');
         }, 9000);
@@ -1526,12 +1548,25 @@
     function renderPapersCards() {
         const q = papersSearchQuery.toLowerCase().trim();
 
-        const filtered = papers.filter(p => {
-            if (papersYearFilter && p.year !== papersYearFilter) return false;
-            if (papersSubjectFilter && p.subject !== papersSubjectFilter) return false;
+        // ★ GUEST LIMIT: only first N papers, skip filters for guests
+        const isGuestLimited = isGuest;
+        let filtered = papers.filter(p => {
+            if (!isGuestLimited) {
+                if (papersYearFilter && p.year !== papersYearFilter) return false;
+                if (papersSubjectFilter && p.subject !== papersSubjectFilter) return false;
+            }
             if (!paperMatchesSearch(p, q)) return false;
             return true;
         });
+
+        if (isGuestLimited) {
+            filtered = filtered.slice(0, GUEST_PAPERS_LIMIT);
+            if (ui.guestPapersLock) ui.guestPapersLock.style.display = 'block';
+            if (ui.papersSearchBar) ui.papersSearchBar.style.display = 'none';
+        } else {
+            if (ui.guestPapersLock) ui.guestPapersLock.style.display = 'none';
+            if (ui.papersSearchBar) ui.papersSearchBar.style.display = '';
+        }
 
         if (!filtered.length) {
             ui.papersCardsGrid.innerHTML = '<div class="read-empty">🔍 No past papers match your filters</div>';
@@ -1600,12 +1635,16 @@
             });
         });
         ui.papersSearchCount.textContent = q ? (filtered.length + ' found') : '';
-        ui.papersSearchBar.classList.toggle('has-text', ui.papersSearchInput.value.length > 0);
+        if (ui.papersSearchBar) ui.papersSearchBar.classList.toggle('has-text', ui.papersSearchInput.value.length > 0);
     }
 
     ui.papersSearchInput.addEventListener('input', () => { papersSearchQuery = ui.papersSearchInput.value.trim(); renderPapersCards(); });
     ui.papersSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.papersSearchInput.value = ''; papersSearchQuery = ''; renderPapersCards(); ui.papersSearchInput.blur(); } });
     ui.papersSearchClear.onclick = () => { ui.papersSearchInput.value = ''; papersSearchQuery = ''; renderPapersCards(); ui.papersSearchInput.focus(); };
+
+    if (ui.guestPapersLoginBtn) {
+        ui.guestPapersLoginBtn.addEventListener('click', () => triggerLogout());
+    }
 
     function applyQuizTitle() {
         if (mode === 'facts') { ui.qTitle.textContent = '💡 Facts'; return; }
@@ -1620,7 +1659,11 @@
         if (mode === 'papers') {
             if (papersLoaded) {
                 const years = new Set(papers.map(p => p.year).filter(Boolean)).size;
-                ui.subjLine.innerHTML = '<span class="subj-label">📄</span> <span class="subj-list">' + papers.length + ' records</span> &nbsp;·&nbsp; <span class="subj-label">📅</span> <span class="subj-list">' + years + ' years</span>';
+                if (isGuest) {
+                    ui.subjLine.innerHTML = '<span class="subj-label">📄</span> <span class="subj-list">Guest · Showing first ' + GUEST_PAPERS_LIMIT + ' of ' + papers.length + ' records</span>';
+                } else {
+                    ui.subjLine.innerHTML = '<span class="subj-label">📄</span> <span class="subj-list">' + papers.length + ' records</span> &nbsp;·&nbsp; <span class="subj-label">📅</span> <span class="subj-list">' + years + ' years</span>';
+                }
             } else {
                 ui.subjLine.innerHTML = '<span class="subj-label">📄</span> <span class="subj-list">Loading past papers…</span>';
             }
@@ -2115,20 +2158,44 @@
     ui.jobsitesOverlay.addEventListener('click', (e) => { if (e.target === ui.jobsitesOverlay) closeJobSitesModal(); });
     ui.jobsitesSearchInput.addEventListener('input', () => { jobSitesSearchQuery = ui.jobsitesSearchInput.value; renderJobSites(); });
 
+    /* ============================================================
+       PARENT MESSAGES — includes auth change re-render fix
+       ============================================================ */
     window.addEventListener('message', (e) => {
         const d = e.data;
         if (!d || typeof d !== 'object') return;
 
         if (d.type === 'SL_THEME') { /* theme already applied */ }
         else if (d.type === 'SL_USER') {
+            const prevIsGuest = isGuest;
             user = d.user || null;
             isGuest = !!d.isGuest;
+
             if (user) updateUserLabels();
             closeBothPanels();
             if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
             if (ui.papersYearPillWrap) ui.papersYearPillWrap.classList.remove('open');
             if (ui.papersSubjectPillWrap) ui.papersSubjectPillWrap.classList.remove('open');
             document.body.style.overflow = '';
+
+            // ★ Re-render current view if guest status changed (fixes lock persisting after login)
+            if (prevIsGuest !== isGuest) {
+                if (mode === 'mcq') {
+                    renderDots(currentQ);
+                    renderQuestion();
+                    updateProgress();
+                    updateOverview();
+                } else if (mode === 'read') {
+                    renderReadMode();
+                } else if (mode === 'facts') {
+                    renderFactsMode();
+                } else if (mode === 'papers') {
+                    renderPapersCards();
+                    renderSelectedSubjectsLine();
+                }
+                // Re-sync overview dots in case limit changed
+                if (ui.dots && mode === 'mcq') renderDots(currentQ);
+            }
         } else if (d.type === 'SL_SET_MODE') {
             setMode(d.mode, true);
         } else if (d.type === 'SL_FORCE_CLOSE_OVERLAYS') {
