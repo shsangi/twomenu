@@ -792,6 +792,7 @@
                     <input type="text" id="readSearchInput" placeholder="Search questions, options, topics..." autocomplete="off"/>
                     <span class="msb-count" id="readSearchCount"></span>
                     <button class="msb-clear" id="readSearchClear">✕</button>
+                    <button class="msb-load-more hidden" id="readLoadMoreBtn" type="button">⬇️ Load 100 more</button>
                 </div>
                 <div class="read-container" id="readContainer"></div>
             </div>
@@ -967,7 +968,7 @@
     const KEY_INSTALL_DISMISSED = 'slInstallDismissed';
     const KEY_PAPERS_CACHE = 'slPapersCache';
     const GUEST_LIMIT = 15;
-    const FACTS_PAGE_SIZE = 100;
+    const PAGE_SIZE = 100;
 
     const $ = (id) => document.getElementById(id);
     const ui = {
@@ -978,6 +979,7 @@
         prog: $('progressFill'), single: $('singleQuestionView'), subBanner: $('submittedBanner'), qCard: $('questionCard'),
         prev: $('prevBtn'), next: $('nextBtn'), endBtn: $('endQuizBtn'),
         readBox: $('readContainer'), readSearchBar: $('readSearchBar'), readSearchInput: $('readSearchInput'), readSearchClear: $('readSearchClear'), readSearchCount: $('readSearchCount'),
+        readLoadMoreBtn: $('readLoadMoreBtn'),
         factsBox: $('factsContainer'), factsSearchBar: $('factsSearchBar'), factsSearchInput: $('factsSearchInput'), factsSearchClear: $('factsSearchClear'), factsSearchCount: $('factsSearchCount'),
         factsLoadMoreBtn: $('factsLoadMoreBtn'),
         papersSearchBar: $('papersSearchBar'), papersSearchInput: $('papersSearchInput'), papersSearchClear: $('papersSearchClear'), papersSearchCount: $('papersSearchCount'),
@@ -996,7 +998,8 @@
     let mode = 'mcq', isGuest = false, user = null;
     let selJobs = [], selSubjs = [], availSubjs = [], jobSearchText = '', subjSearchText = '';
     let facts = [], factsLoaded = false, factsLoading = false, factsReadSet = new Set();
-    let factsVisibleLimit = FACTS_PAGE_SIZE;
+    let factsVisibleLimit = PAGE_SIZE;
+    let readVisibleLimit = PAGE_SIZE;
     let readSearchQuery = '', factsSearchQuery = '';
     let papers = [], papersLoaded = false, papersLoading = false, papersSearchQuery = '';
     let toastTimer = null, confirmResolve = null;
@@ -1168,7 +1171,7 @@
                 rowNum++;
                 const rawVerify = cols[verifyIdx] ? cols[verifyIdx].trim() : '';
                 facts.push({
-                    srno: rowNum,   // ← srno comes from code, not sheet
+                    srno: rowNum,
                     question,
                     answer: cols[aIdx] ? cols[aIdx].trim() : '',
                     topic: cols[topicIdx] ? cols[topicIdx].trim() : '',
@@ -1532,10 +1535,12 @@
             applyQuizTitle(); renderSelectedSubjectsLine();
             if (finished) { ui.single.style.display = 'none'; ui.result.style.display = 'block'; $('endQuizBottom').style.display = 'none'; ui.quizApp.classList.add('result-active'); } else { ui.single.style.display = 'block'; }
         } else if (mode === 'read') {
-            ui.quizApp.classList.add('read-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); renderReadMode();
+            ui.quizApp.classList.add('read-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine();
+            readVisibleLimit = PAGE_SIZE;
+            renderReadMode();
         } else if (mode === 'facts') {
             ui.quizApp.classList.add('facts-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine();
-            factsVisibleLimit = FACTS_PAGE_SIZE;
+            factsVisibleLimit = PAGE_SIZE;
             if (!factsLoaded && !factsLoading) fetchFacts(() => renderFactsMode()); else renderFactsMode();
         } else if (mode === 'papers') {
             ui.quizApp.classList.add('papers-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); loadPapersInline();
@@ -1555,10 +1560,12 @@
     document.addEventListener('click', (e) => { if (!ui.modePillWrap.contains(e.target)) ui.modePillWrap.classList.remove('open'); });
 
     function readItemMatchesSearch(q, query) { if (!query) return true; const nq = query.toLowerCase(); if (q.question && q.question.toLowerCase().includes(nq)) return true; if (q.subject && q.subject.toLowerCase().includes(nq)) return true; if (q.topic && q.topic.toLowerCase().includes(nq)) return true; if (q.job && q.job.toLowerCase().includes(nq)) return true; if (Array.isArray(q.options)) for (const opt of q.options) if (opt && String(opt).toLowerCase().includes(nq)) return true; return false; }
+
     function renderReadMode() {
-        if (!questions.length) { ui.readBox.innerHTML = '<div class="read-empty">No questions available</div>'; ui.readSearchCount.textContent = ''; return; }
+        if (!questions.length) { ui.readBox.innerHTML = '<div class="read-empty">No questions available</div>'; ui.readSearchCount.textContent = ''; if (ui.readLoadMoreBtn) ui.readLoadMoreBtn.classList.add('hidden'); return; }
         const letters = ['A', 'B', 'C', 'D'];
-        const limit = isGuest ? GUEST_LIMIT : questions.length;
+        const guestLimit = isGuest ? GUEST_LIMIT : questions.length;
+        const limit = Math.min(readVisibleLimit, guestLimit);
         let html = '', shownCount = 0;
         questions.slice(0, limit).forEach((q, i) => {
             if (!readItemMatchesSearch(q, readSearchQuery)) return;
@@ -1574,12 +1581,36 @@
         });
         if (shownCount === 0) { ui.readBox.innerHTML = '<div class="read-empty">🔍 No questions match "' + escapeHtml(readSearchQuery) + '"</div>'; ui.readSearchCount.textContent = '0'; }
         else { ui.readBox.innerHTML = html; ui.readSearchCount.textContent = readSearchQuery ? (shownCount + ' found') : ''; ui.readBox.querySelectorAll('.read-q').forEach((el) => { el.onclick = (e) => { e.stopPropagation(); openGoogleSearch(decodeURIComponent(el.dataset.q), decodeURIComponent(el.dataset.s), decodeURIComponent(el.dataset.t)); }; }); }
+
+        // Load more button for read mode
+        const totalLimit = isGuest ? Math.min(GUEST_LIMIT, questions.length) : questions.length;
+        const hasMore = !readSearchQuery && readVisibleLimit < totalLimit;
+        if (ui.readLoadMoreBtn) {
+            if (hasMore) {
+                const remaining = totalLimit - readVisibleLimit;
+                const step = Math.min(PAGE_SIZE, Math.max(remaining, 0));
+                ui.readLoadMoreBtn.textContent = step > 0 ? `⬇️ +${step}` : '⬇️ +more';
+                ui.readLoadMoreBtn.classList.remove('hidden');
+                ui.readLoadMoreBtn.disabled = false;
+            } else {
+                ui.readLoadMoreBtn.classList.add('hidden');
+            }
+        }
+
         updateSearchBarState(ui.readSearchBar, ui.readSearchInput);
     }
 
-    ui.readSearchInput.addEventListener('input', () => { readSearchQuery = ui.readSearchInput.value.trim(); renderReadMode(); });
-    ui.readSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.readSearchInput.value = ''; readSearchQuery = ''; renderReadMode(); ui.readSearchInput.blur(); } });
-    ui.readSearchClear.onclick = () => { ui.readSearchInput.value = ''; readSearchQuery = ''; renderReadMode(); ui.readSearchInput.focus(); };
+    if (ui.readLoadMoreBtn) {
+        ui.readLoadMoreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            readVisibleLimit += PAGE_SIZE;
+            renderReadMode();
+        });
+    }
+
+    ui.readSearchInput.addEventListener('input', () => { readSearchQuery = ui.readSearchInput.value.trim(); readVisibleLimit = PAGE_SIZE; renderReadMode(); });
+    ui.readSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.readSearchInput.value = ''; readSearchQuery = ''; readVisibleLimit = PAGE_SIZE; renderReadMode(); ui.readSearchInput.blur(); } });
+    ui.readSearchClear.onclick = () => { ui.readSearchInput.value = ''; readSearchQuery = ''; readVisibleLimit = PAGE_SIZE; renderReadMode(); ui.readSearchInput.focus(); };
 
     /* ============ FACTS SEARCH — searches all 8 columns ============ */
     function factMatchesSearch(f, query) {
@@ -1637,7 +1668,6 @@
                 metaChips.push(`<span class="fm-chip topic">🏷️ ${escapeHtml(f.topic)}</span>`);
             }
 
-            // srno shown = position in visible list (i+1), not from sheet
             const displaySrno = i + 1;
             html += `<div class="fact-card${isRead ? ' read-flag' : ''}" data-key="${encodeURIComponent(key)}" data-q="${encodeURIComponent(f.question)}" data-c="${encodeURIComponent(f.subject || f.topic || '')}">${cornerHtml}<div class="fact-head"><span class="fact-srno">${displaySrno}</span><span class="fact-question">${escapeHtml(f.question)} <span class="fact-search-hint">🔍</span></span></div><div class="fact-answer${hasAnswer ? '' : ' empty'}"><strong>Answer:</strong> ${hasAnswer ? escapeHtml(f.answer) : '—'}</div>${metaChips.length ? '<div class="fact-meta">' + metaChips.join('') + '</div>' : ''}</div>`;
         });
@@ -1660,13 +1690,12 @@
             });
         }
 
-        // Load more button — inside search bar, next to count
         const totalLimit = isGuest ? Math.min(GUEST_LIMIT, facts.length) : facts.length;
         const hasMore = !factsSearchQuery && factsVisibleLimit < totalLimit;
         if (ui.factsLoadMoreBtn) {
             if (hasMore) {
                 const remaining = totalLimit - factsVisibleLimit;
-                const step = Math.min(FACTS_PAGE_SIZE, Math.max(remaining, 0));
+                const step = Math.min(PAGE_SIZE, Math.max(remaining, 0));
                 ui.factsLoadMoreBtn.textContent = step > 0 ? `⬇️ +${step}` : '⬇️ +more';
                 ui.factsLoadMoreBtn.classList.remove('hidden');
                 ui.factsLoadMoreBtn.disabled = false;
@@ -1682,7 +1711,7 @@
     if (ui.factsLoadMoreBtn) {
         ui.factsLoadMoreBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            factsVisibleLimit += FACTS_PAGE_SIZE;
+            factsVisibleLimit += PAGE_SIZE;
             renderFactsMode();
         });
     }
@@ -1696,11 +1725,11 @@
     }
     ui.factsSearchInput.addEventListener('input', () => {
         factsSearchQuery = ui.factsSearchInput.value.trim();
-        factsVisibleLimit = FACTS_PAGE_SIZE;
+        factsVisibleLimit = PAGE_SIZE;
         renderFactsMode();
     });
-    ui.factsSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.factsSearchInput.value = ''; factsSearchQuery = ''; factsVisibleLimit = FACTS_PAGE_SIZE; renderFactsMode(); ui.factsSearchInput.blur(); } });
-    ui.factsSearchClear.onclick = () => { ui.factsSearchInput.value = ''; factsSearchQuery = ''; factsVisibleLimit = FACTS_PAGE_SIZE; renderFactsMode(); ui.factsSearchInput.focus(); };
+    ui.factsSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.factsSearchInput.value = ''; factsSearchQuery = ''; factsVisibleLimit = PAGE_SIZE; renderFactsMode(); ui.factsSearchInput.blur(); } });
+    ui.factsSearchClear.onclick = () => { ui.factsSearchInput.value = ''; factsSearchQuery = ''; factsVisibleLimit = PAGE_SIZE; renderFactsMode(); ui.factsSearchInput.focus(); };
     function updateSearchBarState(bar, input) { if (!bar || !input) return; bar.classList.toggle('has-text', input.value.length > 0); }
 
     const panels = {
@@ -1773,7 +1802,7 @@
     document.addEventListener('click', (e) => { ['modal', 'drawer'].forEach((key) => { const p = panels[key]; if (!p.jobC.contains(e.target) && !p.subjC.contains(e.target)) { p.jobC.classList.remove('open'); p.subjC.classList.remove('open'); } }); });
 
     function resetFilters() { selJobs = []; selSubjs = []; jobSearchText = subjSearchText = ''; panels.modal.jobSearch.value = ''; panels.modal.subjSearch.value = ''; panels.drawer.jobSearch.value = ''; panels.drawer.subjSearch.value = ''; updateAvailableSubjects(); renderJobChipsBoth(); renderJobDropdowns(); renderSubjectChipsBoth(); renderSubjectDropdowns(); toast('Filters reset', 'info', 2000, false); }
-    function confirmAndRefresh() { closeBothPanels(); if (timerHandle) clearInterval(timerHandle); resetToQuizView(); fetchQuestions(true); factsLoaded = false; factsVisibleLimit = FACTS_PAGE_SIZE; if (mode === 'facts') fetchFacts(() => renderFactsMode()); if (mode === 'papers') { papersLoaded = false; loadPapersInline(); } }
+    function confirmAndRefresh() { closeBothPanels(); if (timerHandle) clearInterval(timerHandle); resetToQuizView(); fetchQuestions(true); factsLoaded = false; factsVisibleLimit = PAGE_SIZE; readVisibleLimit = PAGE_SIZE; if (mode === 'facts') fetchFacts(() => renderFactsMode()); if (mode === 'papers') { papersLoaded = false; loadPapersInline(); } }
     function populatePanels() { updateUserLabels(); renderJobChipsBoth(); renderJobDropdowns(); updateAvailableSubjects(); renderSubjectChipsBoth(); renderSubjectDropdowns(); }
     function openModal() { populatePanels(); ui.modal.classList.add('active'); }
     function closeModal() { ui.modal.classList.remove('active'); closeAllDropdowns(); }
