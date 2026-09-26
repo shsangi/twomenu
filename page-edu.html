@@ -257,6 +257,62 @@
         }
         .mode-pill-item .emoji { font-size: .95rem; }
 
+        /* ============================================================
+           PAPERS FILTER PILLS (year / subject) — blue, in top row
+           ============================================================ */
+        .papers-filter-pill-wrap {
+            display: none;
+            position: relative;
+        }
+        .papers-mode-active .papers-filter-pill-wrap { display: inline-block; }
+
+        .papers-filter-pill {
+            display: inline-flex; align-items: center; gap: .3rem;
+            padding: .3rem .65rem; border-radius: var(--rf);
+            font-size: .68rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            color: #fff; border: 1px solid var(--sky-dark);
+            cursor: pointer; font-family: inherit;
+            box-shadow: 0 2px 6px -2px rgba(14,165,233,.45);
+            transition: all .15s; white-space: nowrap;
+            line-height: 1;
+            max-width: 200px;
+        }
+        .papers-filter-pill:hover { transform: translateY(-1px); }
+        .papers-filter-pill .pfp-label {
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            max-width: 130px;
+        }
+        .papers-filter-pill .pfp-arrow {
+            font-size: .5rem; transition: transform .2s;
+        }
+        .papers-filter-pill-wrap.open .papers-filter-pill .pfp-arrow { transform: rotate(180deg); }
+
+        .papers-filter-pill-menu {
+            position: absolute; top: calc(100% + 6px); left: 0;
+            background: #fff; border: 1.5px solid var(--border);
+            border-radius: var(--r); box-shadow: 0 16px 40px -10px rgba(10,30,63,.25);
+            min-width: 160px; max-height: 280px; overflow-y: auto;
+            padding: .35rem; z-index: 300;
+            display: none; flex-direction: column; gap: .1rem;
+        }
+        .papers-filter-pill-wrap.open .papers-filter-pill-menu { display: flex; }
+        .papers-filter-pill-item {
+            display: flex; align-items: center; gap: .5rem;
+            padding: .5rem .7rem; border-radius: 12px;
+            font-size: .8rem; font-weight: 700;
+            color: var(--text); background: transparent;
+            border: none; cursor: pointer; font-family: inherit;
+            text-align: left; width: 100%;
+            transition: all .15s;
+            white-space: nowrap;
+        }
+        .papers-filter-pill-item:hover { background: var(--sky-soft); color: var(--sky-dark); }
+        .papers-filter-pill-item.active {
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            color: #fff;
+        }
+
         .progress-block { background: var(--border); height: 5px; border-radius: var(--rf); margin: .35rem 0 .5rem; overflow: hidden; }
         .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--sky), var(--yellow)); border-radius: var(--rf); transition: width .4s cubic-bezier(.4,0,.2,1); }
 
@@ -403,7 +459,6 @@
         .mode-search-bar .msb-count { font-size: .68rem; font-weight: 800; color: var(--sky-dark); background: var(--sky-soft); padding: .18rem .5rem; border-radius: var(--rf); white-space: nowrap; }
         .mode-search-bar .msb-count:empty { display: none; }
 
-        /* Load +100 button inside search bar */
         .mode-search-bar .msb-load-more {
             font-size: .68rem; font-weight: 800;
             color: #fff; background: linear-gradient(135deg, var(--sky), var(--sky-dark));
@@ -436,7 +491,7 @@
         .verify-corner.unknown { background: var(--border-strong); color: var(--text-muted); }
 
         /* ============================================================
-           PAPERS — FLAT LAYOUT with 3 blue dropdowns
+           PAPERS
            ============================================================ */
         #papersView { display: none; }
 
@@ -454,61 +509,6 @@
         .papers-search-bar .psb-clear { background: 0 0; border: none; cursor: pointer; color: var(--text-muted); font-size: .95rem; padding: .2rem .4rem; border-radius: 50%; display: none; }
         .papers-search-bar.has-text .psb-clear { display: block; }
         .papers-search-bar .psb-count { font-size: .68rem; font-weight: 800; color: var(--sky-dark); background: var(--sky-soft); padding: .18rem .5rem; border-radius: var(--rf); white-space: nowrap; }
-
-        /* 3 dropdowns in one line, blue text */
-        .papers-filter-row {
-            display: flex;
-            gap: .4rem;
-            margin: 0 0 .8rem 0;
-            flex-wrap: nowrap;
-        }
-        .papers-filter-row select {
-            flex: 1 1 0;
-            min-width: 0;
-            background: var(--sf2);
-            border: 1.5px solid var(--border);
-            border-radius: var(--rf);
-            padding: .55rem 1.7rem .55rem .75rem;
-            font-size: .76rem;
-            font-weight: 700;
-            color: var(--sky-dark);
-            cursor: pointer;
-            outline: none;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right .5rem center;
-            background-size: 10px;
-            transition: all .2s;
-            min-height: 40px;
-            text-overflow: ellipsis;
-            font-family: inherit;
-        }
-        .papers-filter-row select:focus,
-        .papers-filter-row select:active {
-            border-color: var(--sky);
-            background-color: #fff;
-            color: var(--sky-dark);
-            box-shadow: 0 0 0 4px rgba(14,165,233,.1);
-        }
-        .papers-filter-row select option {
-            color: var(--text);
-            background: #fff;
-            font-weight: 600;
-            padding: .5rem;
-        }
-
-        @media (max-width: 480px) {
-            .papers-filter-row select {
-                font-size: .68rem;
-                padding: .5rem 1.4rem .5rem .55rem;
-                background-size: 9px;
-                background-position: right .35rem center;
-                min-height: 38px;
-            }
-        }
 
         .papers-cards-grid {
             display: grid;
@@ -677,10 +677,12 @@
             .install-banner .ib-text span { font-size: .7rem; }
             .install-banner .ib-btn { font-size: .78rem; padding: .6rem 1rem; }
             .papers-cards-grid { max-height: 72vh; min-height: 50vh; }
+            .papers-filter-pill { font-size: .64rem; padding: .28rem .6rem; max-width: 140px; }
+            .papers-filter-pill .pfp-label { max-width: 90px; }
         }
 
         /* ============================================================
-           MODE VISIBILITY — HIGH SPECIFICITY OVERRIDE
+           MODE VISIBILITY
            ============================================================ */
         #quizApp #readView,
         #quizApp #factsView,
@@ -786,6 +788,26 @@
                     </div>
                 </div>
 
+                <!-- Papers year filter pill — only visible in Papers mode -->
+                <div class="papers-filter-pill-wrap" id="papersYearPillWrap">
+                    <button class="papers-filter-pill" id="papersYearPill" type="button">
+                        <span>📅</span>
+                        <span class="pfp-label" id="papersYearPillLabel">All years</span>
+                        <span class="pfp-arrow">▼</span>
+                    </button>
+                    <div class="papers-filter-pill-menu" id="papersYearPillMenu"></div>
+                </div>
+
+                <!-- Papers subject filter pill — only visible in Papers mode -->
+                <div class="papers-filter-pill-wrap" id="papersSubjectPillWrap">
+                    <button class="papers-filter-pill" id="papersSubjectPill" type="button">
+                        <span>📚</span>
+                        <span class="pfp-label" id="papersSubjectPillLabel">All subjects</span>
+                        <span class="pfp-arrow">▼</span>
+                    </button>
+                    <div class="papers-filter-pill-menu" id="papersSubjectPillMenu"></div>
+                </div>
+
                 <span class="attempted-pill" id="attemptedPill">
                     <span class="attempted" id="attemptedCount">0</span>
                     <span>/</span>
@@ -848,11 +870,6 @@
                     <input type="text" id="papersSearchInput" placeholder="Search past papers…" autocomplete="off"/>
                     <span class="psb-count" id="papersSearchCount"></span>
                     <button class="psb-clear" id="papersSearchClear">✕</button>
-                </div>
-                <div class="papers-filter-row">
-                    <select id="papersYearFilter"><option value="">All years</option></select>
-                    <select id="papersCategoryFilter"><option value="">All categories</option></select>
-                    <select id="papersSubjectFilter"><option value="">All subjects</option></select>
                 </div>
                 <div class="papers-cards-grid" id="papersCardsGrid">
                     <div class="read-empty">🔄 Loading past papers…</div>
@@ -1018,7 +1035,9 @@
         factsBox: $('factsContainer'), factsSearchBar: $('factsSearchBar'), factsSearchInput: $('factsSearchInput'), factsSearchClear: $('factsSearchClear'), factsSearchCount: $('factsSearchCount'),
         factsLoadMoreBtn: $('factsLoadMoreBtn'),
         papersSearchBar: $('papersSearchBar'), papersSearchInput: $('papersSearchInput'), papersSearchClear: $('papersSearchClear'), papersSearchCount: $('papersSearchCount'),
-        papersYearFilter: $('papersYearFilter'), papersCategoryFilter: $('papersCategoryFilter'), papersSubjectFilter: $('papersSubjectFilter'), papersCardsGrid: $('papersCardsGrid'),
+        papersCardsGrid: $('papersCardsGrid'),
+        papersYearPillWrap: $('papersYearPillWrap'), papersYearPill: $('papersYearPill'), papersYearPillLabel: $('papersYearPillLabel'), papersYearPillMenu: $('papersYearPillMenu'),
+        papersSubjectPillWrap: $('papersSubjectPillWrap'), papersSubjectPill: $('papersSubjectPill'), papersSubjectPillLabel: $('papersSubjectPillLabel'), papersSubjectPillMenu: $('papersSubjectPillMenu'),
         dots: $('dotGrid'), doneC: $('doneCount'), pendC: $('pendingCount'), corrC: $('correctCount'), wrongC: $('wrongCount'), invC: $('invalidCount'), invLeg: $('invalidLegend'),
         result: $('resultArea'), score: $('finalScore'), rmsg: $('resultMessage'), rdetails: $('resultDetails'), restart: $('restartFromResult'),
         modal: $('refreshModal'), mCancel: $('modalCancel'), mConfirm: $('modalConfirm'), mReset: $('modalResetBtn'), mUserAv: $('modalUserAvatar'), mUserName: $('modalUserName'), mLogout: $('modalLogoutBtn'),
@@ -1037,6 +1056,8 @@
     let readVisibleLimit = PAGE_SIZE;
     let readSearchQuery = '', factsSearchQuery = '';
     let papers = [], papersLoaded = false, papersLoading = false, papersSearchQuery = '';
+    let papersYearFilter = '', papersSubjectFilter = '';
+    let papersYearOptions = [], papersSubjectOptions = [];
     let toastTimer = null, confirmResolve = null;
     let jobSites = [], jobSitesLoaded = false, jobSitesLoading = false, jobSitesSearchQuery = '';
     let deferredPrompt = null;
@@ -1283,7 +1304,7 @@
             papers = buildPapersFromCSV(csvText);
             papersLoaded = true;
             papersLoading = false;
-            populatePapersFilters();
+            populatePaperFilters();
             renderPapersCards();
             renderSelectedSubjectsLine();
         } catch (err) {
@@ -1292,17 +1313,52 @@
         }
     }
 
-    function populatePapersFilters() {
-        const years = [...new Set(papers.map(p => p.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
-        const categories = [...new Set(papers.map(p => p.category).filter(Boolean))].sort();
-        const subjects = [...new Set(papers.map(p => p.subject).filter(Boolean))].sort();
-        ui.papersYearFilter.innerHTML = '<option value="">All years</option>';
-        years.forEach(y => { const o = document.createElement('option'); o.value = y; o.textContent = y; ui.papersYearFilter.appendChild(o); });
-        ui.papersCategoryFilter.innerHTML = '<option value="">All categories</option>';
-        categories.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; ui.papersCategoryFilter.appendChild(o); });
-        ui.papersSubjectFilter.innerHTML = '<option value="">All subjects</option>';
-        subjects.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; ui.papersSubjectFilter.appendChild(o); });
+    function populatePaperFilters() {
+        papersYearOptions = [...new Set(papers.map(p => p.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
+        papersSubjectOptions = [...new Set(papers.map(p => p.subject).filter(Boolean))].sort();
+        renderPaperPillMenu('year');
+        renderPaperPillMenu('subject');
+        updatePaperPillLabels();
     }
+
+    function renderPaperPillMenu(which) {
+        const wrap = which === 'year' ? ui.papersYearPillWrap : ui.papersSubjectPillWrap;
+        const menu = which === 'year' ? ui.papersYearPillMenu : ui.papersSubjectPillMenu;
+        const options = which === 'year' ? papersYearOptions : papersSubjectOptions;
+        const current = which === 'year' ? papersYearFilter : papersSubjectFilter;
+        const allLabel = which === 'year' ? 'All years' : 'All subjects';
+
+        let html = '<button class="papers-filter-pill-item' + (current === '' ? ' active' : '') + '" data-value="">' + allLabel + '</button>';
+        options.forEach((v) => {
+            const active = current === v;
+            html += '<button class="papers-filter-pill-item' + (active ? ' active' : '') + '" data-value="' + escapeHtml(v) + '">' + escapeHtml(v) + '</button>';
+        });
+        menu.innerHTML = html;
+
+        menu.querySelectorAll('.papers-filter-pill-item').forEach((btn) => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const val = btn.getAttribute('data-value');
+                if (which === 'year') { papersYearFilter = val; } else { papersSubjectFilter = val; }
+                wrap.classList.remove('open');
+                updatePaperPillLabels();
+                renderPaperPillMenu(which);
+                renderPapersCards();
+            };
+        });
+    }
+
+    function updatePaperPillLabels() {
+        ui.papersYearPillLabel.textContent = papersYearFilter || 'All years';
+        ui.papersSubjectPillLabel.textContent = papersSubjectFilter || 'All subjects';
+    }
+
+    ui.papersYearPill.onclick = (e) => { e.stopPropagation(); const wasOpen = ui.papersYearPillWrap.classList.contains('open'); ui.papersSubjectPillWrap.classList.remove('open'); ui.papersYearPillWrap.classList.toggle('open', !wasOpen); };
+    ui.papersSubjectPill.onclick = (e) => { e.stopPropagation(); const wasOpen = ui.papersSubjectPillWrap.classList.contains('open'); ui.papersYearPillWrap.classList.remove('open'); ui.papersSubjectPillWrap.classList.toggle('open', !wasOpen); };
+    document.addEventListener('click', (e) => {
+        if (!ui.papersYearPillWrap.contains(e.target)) ui.papersYearPillWrap.classList.remove('open');
+        if (!ui.papersSubjectPillWrap.contains(e.target)) ui.papersSubjectPillWrap.classList.remove('open');
+    });
 
     function paperMatchesSearch(p, q) {
         if (!q) return true;
@@ -1312,15 +1368,11 @@
     }
 
     function renderPapersCards() {
-        const year = ui.papersYearFilter.value;
-        const category = ui.papersCategoryFilter.value;
-        const subj = ui.papersSubjectFilter.value;
         const q = papersSearchQuery.toLowerCase().trim();
 
         const filtered = papers.filter(p => {
-            if (year && p.year !== year) return false;
-            if (category && p.category !== category) return false;
-            if (subj && p.subject !== subj) return false;
+            if (papersYearFilter && p.year !== papersYearFilter) return false;
+            if (papersSubjectFilter && p.subject !== papersSubjectFilter) return false;
             if (!paperMatchesSearch(p, q)) return false;
             return true;
         });
@@ -1398,9 +1450,6 @@
     ui.papersSearchInput.addEventListener('input', () => { papersSearchQuery = ui.papersSearchInput.value.trim(); renderPapersCards(); });
     ui.papersSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.papersSearchInput.value = ''; papersSearchQuery = ''; renderPapersCards(); ui.papersSearchInput.blur(); } });
     ui.papersSearchClear.onclick = () => { ui.papersSearchInput.value = ''; papersSearchQuery = ''; renderPapersCards(); ui.papersSearchInput.focus(); };
-    ui.papersYearFilter.addEventListener('change', renderPapersCards);
-    ui.papersCategoryFilter.addEventListener('change', renderPapersCards);
-    ui.papersSubjectFilter.addEventListener('change', renderPapersCards);
 
     function applyQuizTitle() {
         if (mode === 'facts') { ui.qTitle.textContent = '💡 Facts'; return; }
@@ -1438,6 +1487,8 @@
         if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
         if (ui.cOverlay) ui.cOverlay.classList.remove('active');
         if (ui.modePillWrap) ui.modePillWrap.classList.remove('open');
+        if (ui.papersYearPillWrap) ui.papersYearPillWrap.classList.remove('open');
+        if (ui.papersSubjectPillWrap) ui.papersSubjectPillWrap.classList.remove('open');
         document.body.style.overflow = '';
         try { localStorage.removeItem(KEY_USER); localStorage.removeItem(KEY_QUIZ); } catch (e) { /* ignore */ }
         try {
@@ -1571,6 +1622,11 @@
         ui.result.style.display = 'none'; $('endQuizBottom').style.display = 'flex';
         updateModePill(mode);
         ui.modePillWrap.classList.remove('open');
+        // Close papers filter pills when leaving papers
+        if (mode !== 'papers') {
+            ui.papersYearPillWrap.classList.remove('open');
+            ui.papersSubjectPillWrap.classList.remove('open');
+        }
 
         if (mode === 'mcq') {
             applyQuizTitle(); renderSelectedSubjectsLine();
@@ -1652,7 +1708,6 @@
     ui.readSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.readSearchInput.value = ''; readSearchQuery = ''; readVisibleLimit = PAGE_SIZE; renderReadMode(); ui.readSearchInput.blur(); } });
     ui.readSearchClear.onclick = () => { ui.readSearchInput.value = ''; readSearchQuery = ''; readVisibleLimit = PAGE_SIZE; renderReadMode(); ui.readSearchInput.focus(); };
 
-    /* ============ FACTS SEARCH — searches all 8 columns ============ */
     function factMatchesSearch(f, query) {
         if (!query) return true;
         const nq = query.toLowerCase();
@@ -1763,11 +1818,7 @@
         ui.factsDone.textContent = done;
         ui.factsTotal.textContent = limit;
     }
-    ui.factsSearchInput.addEventListener('input', () => {
-        factsSearchQuery = ui.factsSearchInput.value.trim();
-        factsVisibleLimit = PAGE_SIZE;
-        renderFactsMode();
-    });
+    ui.factsSearchInput.addEventListener('input', () => { factsSearchQuery = ui.factsSearchInput.value.trim(); factsVisibleLimit = PAGE_SIZE; renderFactsMode(); });
     ui.factsSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.factsSearchInput.value = ''; factsSearchQuery = ''; factsVisibleLimit = PAGE_SIZE; renderFactsMode(); ui.factsSearchInput.blur(); } });
     ui.factsSearchClear.onclick = () => { ui.factsSearchInput.value = ''; factsSearchQuery = ''; factsVisibleLimit = PAGE_SIZE; renderFactsMode(); ui.factsSearchInput.focus(); };
     function updateSearchBarState(bar, input) { if (!bar || !input) return; bar.classList.toggle('has-text', input.value.length > 0); }
@@ -1853,7 +1904,7 @@
     ui.refresh.onclick = openModal; ui.mCancel.onclick = closeModal; ui.mConfirm.onclick = confirmAndRefresh; ui.mReset.onclick = resetFilters; ui.modal.onclick = (e) => { if (e.target === ui.modal) closeModal(); };
     ui.drawerBtn.onclick = openDrawer; ui.drawerCloseBtn.onclick = closeDrawer; ui.drawerOverlay.onclick = closeDrawer; ui.dCancel.onclick = closeDrawer; ui.dConfirm.onclick = confirmAndRefresh; ui.dReset.onclick = resetFilters;
 
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (ui.drawer.classList.contains('open')) closeDrawer(); else if (ui.modal.classList.contains('active')) closeModal(); else if (ui.jobsitesOverlay.classList.contains('active')) closeJobSitesModal(); else if (ui.modePillWrap.classList.contains('open')) ui.modePillWrap.classList.remove('open'); } });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (ui.drawer.classList.contains('open')) closeDrawer(); else if (ui.modal.classList.contains('active')) closeModal(); else if (ui.jobsitesOverlay.classList.contains('active')) closeJobSitesModal(); else if (ui.modePillWrap.classList.contains('open')) ui.modePillWrap.classList.remove('open'); else if (ui.papersYearPillWrap.classList.contains('open')) ui.papersYearPillWrap.classList.remove('open'); else if (ui.papersSubjectPillWrap.classList.contains('open')) ui.papersSubjectPillWrap.classList.remove('open'); } });
 
     async function doLogout() { const ok = await confirmBox('🚪', 'Logout?', 'Your quiz progress will NOT be saved.', 'Logout'); if (!ok) return; triggerLogout(); }
     ui.mLogout.onclick = doLogout; ui.dLogout.onclick = doLogout;
@@ -1924,6 +1975,8 @@
             closeBothPanels();
             if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
             if (ui.modePillWrap) ui.modePillWrap.classList.remove('open');
+            if (ui.papersYearPillWrap) ui.papersYearPillWrap.classList.remove('open');
+            if (ui.papersSubjectPillWrap) ui.papersSubjectPillWrap.classList.remove('open');
             document.body.style.overflow = '';
         } else if (d.type === 'SL_SET_MODE') {
             setMode(d.mode, true);
@@ -1932,6 +1985,8 @@
             if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
             if (ui.cOverlay) ui.cOverlay.classList.remove('active');
             if (ui.modePillWrap) ui.modePillWrap.classList.remove('open');
+            if (ui.papersYearPillWrap) ui.papersYearPillWrap.classList.remove('open');
+            if (ui.papersSubjectPillWrap) ui.papersSubjectPillWrap.classList.remove('open');
             document.body.style.overflow = '';
         }
     });
