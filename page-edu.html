@@ -183,6 +183,9 @@
             transition: all .15s;
         }
         .btn-drawer:hover { background: var(--sky); border-color: var(--sky); color: #fff; }
+        /* Hide drawer (☰) in Facts and Papers modes */
+        .facts-mode-active .btn-drawer,
+        .papers-mode-active .btn-drawer { display: none !important; }
 
         .top-row-3 { display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; }
         .attempted-pill, .timer-pill, .facts-pill {
@@ -217,45 +220,6 @@
         .papers-mode-active .attempted-pill,
         .papers-mode-active .timer-pill,
         .papers-mode-active .facts-pill { display: none !important; }
-
-        .mode-pill-wrap { position: relative; display: inline-block; }
-        .mode-pill-btn {
-            display: inline-flex; align-items: center; gap: .3rem;
-            padding: .3rem .65rem; border-radius: var(--rf);
-            font-size: .68rem; font-weight: 800;
-            background: linear-gradient(135deg, var(--navy), var(--navy-light));
-            color: #fff; border: 1px solid var(--navy);
-            cursor: pointer; font-family: inherit;
-            box-shadow: 0 2px 6px -2px rgba(10,30,63,.3);
-            transition: all .15s; white-space: nowrap;
-            line-height: 1;
-        }
-        .mode-pill-btn:hover { transform: translateY(-1px); }
-        .mode-pill-btn .arrow { font-size: .5rem; transition: transform .2s; }
-        .mode-pill-wrap.open .mode-pill-btn .arrow { transform: rotate(180deg); }
-        .mode-pill-menu {
-            position: absolute; top: calc(100% + 6px); left: 0;
-            background: #fff; border: 1.5px solid var(--border);
-            border-radius: var(--r); box-shadow: 0 16px 40px -10px rgba(10,30,63,.25);
-            min-width: 160px; padding: .35rem; z-index: 300;
-            display: none; flex-direction: column; gap: .1rem;
-        }
-        .mode-pill-wrap.open .mode-pill-menu { display: flex; }
-        .mode-pill-item {
-            display: flex; align-items: center; gap: .5rem;
-            padding: .55rem .7rem; border-radius: 12px;
-            font-size: .8rem; font-weight: 700;
-            color: var(--text); background: transparent;
-            border: none; cursor: pointer; font-family: inherit;
-            text-align: left; width: 100%;
-            transition: all .15s;
-        }
-        .mode-pill-item:hover { background: var(--sky-soft); color: var(--sky-dark); }
-        .mode-pill-item.active {
-            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
-            color: #fff;
-        }
-        .mode-pill-item .emoji { font-size: .95rem; }
 
         /* ============================================================
            PAPERS FILTER PILLS (year / subject) — blue, in top row
@@ -766,27 +730,7 @@
             </div>
 
             <div class="top-row-3">
-                <div class="mode-pill-wrap" id="modePillWrap">
-                    <button class="mode-pill-btn" id="modePillBtn" type="button">
-                        <span id="modePillEmoji">📝</span>
-                        <span id="modePillLabel">MCQs</span>
-                        <span class="arrow">▼</span>
-                    </button>
-                    <div class="mode-pill-menu" id="modePillMenu">
-                        <button class="mode-pill-item active" data-mode="mcq" type="button">
-                            <span class="emoji">📝</span> MCQs
-                        </button>
-                        <button class="mode-pill-item" data-mode="read" type="button">
-                            <span class="emoji">📖</span> Solved
-                        </button>
-                        <button class="mode-pill-item" data-mode="facts" type="button">
-                            <span class="emoji">💡</span> Facts
-                        </button>
-                        <button class="mode-pill-item" data-mode="papers" type="button">
-                            <span class="emoji">📄</span> Papers
-                        </button>
-                    </div>
-                </div>
+                <!-- Black mode dropdown REMOVED. Mode switching handled by bottom nav. -->
 
                 <!-- Papers year filter pill — only visible in Papers mode -->
                 <div class="papers-filter-pill-wrap" id="papersYearPillWrap">
@@ -1025,7 +969,6 @@
     const $ = (id) => document.getElementById(id);
     const ui = {
         quizApp: $('quizApp'), topBar: $('topBar'), brandLogo: $('brandLogo'), qTitle: $('quizTitle'), subjLine: $('selectedSubjectsLine'),
-        modePillWrap: $('modePillWrap'), modePillBtn: $('modePillBtn'), modePillEmoji: $('modePillEmoji'), modePillLabel: $('modePillLabel'),
         att: $('attemptedCount'), tot: $('totalCount'), timer: $('timerDisplay'), timerPill: $('timerPill'), factsPill: $('factsPill'), factsDone: $('factsDoneCount'), factsTotal: $('factsTotalCount'),
         refresh: $('refreshBtn'), refreshIcon: $('refreshIcon'), drawerBtn: $('drawerBtn'),
         prog: $('progressFill'), single: $('singleQuestionView'), subBanner: $('submittedBanner'), qCard: $('questionCard'),
@@ -1486,7 +1429,6 @@
         closeBothPanels();
         if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
         if (ui.cOverlay) ui.cOverlay.classList.remove('active');
-        if (ui.modePillWrap) ui.modePillWrap.classList.remove('open');
         if (ui.papersYearPillWrap) ui.papersYearPillWrap.classList.remove('open');
         if (ui.papersSubjectPillWrap) ui.papersSubjectPillWrap.classList.remove('open');
         document.body.style.overflow = '';
@@ -1600,32 +1542,19 @@
         saveState(); window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    const MODE_META = {
-        mcq:    { emoji: '📝', label: 'MCQs' },
-        read:   { emoji: '📖', label: 'Solved' },
-        facts:  { emoji: '💡', label: 'Facts' },
-        papers: { emoji: '📄', label: 'Papers' }
-    };
-
-    function updateModePill(m) {
-        const meta = MODE_META[m] || MODE_META.mcq;
-        ui.modePillEmoji.textContent = meta.emoji;
-        ui.modePillLabel.textContent = meta.label;
-        document.querySelectorAll('.mode-pill-item').forEach((item) => {
-            item.classList.toggle('active', item.dataset.mode === m);
-        });
-    }
-
     function setMode(newMode, silent) {
         mode = (newMode === 'read' || newMode === 'facts' || newMode === 'papers') ? newMode : 'mcq';
         ui.quizApp.classList.remove('read-mode-active', 'facts-mode-active', 'papers-mode-active', 'result-active');
         ui.result.style.display = 'none'; $('endQuizBottom').style.display = 'flex';
-        updateModePill(mode);
-        ui.modePillWrap.classList.remove('open');
-        // Close papers filter pills when leaving papers
+
+        // Close papers pills when leaving papers
         if (mode !== 'papers') {
             ui.papersYearPillWrap.classList.remove('open');
             ui.papersSubjectPillWrap.classList.remove('open');
+        }
+        // Close drawer if opening facts or papers (drawer is hidden in those modes)
+        if (mode === 'facts' || mode === 'papers') {
+            closeDrawer();
         }
 
         if (mode === 'mcq') {
@@ -1652,9 +1581,10 @@
         }
     }
 
-    ui.modePillBtn.onclick = (e) => { e.stopPropagation(); ui.modePillWrap.classList.toggle('open'); };
-    document.querySelectorAll('.mode-pill-item').forEach((item) => { item.onclick = (e) => { e.stopPropagation(); setMode(item.dataset.mode); }; });
-    document.addEventListener('click', (e) => { if (!ui.modePillWrap.contains(e.target)) ui.modePillWrap.classList.remove('open'); });
+    document.addEventListener('click', (e) => {
+        if (!ui.papersYearPillWrap.contains(e.target)) ui.papersYearPillWrap.classList.remove('open');
+        if (!ui.papersSubjectPillWrap.contains(e.target)) ui.papersSubjectPillWrap.classList.remove('open');
+    });
 
     function readItemMatchesSearch(q, query) { if (!query) return true; const nq = query.toLowerCase(); if (q.question && q.question.toLowerCase().includes(nq)) return true; if (q.subject && q.subject.toLowerCase().includes(nq)) return true; if (q.topic && q.topic.toLowerCase().includes(nq)) return true; if (q.job && q.job.toLowerCase().includes(nq)) return true; if (Array.isArray(q.options)) for (const opt of q.options) if (opt && String(opt).toLowerCase().includes(nq)) return true; return false; }
 
@@ -1904,7 +1834,7 @@
     ui.refresh.onclick = openModal; ui.mCancel.onclick = closeModal; ui.mConfirm.onclick = confirmAndRefresh; ui.mReset.onclick = resetFilters; ui.modal.onclick = (e) => { if (e.target === ui.modal) closeModal(); };
     ui.drawerBtn.onclick = openDrawer; ui.drawerCloseBtn.onclick = closeDrawer; ui.drawerOverlay.onclick = closeDrawer; ui.dCancel.onclick = closeDrawer; ui.dConfirm.onclick = confirmAndRefresh; ui.dReset.onclick = resetFilters;
 
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (ui.drawer.classList.contains('open')) closeDrawer(); else if (ui.modal.classList.contains('active')) closeModal(); else if (ui.jobsitesOverlay.classList.contains('active')) closeJobSitesModal(); else if (ui.modePillWrap.classList.contains('open')) ui.modePillWrap.classList.remove('open'); else if (ui.papersYearPillWrap.classList.contains('open')) ui.papersYearPillWrap.classList.remove('open'); else if (ui.papersSubjectPillWrap.classList.contains('open')) ui.papersSubjectPillWrap.classList.remove('open'); } });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (ui.drawer.classList.contains('open')) closeDrawer(); else if (ui.modal.classList.contains('active')) closeModal(); else if (ui.jobsitesOverlay.classList.contains('active')) closeJobSitesModal(); else if (ui.papersYearPillWrap.classList.contains('open')) ui.papersYearPillWrap.classList.remove('open'); else if (ui.papersSubjectPillWrap.classList.contains('open')) ui.papersSubjectPillWrap.classList.remove('open'); } });
 
     async function doLogout() { const ok = await confirmBox('🚪', 'Logout?', 'Your quiz progress will NOT be saved.', 'Logout'); if (!ok) return; triggerLogout(); }
     ui.mLogout.onclick = doLogout; ui.dLogout.onclick = doLogout;
@@ -1974,7 +1904,6 @@
             if (user) updateUserLabels();
             closeBothPanels();
             if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
-            if (ui.modePillWrap) ui.modePillWrap.classList.remove('open');
             if (ui.papersYearPillWrap) ui.papersYearPillWrap.classList.remove('open');
             if (ui.papersSubjectPillWrap) ui.papersSubjectPillWrap.classList.remove('open');
             document.body.style.overflow = '';
@@ -1984,7 +1913,6 @@
             closeBothPanels();
             if (ui.jobsitesOverlay) ui.jobsitesOverlay.classList.remove('active');
             if (ui.cOverlay) ui.cOverlay.classList.remove('active');
-            if (ui.modePillWrap) ui.modePillWrap.classList.remove('open');
             if (ui.papersYearPillWrap) ui.papersYearPillWrap.classList.remove('open');
             if (ui.papersSubjectPillWrap) ui.papersSubjectPillWrap.classList.remove('open');
             document.body.style.overflow = '';
