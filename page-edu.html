@@ -29,7 +29,6 @@
             --shadow-xl: 0 30px 60px -15px rgba(10,30,63,.25);
         }
         html, body { -webkit-text-size-adjust: 100%; }
-        html { background: var(--bg); }
         body {
             background: transparent;
             min-height: 100dvh;
@@ -37,91 +36,10 @@
             padding: 1.25rem; color: var(--text);
             -webkit-font-smoothing: antialiased;
             overscroll-behavior: contain;
-            position: relative;
         }
-
-        /* ============================================================
-           ANIMATED BACKGROUND
-           ============================================================ */
-        .bg-anim {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-            overflow: hidden;
-            background:
-                radial-gradient(circle at 0% 0%, rgba(14,165,233,.06) 0%, transparent 40%),
-                radial-gradient(circle at 100% 100%, rgba(10,30,63,.05) 0%, transparent 45%),
-                var(--bg);
-        }
-
-        /* Floating blurred orbs */
-        .bg-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            will-change: transform;
-        }
-        .bg-orb-1 {
-            width: 380px; height: 380px;
-            top: -120px; left: -80px;
-            background: radial-gradient(circle, rgba(14,165,233,.35), rgba(14,165,233,0) 70%);
-            animation: orb1 38s ease-in-out infinite;
-        }
-        .bg-orb-2 {
-            width: 340px; height: 340px;
-            bottom: -100px; right: -80px;
-            background: radial-gradient(circle, rgba(245,184,0,.28), rgba(245,184,0,0) 70%);
-            animation: orb2 32s ease-in-out infinite;
-        }
-        .bg-orb-3 {
-            width: 420px; height: 420px;
-            top: 40%; left: 55%;
-            background: radial-gradient(circle, rgba(10,30,63,.20), rgba(10,30,63,0) 70%);
-            animation: orb3 45s ease-in-out infinite;
-        }
-
-        @keyframes orb1 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50%      { transform: translate(60px, 40px) scale(1.08); }
-        }
-        @keyframes orb2 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50%      { transform: translate(-50px, -40px) scale(1.1); }
-        }
-        @keyframes orb3 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            33%      { transform: translate(-40%, -55%) scale(1.06); }
-            66%      { transform: translate(-60%, -45%) scale(0.96); }
-        }
-
-        /* Subtle dot grid overlay */
-        .bg-dots {
-            position: absolute;
-            inset: -50%;
-            background-image: radial-gradient(rgba(10,30,63,.10) 1px, transparent 1px);
-            background-size: 28px 28px;
-            opacity: .35;
-            animation: dotsDrift 60s linear infinite;
-        }
-        @keyframes dotsDrift {
-            0%   { transform: translate(0, 0); }
-            100% { transform: translate(28px, 28px); }
-        }
-
-        /* Reduce motion friendly */
-        @media (prefers-reduced-motion: reduce) {
-            .bg-orb-1, .bg-orb-2, .bg-orb-3, .bg-dots {
-                animation: none !important;
-            }
-        }
-        /* On small phones, soften orbs so text stays crisp */
-        @media (max-width: 560px) {
-            .bg-orb-1 { width: 280px; height: 280px; filter: blur(60px); }
-            .bg-orb-2 { width: 260px; height: 260px; filter: blur(60px); }
-            .bg-orb-3 { width: 320px; height: 320px; filter: blur(70px); }
-            .bg-dots { opacity: .25; }
-        }
+        .edu-page { width: 100%; max-width: 920px; }
+        .edu-page * { -webkit-user-select: none; user-select: none; }
+        .edu-page input, .edu-page textarea { -webkit-user-select: text; user-select: text; }
 
         /* ============================================================
            DESKTOP TOP NAV
@@ -167,10 +85,6 @@
             .desktop-nav { display: flex; }
             body { padding-top: 1.5rem; }
         }
-
-        .edu-page { width: 100%; max-width: 920px; position: relative; z-index: 1; }
-        .edu-page * { -webkit-user-select: none; user-select: none; }
-        .edu-page input, .edu-page textarea { -webkit-user-select: text; user-select: text; }
 
         .install-banner {
             position: fixed; bottom: 1.2rem; left: 50%;
@@ -249,14 +163,84 @@
             border: 1px solid var(--border);
         }
 
+        /* ============================================================
+           TOP BAR — with animated aurora behind it
+           ============================================================ */
         .top-bar {
             display: flex; flex-direction: column; gap: .4rem;
-            padding: .35rem 0 .6rem; margin-bottom: .35rem;
+            padding: .65rem .85rem .75rem;
+            margin: -.65rem -.85rem .35rem;
             position: sticky; top: 0; z-index: 50;
-            background: var(--sf); border-bottom: 1px solid transparent;
-            transition: border-color .2s, box-shadow .2s;
+            background: rgba(255,255,255,.72);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            border-radius: 18px;
+            border-bottom: 1px solid transparent;
+            overflow: hidden;
+            transition: border-color .2s, box-shadow .2s, background .2s;
         }
-        .top-bar.scrolled { border-bottom-color: var(--border); box-shadow: 0 4px 16px -8px rgba(10,30,63,.15); }
+        .top-bar.scrolled {
+            border-bottom-color: var(--border);
+            box-shadow: 0 8px 24px -10px rgba(10,30,63,.18);
+            background: rgba(255,255,255,.88);
+        }
+        /* Aurora layer behind header content */
+        .top-bar::before,
+        .top-bar::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(38px);
+            z-index: 0;
+            pointer-events: none;
+            will-change: transform;
+        }
+        .top-bar::before {
+            width: 260px; height: 180px;
+            top: -40px; left: -60px;
+            background: radial-gradient(circle, rgba(14,165,233,.60), rgba(14,165,233,0) 72%);
+            animation: aurora1 20s ease-in-out infinite;
+        }
+        .top-bar::after {
+            width: 280px; height: 180px;
+            bottom: -60px; right: -70px;
+            background: radial-gradient(circle, rgba(245,184,0,.50), rgba(245,184,0,0) 72%);
+            animation: aurora2 24s ease-in-out infinite;
+        }
+        /* Extra navy orb as a separate layer */
+        .top-bar-aurora-extra {
+            position: absolute;
+            width: 320px; height: 200px;
+            top: -50px; left: 35%;
+            border-radius: 50%;
+            filter: blur(44px);
+            background: radial-gradient(circle, rgba(10,30,63,.35), rgba(10,30,63,0) 72%);
+            z-index: 0;
+            pointer-events: none;
+            will-change: transform;
+            animation: aurora3 26s ease-in-out infinite;
+        }
+        .top-bar > * { position: relative; z-index: 1; }
+
+        @keyframes aurora1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50%      { transform: translate(120px, 20px) scale(1.15); }
+        }
+        @keyframes aurora2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50%      { transform: translate(-110px, -25px) scale(1.18); }
+        }
+        @keyframes aurora3 {
+            0%, 100% { transform: translate(-50%, 0) scale(1); }
+            33%      { transform: translate(-30%, 15px) scale(1.08); }
+            66%      { transform: translate(-70%, -15px) scale(0.94); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .top-bar::before,
+            .top-bar::after,
+            .top-bar-aurora-extra { animation: none !important; }
+        }
 
         .top-row-1 { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
         .brand { display: flex; align-items: flex-start; gap: .65rem; min-width: 0; flex: 1 1 auto; }
@@ -739,6 +723,10 @@
             .btn-drawer { display: inline-flex; }
             .btn-icon#refreshBtn { display: none; }
             .quiz-wrapper { padding: 1rem .85rem 1.15rem; border-radius: 22px; }
+            .top-bar { padding: .55rem .65rem .65rem; margin: -.55rem -.65rem .35rem; }
+            .top-bar::before { width: 180px; height: 130px; filter: blur(30px); }
+            .top-bar::after { width: 200px; height: 130px; filter: blur(30px); }
+            .top-bar-aurora-extra { width: 220px; height: 140px; filter: blur(32px); }
             .question-card { padding: 1.15rem 1rem .75rem; }
             .question-card .q-text { font-size: 1rem; }
             .options-list .option-btn { padding: .7rem .95rem; font-size: .87rem; }
@@ -805,15 +793,6 @@
     </style>
 </head>
 <body>
-
-<!-- Animated background layer -->
-<div class="bg-anim" aria-hidden="true">
-    <div class="bg-orb bg-orb-1"></div>
-    <div class="bg-orb bg-orb-2"></div>
-    <div class="bg-orb bg-orb-3"></div>
-    <div class="bg-dots"></div>
-</div>
-
 <div class="edu-page">
     <div class="toast-container" id="toastContainer"></div>
 
@@ -839,7 +818,6 @@
         </div>
     </div>
 
-    <!-- Desktop top nav -->
     <nav class="desktop-nav" id="desktopNav" aria-label="Desktop mode navigation">
         <button class="desktop-nav-tab active" data-desktop-mode="mcq" type="button">
             <span class="dnt-emoji">📝</span>
@@ -861,6 +839,7 @@
 
     <div class="quiz-wrapper" id="quizApp">
         <div class="top-bar" id="topBar">
+            <div class="top-bar-aurora-extra" aria-hidden="true"></div>
             <div class="top-row-1">
                 <div class="brand">
                     <img class="brand-logo" id="brandLogo"
