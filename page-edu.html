@@ -403,11 +403,20 @@
         .mode-search-bar .msb-count { font-size: .68rem; font-weight: 800; color: var(--sky-dark); background: var(--sky-soft); padding: .18rem .5rem; border-radius: var(--rf); white-space: nowrap; }
         .mode-search-bar .msb-count:empty { display: none; }
 
+        /* Load +100 button inside search bar */
+        .mode-search-bar .msb-load-more {
+            font-size: .68rem; font-weight: 800;
+            color: #fff; background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            border: none; padding: .3rem .7rem; border-radius: var(--rf);
+            white-space: nowrap; cursor: pointer; font-family: inherit;
+            box-shadow: 0 2px 6px -2px rgba(14,165,233,.5);
+            transition: all .15s;
+        }
+        .mode-search-bar .msb-load-more:hover { transform: translateY(-1px); box-shadow: 0 4px 10px -2px rgba(14,165,233,.6); }
+        .mode-search-bar .msb-load-more:disabled { opacity: .5; cursor: not-allowed; }
+        .mode-search-bar .msb-load-more.hidden { display: none !important; }
+
         .facts-container { margin-top: .7rem; display: flex; flex-direction: column; gap: .7rem; max-height: 78vh; min-height: 55vh; overflow-y: auto; padding-right: .5rem; }
-        .facts-load-more-wrap { display: flex; justify-content: center; margin-top: 1rem; padding-bottom: .5rem; }
-        .facts-load-more-btn { background: linear-gradient(135deg, var(--sky), var(--sky-dark)); color: #fff; border: none; font-weight: 700; font-size: .88rem; padding: .75rem 2rem; border-radius: var(--rf); cursor: pointer; font-family: inherit; box-shadow: 0 4px 12px -4px rgba(14,165,233,.4); transition: all .15s; }
-        .facts-load-more-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(14,165,233,.5); }
-        .facts-load-more-btn:disabled { opacity: .5; cursor: not-allowed; }
 
         .fact-card { background: var(--sf2); border: 1.5px solid var(--border); border-left: 4px solid var(--sky); border-radius: var(--r); padding: .9rem 1.1rem .8rem; position: relative; cursor: pointer; transition: all .18s; }
         .fact-card:hover { background: var(--sky-soft); border-left-color: var(--yellow); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
@@ -793,11 +802,9 @@
                     <input type="text" id="factsSearchInput" placeholder="Search facts, answers, topics, tags…" autocomplete="off"/>
                     <span class="msb-count" id="factsSearchCount"></span>
                     <button class="msb-clear" id="factsSearchClear">✕</button>
+                    <button class="msb-load-more hidden" id="factsLoadMoreBtn" type="button">⬇️ Load 100 more</button>
                 </div>
                 <div class="facts-container" id="factsContainer"></div>
-                <div class="facts-load-more-wrap" id="factsLoadMoreWrap" style="display:none">
-                    <button class="facts-load-more-btn" id="factsLoadMoreBtn">⬇️ Load 100 more</button>
-                </div>
             </div>
 
             <div id="papersView">
@@ -972,7 +979,7 @@
         prev: $('prevBtn'), next: $('nextBtn'), endBtn: $('endQuizBtn'),
         readBox: $('readContainer'), readSearchBar: $('readSearchBar'), readSearchInput: $('readSearchInput'), readSearchClear: $('readSearchClear'), readSearchCount: $('readSearchCount'),
         factsBox: $('factsContainer'), factsSearchBar: $('factsSearchBar'), factsSearchInput: $('factsSearchInput'), factsSearchClear: $('factsSearchClear'), factsSearchCount: $('factsSearchCount'),
-        factsLoadMoreWrap: $('factsLoadMoreWrap'), factsLoadMoreBtn: $('factsLoadMoreBtn'),
+        factsLoadMoreBtn: $('factsLoadMoreBtn'),
         papersSearchBar: $('papersSearchBar'), papersSearchInput: $('papersSearchInput'), papersSearchClear: $('papersSearchClear'), papersSearchCount: $('papersSearchCount'),
         papersYearFilter: $('papersYearFilter'), papersSubjectFilter: $('papersSubjectFilter'), papersCardsGrid: $('papersCardsGrid'),
         dots: $('dotGrid'), doneC: $('doneCount'), pendC: $('pendingCount'), corrC: $('correctCount'), wrongC: $('wrongCount'), invC: $('invalidCount'), invLeg: $('invalidLegend'),
@@ -1145,7 +1152,6 @@
             if (lines.length < 2) { factsLoaded = true; factsLoading = false; if (callback) callback(); return; }
             const headerCols = parseCSVLine(lines[0]).map((h) => h.toLowerCase());
             const findIdx = (keywords, fallback) => { for (let k = 0; k < headerCols.length; k++) { const h = headerCols[k]; if (keywords.some((kw) => h.includes(kw))) return k; } return fallback; };
-            const srnoIdx = findIdx(['srno', 'sr no', 's.no', 'serial'], 0);
             const qIdx = findIdx(['question'], 1);
             const aIdx = findIdx(['answer'], 2);
             const topicIdx = findIdx(['topic'], 3);
@@ -1153,14 +1159,16 @@
             const verifyIdx = findIdx(['is question and answer', 'verify', 'correct'], 5);
             const createdIdx = findIdx(['created date', 'created'], 6);
             const tagIdx = findIdx(['tag_common_word', 'tag'], 7);
+            let rowNum = 0;
             for (let i = 1; i < lines.length; i++) {
                 const cols = parseCSVLine(lines[i]);
                 if (!cols.length) continue;
                 const question = cols[qIdx] ? cols[qIdx].trim() : '';
                 if (!question) continue;
+                rowNum++;
                 const rawVerify = cols[verifyIdx] ? cols[verifyIdx].trim() : '';
                 facts.push({
-                    srno: cols[srnoIdx] ? cols[srnoIdx].trim() : String(i),
+                    srno: rowNum,   // ← srno comes from code, not sheet
                     question,
                     answer: cols[aIdx] ? cols[aIdx].trim() : '',
                     topic: cols[topicIdx] ? cols[topicIdx].trim() : '',
@@ -1596,7 +1604,7 @@
             ui.factsDone.textContent = '0';
             ui.factsTotal.textContent = '0';
             ui.factsSearchCount.textContent = '';
-            if (ui.factsLoadMoreWrap) ui.factsLoadMoreWrap.style.display = 'none';
+            if (ui.factsLoadMoreBtn) ui.factsLoadMoreBtn.classList.add('hidden');
             return;
         }
 
@@ -1615,7 +1623,6 @@
             else if (f.verify === 'false') cornerHtml = '<span class="verify-corner false">✘</span>';
             else cornerHtml = '<span class="verify-corner unknown">?</span>';
 
-            // Topic = Subject → show only subject
             const metaChips = [];
             const topicClean = (f.topic || '').trim().toLowerCase();
             const subjectClean = (f.subject || '').trim().toLowerCase();
@@ -1630,7 +1637,9 @@
                 metaChips.push(`<span class="fm-chip topic">🏷️ ${escapeHtml(f.topic)}</span>`);
             }
 
-            html += `<div class="fact-card${isRead ? ' read-flag' : ''}" data-key="${encodeURIComponent(key)}" data-q="${encodeURIComponent(f.question)}" data-c="${encodeURIComponent(f.subject || f.topic || '')}">${cornerHtml}<div class="fact-head"><span class="fact-srno">${escapeHtml(f.srno)}</span><span class="fact-question">${escapeHtml(f.question)} <span class="fact-search-hint">🔍</span></span></div><div class="fact-answer${hasAnswer ? '' : ' empty'}"><strong>Answer:</strong> ${hasAnswer ? escapeHtml(f.answer) : '—'}</div>${metaChips.length ? '<div class="fact-meta">' + metaChips.join('') + '</div>' : ''}</div>`;
+            // srno shown = position in visible list (i+1), not from sheet
+            const displaySrno = i + 1;
+            html += `<div class="fact-card${isRead ? ' read-flag' : ''}" data-key="${encodeURIComponent(key)}" data-q="${encodeURIComponent(f.question)}" data-c="${encodeURIComponent(f.subject || f.topic || '')}">${cornerHtml}<div class="fact-head"><span class="fact-srno">${displaySrno}</span><span class="fact-question">${escapeHtml(f.question)} <span class="fact-search-hint">🔍</span></span></div><div class="fact-answer${hasAnswer ? '' : ' empty'}"><strong>Answer:</strong> ${hasAnswer ? escapeHtml(f.answer) : '—'}</div>${metaChips.length ? '<div class="fact-meta">' + metaChips.join('') + '</div>' : ''}</div>`;
         });
 
         if (shownCount === 0) {
@@ -1651,15 +1660,19 @@
             });
         }
 
-        // Show / hide "Load more" button
+        // Load more button — inside search bar, next to count
         const totalLimit = isGuest ? Math.min(GUEST_LIMIT, facts.length) : facts.length;
         const hasMore = !factsSearchQuery && factsVisibleLimit < totalLimit;
-        if (ui.factsLoadMoreWrap) ui.factsLoadMoreWrap.style.display = hasMore ? 'flex' : 'none';
         if (ui.factsLoadMoreBtn) {
-            const remaining = totalLimit - factsVisibleLimit;
-            const step = Math.min(FACTS_PAGE_SIZE, Math.max(remaining, 0));
-            ui.factsLoadMoreBtn.textContent = step > 0 ? `⬇️ Load ${step} more` : '⬇️ Load more';
-            ui.factsLoadMoreBtn.disabled = !hasMore;
+            if (hasMore) {
+                const remaining = totalLimit - factsVisibleLimit;
+                const step = Math.min(FACTS_PAGE_SIZE, Math.max(remaining, 0));
+                ui.factsLoadMoreBtn.textContent = step > 0 ? `⬇️ +${step}` : '⬇️ +more';
+                ui.factsLoadMoreBtn.classList.remove('hidden');
+                ui.factsLoadMoreBtn.disabled = false;
+            } else {
+                ui.factsLoadMoreBtn.classList.add('hidden');
+            }
         }
 
         updateFactsCounter();
@@ -1667,7 +1680,8 @@
     }
 
     if (ui.factsLoadMoreBtn) {
-        ui.factsLoadMoreBtn.addEventListener('click', () => {
+        ui.factsLoadMoreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             factsVisibleLimit += FACTS_PAGE_SIZE;
             renderFactsMode();
         });
