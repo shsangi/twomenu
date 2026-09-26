@@ -41,6 +41,51 @@
         .edu-page * { -webkit-user-select: none; user-select: none; }
         .edu-page input, .edu-page textarea { -webkit-user-select: text; user-select: text; }
 
+        /* ============================================================
+           DESKTOP TOP NAV — only visible on wide screens
+           ============================================================ */
+        .desktop-nav {
+            display: none;
+            background: var(--sf);
+            border-radius: 20px;
+            padding: .5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            gap: .35rem;
+        }
+        .desktop-nav-tab {
+            flex: 1;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: .45rem;
+            padding: .75rem 1rem;
+            border-radius: 14px;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+            font-size: .9rem; font-weight: 700;
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: all .2s ease;
+            white-space: nowrap;
+        }
+        .desktop-nav-tab:hover {
+            background: var(--sky-soft);
+            color: var(--sky-dark);
+        }
+        .desktop-nav-tab.active {
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            color: #fff;
+            box-shadow: 0 4px 14px -4px rgba(14,165,233,.55);
+        }
+        .desktop-nav-tab .dnt-emoji { font-size: 1.05rem; }
+        .desktop-nav-tab .dnt-label { font-weight: 800; letter-spacing: -.01em; }
+
+        @media (min-width: 769px) {
+            .desktop-nav { display: flex; }
+            body { padding-top: 1.5rem; }
+        }
+
         .install-banner {
             position: fixed; bottom: 1.2rem; left: 50%;
             transform: translateX(-50%) translateY(200%);
@@ -183,7 +228,6 @@
             transition: all .15s;
         }
         .btn-drawer:hover { background: var(--sky); border-color: var(--sky); color: #fff; }
-        /* Hide drawer (☰) in Facts and Papers modes */
         .facts-mode-active .btn-drawer,
         .papers-mode-active .btn-drawer { display: none !important; }
 
@@ -221,9 +265,6 @@
         .papers-mode-active .timer-pill,
         .papers-mode-active .facts-pill { display: none !important; }
 
-        /* ============================================================
-           PAPERS FILTER PILLS (year / subject) — blue, in top row
-           ============================================================ */
         .papers-filter-pill-wrap {
             display: none;
             position: relative;
@@ -454,9 +495,6 @@
         .verify-corner.false { background: var(--danger); color: #fff; }
         .verify-corner.unknown { background: var(--border-strong); color: var(--text-muted); }
 
-        /* ============================================================
-           PAPERS
-           ============================================================ */
         #papersView { display: none; }
 
         .papers-search-bar {
@@ -645,9 +683,6 @@
             .papers-filter-pill .pfp-label { max-width: 90px; }
         }
 
-        /* ============================================================
-           MODE VISIBILITY
-           ============================================================ */
         #quizApp #readView,
         #quizApp #factsView,
         #quizApp #papersView { display: none !important; }
@@ -709,6 +744,28 @@
         </div>
     </div>
 
+    <!-- ============================================================
+         DESKTOP TOP NAV — only visible on wide screens
+         ============================================================ -->
+    <nav class="desktop-nav" id="desktopNav" aria-label="Desktop mode navigation">
+        <button class="desktop-nav-tab active" data-desktop-mode="mcq" type="button">
+            <span class="dnt-emoji">📝</span>
+            <span class="dnt-label">MCQs</span>
+        </button>
+        <button class="desktop-nav-tab" data-desktop-mode="read" type="button">
+            <span class="dnt-emoji">📖</span>
+            <span class="dnt-label">Solved</span>
+        </button>
+        <button class="desktop-nav-tab" data-desktop-mode="facts" type="button">
+            <span class="dnt-emoji">💡</span>
+            <span class="dnt-label">Facts</span>
+        </button>
+        <button class="desktop-nav-tab" data-desktop-mode="papers" type="button">
+            <span class="dnt-emoji">📄</span>
+            <span class="dnt-label">Papers</span>
+        </button>
+    </nav>
+
     <div class="quiz-wrapper" id="quizApp">
         <div class="top-bar" id="topBar">
             <div class="top-row-1">
@@ -730,9 +787,6 @@
             </div>
 
             <div class="top-row-3">
-                <!-- Black mode dropdown REMOVED. Mode switching handled by bottom nav. -->
-
-                <!-- Papers year filter pill — only visible in Papers mode -->
                 <div class="papers-filter-pill-wrap" id="papersYearPillWrap">
                     <button class="papers-filter-pill" id="papersYearPill" type="button">
                         <span>📅</span>
@@ -742,7 +796,6 @@
                     <div class="papers-filter-pill-menu" id="papersYearPillMenu"></div>
                 </div>
 
-                <!-- Papers subject filter pill — only visible in Papers mode -->
                 <div class="papers-filter-pill-wrap" id="papersSubjectPillWrap">
                     <button class="papers-filter-pill" id="papersSubjectPill" type="button">
                         <span>📚</span>
@@ -988,6 +1041,7 @@
         cOverlay: $('confirmOverlay'), cIcon: $('confirmIcon'), cTitle: $('confirmTitle'), cMsg: $('confirmMessage'), cOk: $('confirmOk'), cCancel: $('confirmCancel'),
         installBanner: $('installBanner'), installBtn: $('installBtn'), installClose: $('installClose'),
         jobSitesBtn: $('jobSitesBtn'), jobsitesOverlay: $('jobsitesOverlay'), jobsitesClose: $('jobsitesClose'), jobsitesSearchInput: $('jobsitesSearchInput'), jobsitesList: $('jobsitesList'),
+        desktopNav: $('desktopNav'),
     };
 
     let questions = [], originalQuestions = [], currentQ = 0, total = 0, answers = [], status = [], locked = [], invalidQs = [];
@@ -1547,12 +1601,15 @@
         ui.quizApp.classList.remove('read-mode-active', 'facts-mode-active', 'papers-mode-active', 'result-active');
         ui.result.style.display = 'none'; $('endQuizBottom').style.display = 'flex';
 
-        // Close papers pills when leaving papers
+        // Sync desktop nav active state
+        document.querySelectorAll('.desktop-nav-tab').forEach((tab) => {
+            tab.classList.toggle('active', tab.dataset.desktopMode === mode);
+        });
+
         if (mode !== 'papers') {
             ui.papersYearPillWrap.classList.remove('open');
             ui.papersSubjectPillWrap.classList.remove('open');
         }
-        // Close drawer if opening facts or papers (drawer is hidden in those modes)
         if (mode === 'facts' || mode === 'papers') {
             closeDrawer();
         }
@@ -1580,6 +1637,14 @@
             } catch (e) { /* ignore */ }
         }
     }
+
+    // Desktop nav clicks
+    document.querySelectorAll('.desktop-nav-tab').forEach((tab) => {
+        tab.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setMode(tab.dataset.desktopMode);
+        });
+    });
 
     document.addEventListener('click', (e) => {
         if (!ui.papersYearPillWrap.contains(e.target)) ui.papersYearPillWrap.classList.remove('open');
