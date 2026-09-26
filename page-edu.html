@@ -169,7 +169,48 @@
         .top-row-1 { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; position: relative; z-index: 2; }
 
         /* ============================================================
-           FLYING FLAGS LAYER — behind header content
+           INTRO STAGE 1 — SINGLE-LINE FLAG WAVE (0–3s)
+           ============================================================ */
+        .flags-wave {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 1;
+            transition: opacity .8s ease;
+        }
+        .flags-wave.hide { opacity: 0; pointer-events: none; }
+
+        .flags-wave-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1.1rem;
+            white-space: nowrap;
+            animation: flagsMarch 6s linear infinite;
+        }
+        .flags-wave-track span {
+            font-size: 1rem;
+            opacity: 0;
+            animation: flagPop 6s linear infinite;
+            filter: drop-shadow(0 1px 2px rgba(10,30,63,.18));
+        }
+        @keyframes flagsMarch {
+            0%   { transform: translateY(-50%) translateX(20%); }
+            100% { transform: translateY(-50%) translateX(-100%); }
+        }
+        @keyframes flagPop {
+            0%, 8%   { opacity: 0; }
+            20%, 80% { opacity: .92; }
+            100%     { opacity: 0; }
+        }
+
+        /* ============================================================
+           AMBIENT FLAGS (after intro) — scattered floaters
            ============================================================ */
         .flags-layer {
             position: absolute;
@@ -177,16 +218,22 @@
             overflow: hidden;
             pointer-events: none;
             z-index: 1;
+            opacity: 0;
+            transition: opacity 1.2s ease .5s;
         }
+        .flags-layer.show { opacity: 1; }
+
         .flag-emoji {
             position: absolute;
             font-size: 1rem;
             opacity: 0;
             will-change: transform, opacity;
-            user-select: none;
             filter: drop-shadow(0 1px 2px rgba(10,30,63,.15));
         }
-        /* 3 different floating patterns, staggered starting positions/timings */
+        .flag-emoji.p1 { animation: flagFloat1 14s linear infinite; }
+        .flag-emoji.p2 { animation: flagFloat2 16s linear infinite; }
+        .flag-emoji.p3 { animation: flagFloat3 12s linear infinite; }
+
         @keyframes flagFloat1 {
             0%   { transform: translate(0, 0)    rotate(0);   opacity: 0; }
             10%  { opacity: .85; }
@@ -208,18 +255,16 @@
             85%  { opacity: .75; }
             100% { transform: translate(32px, 0)   scale(.9);   opacity: 0; }
         }
-        .flag-emoji.p1 { animation: flagFloat1 14s linear infinite; }
-        .flag-emoji.p2 { animation: flagFloat2 16s linear infinite; }
-        .flag-emoji.p3 { animation: flagFloat3 12s linear infinite; }
 
         @media (prefers-reduced-motion: reduce) {
+            .flags-wave-track, .flags-wave-track span { animation: none !important; }
             .flag-emoji { animation: none !important; opacity: .25; }
         }
 
         .brand { display: flex; align-items: flex-start; gap: .65rem; min-width: 0; flex: 1 1 auto; }
 
         /* ============================================================
-           BRAND LOGO + FLYING BIRD
+           BRAND LOGO — no bird, just the mark + golden ring chase
            ============================================================ */
         .brand-logo-wrap {
             position: relative;
@@ -232,36 +277,63 @@
             width: 34px; height: 34px; border-radius: 10px;
             object-fit: contain; background: var(--sf2); padding: 3px;
             display: block;
-        }
-        .brand-bird {
-            position: absolute;
-            top: 0;
-            left: -14px;
-            width: 14px;
-            height: 14px;
-            pointer-events: none;
-            color: var(--sky-dark);
-            opacity: 0;
-            animation: birdFly 8s ease-in-out infinite;
-        }
-        .brand-bird svg { width: 100%; height: 100%; display: block; }
-
-        @keyframes birdFly {
-            0%   { transform: translate(0, 6px) scale(0.9); opacity: 0; }
-            8%   { opacity: 1; }
-            25%  { transform: translate(8px, 2px) scale(1) rotate(-4deg); opacity: 1; }
-            50%  { transform: translate(18px, 8px) scale(1.05) rotate(2deg); opacity: 1; }
-            75%  { transform: translate(28px, 3px) scale(1) rotate(-2deg); opacity: 1; }
-            92%  { opacity: 1; }
-            100% { transform: translate(40px, 6px) scale(0.9); opacity: 0; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .brand-bird { animation: none !important; display: none; }
+            position: relative;
+            z-index: 2;
         }
 
         /* ============================================================
-           BRAND TITLE + FLOATING MATH FORMULAS
+           STAGE 4 — GOLDEN STRIP CHASING LOGO CORNERS (starts at 9s)
+           ============================================================ */
+        .logo-ring {
+            position: absolute;
+            inset: -3px;
+            border-radius: 13px;
+            z-index: 3;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .5s ease;
+            padding: 2px;
+            background:
+                conic-gradient(
+                    from var(--ring-angle, 0deg),
+                    rgba(245,184,0,0)    0deg,
+                    rgba(245,184,0,0)   40deg,
+                    #f5b800             80deg,
+                    #ffd94a            100deg,
+                    #f5b800            120deg,
+                    rgba(245,184,0,0)  180deg,
+                    rgba(245,184,0,0)  360deg
+                );
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+        }
+        .logo-ring.run {
+            opacity: 1;
+            animation: ringSpin 3.2s linear infinite;
+        }
+
+        @property --ring-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+        @keyframes ringSpin {
+            to { --ring-angle: 360deg; }
+        }
+        /* Fallback for browsers without @property support */
+        @supports not (background: conic-gradient(from var(--ring-angle, 0deg), red, blue)) {
+            .logo-ring.run {
+                background: conic-gradient(from 0deg, rgba(245,184,0,0) 0deg, #f5b800 90deg, rgba(245,184,0,0) 180deg, rgba(245,184,0,0) 360deg);
+                animation: ringSpinFallback 3.2s linear infinite;
+            }
+            @keyframes ringSpinFallback { to { transform: rotate(360deg); } }
+        }
+
+        /* ============================================================
+           BRAND TITLE + MATH FORMULAS (STAGE 2 — reveal 3–6s)
            ============================================================ */
         .brand-title { min-width: 0; flex: 1 1 auto; position: relative; }
         .brand-title h1 {
@@ -289,39 +361,85 @@
             white-space: nowrap;
             will-change: transform, opacity;
         }
-        .formula.f1 { top: 4px;  left: 8%;   font-size: .85rem; color: rgba(2,132,199,.55); animation: floatA 9s linear infinite; animation-delay: 0s; }
-        .formula.f2 { top: 22px; left: 22%;  font-size: .75rem; color: rgba(10,30,63,.45);  animation: floatB 11s linear infinite; animation-delay: 1.2s; }
-        .formula.f3 { top: 6px;  left: 36%;  font-size: .9rem;  color: rgba(245,184,0,.65); animation: floatA 10s linear infinite; animation-delay: 2.6s; }
-        .formula.f4 { top: 26px; left: 50%;  font-size: .7rem;  color: rgba(2,132,199,.45); animation: floatC 12s linear infinite; animation-delay: .8s; }
-        .formula.f5 { top: 2px;  left: 64%;  font-size: .8rem;  color: rgba(10,30,63,.40);  animation: floatB 10s linear infinite; animation-delay: 3.4s; }
-        .formula.f6 { top: 24px; left: 78%;  font-size: .95rem; color: rgba(14,165,233,.60); animation: floatA 13s linear infinite; animation-delay: 4.2s; }
-        .formula.f7 { top: 8px;  left: 90%;  font-size: .7rem;  color: rgba(245,184,0,.55); animation: floatC 11s linear infinite; animation-delay: 5.1s; }
-        .formula.f8 { top: 18px; left: 14%;  font-size: .65rem; color: rgba(2,132,199,.50); animation: floatB 8.5s linear infinite; animation-delay: 6s; }
+        /* Initial reveal: formulas are hidden until .run-intro is added */
+        .formula.f1 { top: 4px;  left: 8%;   font-size: .85rem; color: rgba(2,132,199,.55); }
+        .formula.f2 { top: 22px; left: 22%;  font-size: .75rem; color: rgba(10,30,63,.45);  }
+        .formula.f3 { top: 6px;  left: 36%;  font-size: .9rem;  color: rgba(245,184,0,.65); }
+        .formula.f4 { top: 26px; left: 50%;  font-size: .7rem;  color: rgba(2,132,199,.45); }
+        .formula.f5 { top: 2px;  left: 64%;  font-size: .8rem;  color: rgba(10,30,63,.40);  }
+        .formula.f6 { top: 24px; left: 78%;  font-size: .95rem; color: rgba(14,165,233,.60); }
+        .formula.f7 { top: 8px;  left: 90%;  font-size: .7rem;  color: rgba(245,184,0,.55); }
+        .formula.f8 { top: 18px; left: 14%;  font-size: .65rem; color: rgba(2,132,199,.50); }
 
+        /* Per-formula reveal delay (staggered between 3s and 6s) */
+        .top-bar.run-intro .formula.f1 { animation: formulaReveal .8s ease 3.0s forwards, floatA 9s linear 3.8s infinite; }
+        .top-bar.run-intro .formula.f2 { animation: formulaReveal .8s ease 3.35s forwards, floatB 11s linear 4.15s infinite; }
+        .top-bar.run-intro .formula.f3 { animation: formulaReveal .8s ease 3.7s forwards, floatA 10s linear 4.5s infinite; }
+        .top-bar.run-intro .formula.f4 { animation: formulaReveal .8s ease 4.05s forwards, floatC 12s linear 4.85s infinite; }
+        .top-bar.run-intro .formula.f5 { animation: formulaReveal .8s ease 4.4s forwards, floatB 10s linear 5.2s infinite; }
+        .top-bar.run-intro .formula.f6 { animation: formulaReveal .8s ease 4.75s forwards, floatA 13s linear 5.55s infinite; }
+        .top-bar.run-intro .formula.f7 { animation: formulaReveal .8s ease 5.1s forwards, floatC 11s linear 5.9s infinite; }
+        .top-bar.run-intro .formula.f8 { animation: formulaReveal .8s ease 5.45s forwards, floatB 8.5s linear 6.25s infinite; }
+
+        @keyframes formulaReveal {
+            from { opacity: 0; transform: scale(.6); }
+            to   { opacity: .85; transform: scale(1); }
+        }
         @keyframes floatA {
-            0%   { transform: translateY(6px)  translateX(0)   rotate(-3deg); opacity: 0; }
-            15%  { opacity: .9; }
-            50%  { transform: translateY(-6px) translateX(6px) rotate(2deg);  opacity: .8; }
-            85%  { opacity: .9; }
-            100% { transform: translateY(6px)  translateX(12px) rotate(-3deg); opacity: 0; }
+            0%   { transform: translateY(6px)  translateX(0)   rotate(-3deg); opacity: .3; }
+            50%  { transform: translateY(-6px) translateX(6px) rotate(2deg);  opacity: .95; }
+            100% { transform: translateY(6px)  translateX(12px) rotate(-3deg); opacity: .3; }
         }
         @keyframes floatB {
-            0%   { transform: translateY(-4px) translateX(0)    rotate(2deg);  opacity: 0; }
-            20%  { opacity: .85; }
-            55%  { transform: translateY(6px)  translateX(-6px) rotate(-2deg); opacity: .75; }
-            85%  { opacity: .85; }
-            100% { transform: translateY(-4px) translateX(-12px) rotate(2deg); opacity: 0; }
+            0%   { transform: translateY(-4px) translateX(0)    rotate(2deg);  opacity: .3; }
+            50%  { transform: translateY(6px)  translateX(-6px) rotate(-2deg); opacity: .9; }
+            100% { transform: translateY(-4px) translateX(-12px) rotate(2deg); opacity: .3; }
         }
         @keyframes floatC {
-            0%   { transform: translateY(0)    translateX(0)   scale(.9); opacity: 0; }
-            25%  { opacity: .8; }
-            50%  { transform: translateY(-8px) translateX(4px) scale(1.05); opacity: .9; }
-            75%  { opacity: .8; }
-            100% { transform: translateY(0)    translateX(8px) scale(.9);  opacity: 0; }
+            0%   { transform: translateY(0)    translateX(0)   scale(.9); opacity: .3; }
+            50%  { transform: translateY(-8px) translateX(4px) scale(1.05); opacity: .95; }
+            100% { transform: translateY(0)    translateX(8px) scale(.9);  opacity: .3; }
         }
 
         @media (prefers-reduced-motion: reduce) {
             .formula { animation: none !important; opacity: .35; }
+            .top-bar.run-intro .formula.f1,
+            .top-bar.run-intro .formula.f2,
+            .top-bar.run-intro .formula.f3,
+            .top-bar.run-intro .formula.f4,
+            .top-bar.run-intro .formula.f5,
+            .top-bar.run-intro .formula.f6,
+            .top-bar.run-intro .formula.f7,
+            .top-bar.run-intro .formula.f8 { animation: none !important; opacity: .35 !important; }
+        }
+
+        /* ============================================================
+           STAGE 3 — TAGLINE reveal (6–9s)
+           ============================================================ */
+        .brand-tagline {
+            font-size: .68rem;
+            font-weight: 700;
+            color: var(--sky-dark);
+            letter-spacing: .04em;
+            margin-top: .25rem;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity .8s ease, transform .8s ease;
+            position: relative;
+            z-index: 2;
+            display: block;
+        }
+        .brand-tagline .tag-prefix {
+            font-weight: 900;
+            color: var(--navy);
+            text-transform: uppercase;
+            font-size: .62rem;
+            letter-spacing: .1em;
+        }
+        .top-bar.run-intro .brand-tagline {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 6.0s;
         }
 
         .selected-subjects {
@@ -792,7 +910,6 @@
             .btn-icon#refreshBtn { display: none; }
             .quiz-wrapper { padding: 1rem .85rem 1.15rem; border-radius: 22px; }
             .formula.f3, .formula.f6 { display: none; }
-            /* Fewer flags on very small screens to avoid clutter */
             .flag-emoji.fk-mobile-hide { display: none; }
             .question-card { padding: 1.15rem 1rem .75rem; }
             .question-card .q-text { font-size: 1rem; }
@@ -823,6 +940,8 @@
             .papers-filter-pill { font-size: .64rem; padding: .28rem .6rem; max-width: 140px; }
             .papers-filter-pill .pfp-label { max-width: 90px; }
             .flag-emoji { font-size: .85rem; }
+            .flags-wave-track { gap: .7rem; }
+            .flags-wave-track span { font-size: .85rem; }
         }
 
         #quizApp #readView,
@@ -907,7 +1026,12 @@
 
     <div class="quiz-wrapper" id="quizApp">
         <div class="top-bar" id="topBar">
-            <!-- FLAGS LAYER — populated by JS -->
+            <!-- STAGE 1: single-line flag wave (0–3s) -->
+            <div class="flags-wave" id="flagsWave" aria-hidden="true">
+                <div class="flags-wave-track" id="flagsWaveTrack"></div>
+            </div>
+
+            <!-- AFTER INTRO: scattered ambient flags -->
             <div class="flags-layer" id="flagsLayer" aria-hidden="true"></div>
 
             <div class="top-row-1">
@@ -916,11 +1040,8 @@
                         <img class="brand-logo" id="brandLogo"
                              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230a1e3f'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter,sans-serif' font-size='24' font-weight='700' fill='%23f5b800'%3ESL%3C/text%3E%3C/svg%3E"
                              alt="Logo">
-                        <span class="brand-bird" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M2 12 Q 6 6, 10 10 Q 14 14, 18 9 M 14 9 Q 18 6, 22 9"/>
-                            </svg>
-                        </span>
+                        <!-- STAGE 4: golden ring chase -->
+                        <span class="logo-ring" id="logoRing" aria-hidden="true"></span>
                     </div>
                     <div class="brand-title">
                         <div class="formula-layer" aria-hidden="true">
@@ -934,6 +1055,10 @@
                             <span class="formula f8">≠</span>
                         </div>
                         <h1 id="quizTitle">All Jobs MCQs</h1>
+                        <!-- STAGE 3: tagline -->
+                        <span class="brand-tagline" id="brandTagline">
+                            <span class="tag-prefix">Self Learners</span> — Quality Content Creator Platform
+                        </span>
                         <div class="selected-subjects" id="selectedSubjectsLine"></div>
                     </div>
                 </div>
@@ -1178,12 +1303,8 @@
     const GUEST_LIMIT = 15;
     const PAGE_SIZE = 100;
 
-    /* ============================================================
-       TOP 100 DEVELOPED COUNTRIES (by HDI) — as flag emojis
-       Pakistan 🇵🇰 is included at the end with a special marker.
-       ============================================================ */
+    /* Top ~100 developed countries (HDI) as flags + Pakistan 🇵🇰 */
     const TOP_COUNTRY_FLAGS = [
-        // Top ~100 by HDI / development index
         '🇨🇭','🇳🇴','🇮🇸','🇭🇰','🇩🇰','🇸🇪','🇩🇪','🇮🇪','🇸🇬','🇦🇺',
         '🇳🇱','🇧🇪','🇫🇮','🇬🇧','🇳🇿','🇨🇦','🇰🇷','🇱🇺','🇯🇵','🇮🇱',
         '🇲🇹','🇸🇮','🇦🇹','🇦🇪','🇱🇹','🇪🇸','🇨🇿','🇫🇷','🇮🇹','🇪🇪',
@@ -1219,7 +1340,9 @@
         installBanner: $('installBanner'), installBtn: $('installBtn'), installClose: $('installClose'),
         jobSitesBtn: $('jobSitesBtn'), jobsitesOverlay: $('jobsitesOverlay'), jobsitesClose: $('jobsitesClose'), jobsitesSearchInput: $('jobsitesSearchInput'), jobsitesList: $('jobsitesList'),
         desktopNav: $('desktopNav'),
+        flagsWave: $('flagsWave'), flagsWaveTrack: $('flagsWaveTrack'),
         flagsLayer: $('flagsLayer'),
+        logoRing: $('logoRing'),
     };
 
     let questions = [], originalQuestions = [], currentQ = 0, total = 0, answers = [], status = [], locked = [], invalidQs = [];
@@ -1265,9 +1388,48 @@
     function withCacheBust(url) { const sep = url.includes('?') ? '&' : '?'; return url + sep + '_t=' + Date.now(); }
 
     /* ============================================================
-       BUILD FLAG LAYER — 100 flags floating across the header
+       INTRO SEQUENCE BUILDER
+       Stage 1 (0–3s): single-line flag wave
+       Stage 2 (3–6s): formulas reveal
+       Stage 3 (6–9s): tagline reveal
+       Stage 4 (9s+):  golden ring chase around logo (permanent)
        ============================================================ */
-    function buildFlagsLayer() {
+    function buildIntroSequence() {
+        // STAGE 1: single-line flag wave
+        if (ui.flagsWaveTrack) {
+            ui.flagsWaveTrack.innerHTML = '';
+            TOP_COUNTRY_FLAGS.forEach((flag, i) => {
+                const span = document.createElement('span');
+                span.textContent = flag;
+                span.style.animationDelay = ((i * 0.11) % 6).toFixed(2) + 's';
+                ui.flagsWaveTrack.appendChild(span);
+            });
+        }
+
+        // STAGE 2: formulas start floating — add .run-intro to header (triggers reveals)
+        // STAGE 3: tagline fade is driven by the same class (see CSS)
+        setTimeout(() => {
+            if (ui.topBar) ui.topBar.classList.add('run-intro');
+        }, 3000);
+
+        // STAGE 1 exit: fade out wave at 3s
+        setTimeout(() => {
+            if (ui.flagsWave) ui.flagsWave.classList.add('hide');
+        }, 3000);
+
+        // After wave fades out, build ambient scattered flags
+        setTimeout(() => {
+            buildAmbientFlagsLayer();
+            if (ui.flagsLayer) ui.flagsLayer.classList.add('show');
+        }, 3600);
+
+        // STAGE 4: golden ring chase around logo — starts at 9s, runs forever
+        setTimeout(() => {
+            if (ui.logoRing) ui.logoRing.classList.add('run');
+        }, 9000);
+    }
+
+    function buildAmbientFlagsLayer() {
         if (!ui.flagsLayer) return;
         ui.flagsLayer.innerHTML = '';
         const total = TOP_COUNTRY_FLAGS.length;
@@ -1275,17 +1437,11 @@
             const span = document.createElement('span');
             span.className = 'flag-emoji p' + ((i % 3) + 1);
             span.textContent = flag;
-            // Spread flags across the header width (percent based)
-            const leftPct = (i / total) * 100;
-            const topPct = 4 + ((i * 37) % 74); // pseudo-random vertical spread 4%–78%
-            span.style.left = leftPct + '%';
-            span.style.top = topPct + '%';
-            // Stagger the start time so they don't all pop in together
+            span.style.left = ((i / total) * 100).toFixed(1) + '%';
+            span.style.top = (4 + ((i * 37) % 74)) + '%';
             span.style.animationDelay = ((i * 0.17) % 14).toFixed(2) + 's';
-            // Slight size variation for organic feel
-            const sizeVar = 0.85 + ((i * 7) % 5) * 0.08; // 0.85 – 1.17
+            const sizeVar = 0.85 + ((i * 7) % 5) * 0.08;
             span.style.fontSize = sizeVar.toFixed(2) + 'rem';
-            // Hide every 2nd flag on small screens to reduce clutter
             if (i % 3 === 2) span.classList.add('fk-mobile-hide');
             ui.flagsLayer.appendChild(span);
         });
@@ -2191,7 +2347,7 @@
 
     function init() {
         updateUserLabels();
-        buildFlagsLayer();
+        buildIntroSequence();
         try { const saved = JSON.parse(localStorage.getItem(KEY_FACTS_READ) || '[]'); factsReadSet = new Set(saved); } catch (e) { factsReadSet = new Set(); }
         try { const savedUser = JSON.parse(localStorage.getItem(KEY_USER) || 'null'); if (savedUser) { user = savedUser; isGuest = savedUser.user === 'Guest'; updateUserLabels(); } } catch (e) { /* ignore */ }
         fetchQuestions(false);
