@@ -69,10 +69,7 @@
             transition: all .2s ease;
             white-space: nowrap;
         }
-        .desktop-nav-tab:hover {
-            background: var(--sky-soft);
-            color: var(--sky-dark);
-        }
+        .desktop-nav-tab:hover { background: var(--sky-soft); color: var(--sky-dark); }
         .desktop-nav-tab.active {
             background: linear-gradient(135deg, var(--sky), var(--sky-dark));
             color: #fff;
@@ -163,104 +160,130 @@
             border: 1px solid var(--border);
         }
 
-        /* ============================================================
-           TOP BAR — with animated aurora behind it
-           ============================================================ */
         .top-bar {
             display: flex; flex-direction: column; gap: .4rem;
-            padding: .65rem .85rem .75rem;
-            margin: -.65rem -.85rem .35rem;
+            padding: .35rem 0 .6rem; margin-bottom: .35rem;
             position: sticky; top: 0; z-index: 50;
-            background: rgba(255,255,255,.72);
-            backdrop-filter: blur(14px) saturate(160%);
-            -webkit-backdrop-filter: blur(14px) saturate(160%);
-            border-radius: 18px;
-            border-bottom: 1px solid transparent;
-            overflow: hidden;
-            transition: border-color .2s, box-shadow .2s, background .2s;
+            background: var(--sf); border-bottom: 1px solid transparent;
+            transition: border-color .2s, box-shadow .2s;
         }
-        .top-bar.scrolled {
-            border-bottom-color: var(--border);
-            box-shadow: 0 8px 24px -10px rgba(10,30,63,.18);
-            background: rgba(255,255,255,.88);
-        }
-        /* Aurora layer behind header content */
-        .top-bar::before,
-        .top-bar::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(38px);
-            z-index: 0;
-            pointer-events: none;
-            will-change: transform;
-        }
-        .top-bar::before {
-            width: 260px; height: 180px;
-            top: -40px; left: -60px;
-            background: radial-gradient(circle, rgba(14,165,233,.60), rgba(14,165,233,0) 72%);
-            animation: aurora1 20s ease-in-out infinite;
-        }
-        .top-bar::after {
-            width: 280px; height: 180px;
-            bottom: -60px; right: -70px;
-            background: radial-gradient(circle, rgba(245,184,0,.50), rgba(245,184,0,0) 72%);
-            animation: aurora2 24s ease-in-out infinite;
-        }
-        /* Extra navy orb as a separate layer */
-        .top-bar-aurora-extra {
-            position: absolute;
-            width: 320px; height: 200px;
-            top: -50px; left: 35%;
-            border-radius: 50%;
-            filter: blur(44px);
-            background: radial-gradient(circle, rgba(10,30,63,.35), rgba(10,30,63,0) 72%);
-            z-index: 0;
-            pointer-events: none;
-            will-change: transform;
-            animation: aurora3 26s ease-in-out infinite;
-        }
-        .top-bar > * { position: relative; z-index: 1; }
-
-        @keyframes aurora1 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50%      { transform: translate(120px, 20px) scale(1.15); }
-        }
-        @keyframes aurora2 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50%      { transform: translate(-110px, -25px) scale(1.18); }
-        }
-        @keyframes aurora3 {
-            0%, 100% { transform: translate(-50%, 0) scale(1); }
-            33%      { transform: translate(-30%, 15px) scale(1.08); }
-            66%      { transform: translate(-70%, -15px) scale(0.94); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .top-bar::before,
-            .top-bar::after,
-            .top-bar-aurora-extra { animation: none !important; }
-        }
+        .top-bar.scrolled { border-bottom-color: var(--border); box-shadow: 0 4px 16px -8px rgba(10,30,63,.15); }
 
         .top-row-1 { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
         .brand { display: flex; align-items: flex-start; gap: .65rem; min-width: 0; flex: 1 1 auto; }
+
+        /* ============================================================
+           BRAND LOGO + FLYING BIRD
+           ============================================================ */
+        .brand-logo-wrap {
+            position: relative;
+            flex-shrink: 0;
+            width: 34px;
+            height: 34px;
+            margin-top: 1px;
+        }
         .brand-logo {
             width: 34px; height: 34px; border-radius: 10px;
             object-fit: contain; background: var(--sf2); padding: 3px;
-            flex-shrink: 0; margin-top: 1px;
+            display: block;
         }
-        .brand-title { min-width: 0; flex: 1 1 auto; }
+        /* Bird SVG flying across the logo */
+        .brand-bird {
+            position: absolute;
+            top: 0;
+            left: -14px;
+            width: 14px;
+            height: 14px;
+            pointer-events: none;
+            color: var(--sky-dark);
+            opacity: 0;
+            animation: birdFly 8s ease-in-out infinite;
+        }
+        .brand-bird svg { width: 100%; height: 100%; display: block; }
+
+        @keyframes birdFly {
+            0%   { transform: translate(0, 6px) scale(0.9); opacity: 0; }
+            8%   { opacity: 1; }
+            25%  { transform: translate(8px, 2px) scale(1) rotate(-4deg); opacity: 1; }
+            50%  { transform: translate(18px, 8px) scale(1.05) rotate(2deg); opacity: 1; }
+            75%  { transform: translate(28px, 3px) scale(1) rotate(-2deg); opacity: 1; }
+            92%  { opacity: 1; }
+            100% { transform: translate(40px, 6px) scale(0.9); opacity: 0; }
+        }
+
+        /* ============================================================
+           BRAND TITLE + FLOATING MATH FORMULAS
+           ============================================================ */
+        .brand-title { min-width: 0; flex: 1 1 auto; position: relative; }
         .brand-title h1 {
             font-size: 1rem; font-weight: 800; color: var(--navy);
             line-height: 1.25;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
             overflow: hidden; word-break: break-word;
+            position: relative;
+            z-index: 2;
         }
+
+        /* Floating formula layer sits between header background and title text */
+        .formula-layer {
+            position: absolute;
+            inset: -6px -8px -4px -6px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .formula {
+            position: absolute;
+            font-family: 'Inter', system-ui, sans-serif;
+            font-weight: 700;
+            color: var(--sky-dark);
+            opacity: 0;
+            white-space: nowrap;
+            will-change: transform, opacity;
+        }
+        /* Each formula gets its own position + animation timing */
+        .formula.f1 { top: 4px;  left: 8%;   font-size: .85rem; color: rgba(2,132,199,.55); animation: floatA 9s linear infinite; animation-delay: 0s; }
+        .formula.f2 { top: 22px; left: 22%;  font-size: .75rem; color: rgba(10,30,63,.45);  animation: floatB 11s linear infinite; animation-delay: 1.2s; }
+        .formula.f3 { top: 6px;  left: 36%;  font-size: .9rem;  color: rgba(245,184,0,.65); animation: floatA 10s linear infinite; animation-delay: 2.6s; }
+        .formula.f4 { top: 26px; left: 50%;  font-size: .7rem;  color: rgba(2,132,199,.45); animation: floatC 12s linear infinite; animation-delay: .8s; }
+        .formula.f5 { top: 2px;  left: 64%;  font-size: .8rem;  color: rgba(10,30,63,.40);  animation: floatB 10s linear infinite; animation-delay: 3.4s; }
+        .formula.f6 { top: 24px; left: 78%;  font-size: .95rem; color: rgba(14,165,233,.60); animation: floatA 13s linear infinite; animation-delay: 4.2s; }
+        .formula.f7 { top: 8px;  left: 90%;  font-size: .7rem;  color: rgba(245,184,0,.55); animation: floatC 11s linear infinite; animation-delay: 5.1s; }
+        .formula.f8 { top: 18px; left: 14%;  font-size: .65rem; color: rgba(2,132,199,.50); animation: floatB 8.5s linear infinite; animation-delay: 6s; }
+
+        @keyframes floatA {
+            0%   { transform: translateY(6px)  translateX(0)   rotate(-3deg); opacity: 0; }
+            15%  { opacity: .9; }
+            50%  { transform: translateY(-6px) translateX(6px) rotate(2deg);  opacity: .8; }
+            85%  { opacity: .9; }
+            100% { transform: translateY(6px)  translateX(12px) rotate(-3deg); opacity: 0; }
+        }
+        @keyframes floatB {
+            0%   { transform: translateY(-4px) translateX(0)    rotate(2deg);  opacity: 0; }
+            20%  { opacity: .85; }
+            55%  { transform: translateY(6px)  translateX(-6px) rotate(-2deg); opacity: .75; }
+            85%  { opacity: .85; }
+            100% { transform: translateY(-4px) translateX(-12px) rotate(2deg); opacity: 0; }
+        }
+        @keyframes floatC {
+            0%   { transform: translateY(0)    translateX(0)   scale(.9); opacity: 0; }
+            25%  { opacity: .8; }
+            50%  { transform: translateY(-8px) translateX(4px) scale(1.05); opacity: .9; }
+            75%  { opacity: .8; }
+            100% { transform: translateY(0)    translateX(8px) scale(.9);  opacity: 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .brand-bird { animation: none !important; display: none; }
+            .formula { animation: none !important; opacity: .35; }
+        }
+
         .selected-subjects {
             font-size: .66rem; font-weight: 600; color: var(--text-muted);
             line-height: 1.35; margin-top: .1rem;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
             overflow: hidden; word-break: break-word;
+            position: relative; z-index: 2;
         }
         .selected-subjects:empty { display: none; }
         .selected-subjects .subj-label {
@@ -717,16 +740,14 @@
             .brand-title h1 { font-size: .92rem; }
             .selected-subjects { font-size: .62rem; }
             .brand-logo { width: 32px; height: 32px; }
+            .brand-logo-wrap { width: 32px; height: 32px; }
         }
         @media (max-width: 560px) {
             body { padding: 0; }
             .btn-drawer { display: inline-flex; }
             .btn-icon#refreshBtn { display: none; }
             .quiz-wrapper { padding: 1rem .85rem 1.15rem; border-radius: 22px; }
-            .top-bar { padding: .55rem .65rem .65rem; margin: -.55rem -.65rem .35rem; }
-            .top-bar::before { width: 180px; height: 130px; filter: blur(30px); }
-            .top-bar::after { width: 200px; height: 130px; filter: blur(30px); }
-            .top-bar-aurora-extra { width: 220px; height: 140px; filter: blur(32px); }
+            .formula.f3, .formula.f6 { display: none; }
             .question-card { padding: 1.15rem 1rem .75rem; }
             .question-card .q-text { font-size: 1rem; }
             .options-list .option-btn { padding: .7rem .95rem; font-size: .87rem; }
@@ -839,13 +860,29 @@
 
     <div class="quiz-wrapper" id="quizApp">
         <div class="top-bar" id="topBar">
-            <div class="top-bar-aurora-extra" aria-hidden="true"></div>
             <div class="top-row-1">
                 <div class="brand">
-                    <img class="brand-logo" id="brandLogo"
-                         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230a1e3f'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter,sans-serif' font-size='24' font-weight='700' fill='%23f5b800'%3ESL%3C/text%3E%3C/svg%3E"
-                         alt="Logo">
+                    <div class="brand-logo-wrap">
+                        <img class="brand-logo" id="brandLogo"
+                             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230a1e3f'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter,sans-serif' font-size='24' font-weight='700' fill='%23f5b800'%3ESL%3C/text%3E%3C/svg%3E"
+                             alt="Logo">
+                        <span class="brand-bird" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 12 Q 6 6, 10 10 Q 14 14, 18 9 M 14 9 Q 18 6, 22 9"/>
+                            </svg>
+                        </span>
+                    </div>
                     <div class="brand-title">
+                        <div class="formula-layer" aria-hidden="true">
+                            <span class="formula f1">∑</span>
+                            <span class="formula f2">π</span>
+                            <span class="formula f3">√x</span>
+                            <span class="formula f4">∫</span>
+                            <span class="formula f5">∞</span>
+                            <span class="formula f6">±</span>
+                            <span class="formula f7">θ</span>
+                            <span class="formula f8">≠</span>
+                        </div>
                         <h1 id="quizTitle">All Jobs MCQs</h1>
                         <div class="selected-subjects" id="selectedSubjectsLine"></div>
                     </div>
