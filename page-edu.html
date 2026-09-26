@@ -29,6 +29,7 @@
             --shadow-xl: 0 30px 60px -15px rgba(10,30,63,.25);
         }
         html, body { -webkit-text-size-adjust: 100%; }
+        html { background: var(--bg); }
         body {
             background: transparent;
             min-height: 100dvh;
@@ -36,13 +37,94 @@
             padding: 1.25rem; color: var(--text);
             -webkit-font-smoothing: antialiased;
             overscroll-behavior: contain;
+            position: relative;
         }
-        .edu-page { width: 100%; max-width: 920px; }
-        .edu-page * { -webkit-user-select: none; user-select: none; }
-        .edu-page input, .edu-page textarea { -webkit-user-select: text; user-select: text; }
 
         /* ============================================================
-           DESKTOP TOP NAV — only visible on wide screens
+           ANIMATED BACKGROUND
+           ============================================================ */
+        .bg-anim {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 0% 0%, rgba(14,165,233,.06) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(10,30,63,.05) 0%, transparent 45%),
+                var(--bg);
+        }
+
+        /* Floating blurred orbs */
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            will-change: transform;
+        }
+        .bg-orb-1 {
+            width: 380px; height: 380px;
+            top: -120px; left: -80px;
+            background: radial-gradient(circle, rgba(14,165,233,.35), rgba(14,165,233,0) 70%);
+            animation: orb1 38s ease-in-out infinite;
+        }
+        .bg-orb-2 {
+            width: 340px; height: 340px;
+            bottom: -100px; right: -80px;
+            background: radial-gradient(circle, rgba(245,184,0,.28), rgba(245,184,0,0) 70%);
+            animation: orb2 32s ease-in-out infinite;
+        }
+        .bg-orb-3 {
+            width: 420px; height: 420px;
+            top: 40%; left: 55%;
+            background: radial-gradient(circle, rgba(10,30,63,.20), rgba(10,30,63,0) 70%);
+            animation: orb3 45s ease-in-out infinite;
+        }
+
+        @keyframes orb1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50%      { transform: translate(60px, 40px) scale(1.08); }
+        }
+        @keyframes orb2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50%      { transform: translate(-50px, -40px) scale(1.1); }
+        }
+        @keyframes orb3 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            33%      { transform: translate(-40%, -55%) scale(1.06); }
+            66%      { transform: translate(-60%, -45%) scale(0.96); }
+        }
+
+        /* Subtle dot grid overlay */
+        .bg-dots {
+            position: absolute;
+            inset: -50%;
+            background-image: radial-gradient(rgba(10,30,63,.10) 1px, transparent 1px);
+            background-size: 28px 28px;
+            opacity: .35;
+            animation: dotsDrift 60s linear infinite;
+        }
+        @keyframes dotsDrift {
+            0%   { transform: translate(0, 0); }
+            100% { transform: translate(28px, 28px); }
+        }
+
+        /* Reduce motion friendly */
+        @media (prefers-reduced-motion: reduce) {
+            .bg-orb-1, .bg-orb-2, .bg-orb-3, .bg-dots {
+                animation: none !important;
+            }
+        }
+        /* On small phones, soften orbs so text stays crisp */
+        @media (max-width: 560px) {
+            .bg-orb-1 { width: 280px; height: 280px; filter: blur(60px); }
+            .bg-orb-2 { width: 260px; height: 260px; filter: blur(60px); }
+            .bg-orb-3 { width: 320px; height: 320px; filter: blur(70px); }
+            .bg-dots { opacity: .25; }
+        }
+
+        /* ============================================================
+           DESKTOP TOP NAV
            ============================================================ */
         .desktop-nav {
             display: none;
@@ -85,6 +167,10 @@
             .desktop-nav { display: flex; }
             body { padding-top: 1.5rem; }
         }
+
+        .edu-page { width: 100%; max-width: 920px; position: relative; z-index: 1; }
+        .edu-page * { -webkit-user-select: none; user-select: none; }
+        .edu-page input, .edu-page textarea { -webkit-user-select: text; user-select: text; }
 
         .install-banner {
             position: fixed; bottom: 1.2rem; left: 50%;
@@ -719,6 +805,15 @@
     </style>
 </head>
 <body>
+
+<!-- Animated background layer -->
+<div class="bg-anim" aria-hidden="true">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+    <div class="bg-dots"></div>
+</div>
+
 <div class="edu-page">
     <div class="toast-container" id="toastContainer"></div>
 
@@ -744,9 +839,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
-         DESKTOP TOP NAV — only visible on wide screens
-         ============================================================ -->
+    <!-- Desktop top nav -->
     <nav class="desktop-nav" id="desktopNav" aria-label="Desktop mode navigation">
         <button class="desktop-nav-tab active" data-desktop-mode="mcq" type="button">
             <span class="dnt-emoji">📝</span>
@@ -1601,7 +1694,6 @@
         ui.quizApp.classList.remove('read-mode-active', 'facts-mode-active', 'papers-mode-active', 'result-active');
         ui.result.style.display = 'none'; $('endQuizBottom').style.display = 'flex';
 
-        // Sync desktop nav active state
         document.querySelectorAll('.desktop-nav-tab').forEach((tab) => {
             tab.classList.toggle('active', tab.dataset.desktopMode === mode);
         });
@@ -1638,7 +1730,6 @@
         }
     }
 
-    // Desktop nav clicks
     document.querySelectorAll('.desktop-nav-tab').forEach((tab) => {
         tab.addEventListener('click', (e) => {
             e.stopPropagation();
