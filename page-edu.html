@@ -436,7 +436,7 @@
         .verify-corner.unknown { background: var(--border-strong); color: var(--text-muted); }
 
         /* ============================================================
-           PAPERS — FLAT LAYOUT
+           PAPERS — FLAT LAYOUT with 3 blue dropdowns
            ============================================================ */
         #papersView { display: none; }
 
@@ -455,26 +455,60 @@
         .papers-search-bar.has-text .psb-clear { display: block; }
         .papers-search-bar .psb-count { font-size: .68rem; font-weight: 800; color: var(--sky-dark); background: var(--sky-soft); padding: .18rem .5rem; border-radius: var(--rf); white-space: nowrap; }
 
-        .papers-filter-row { display: flex; gap: .45rem; margin-bottom: .8rem; flex-wrap: wrap; }
+        /* 3 dropdowns in one line, blue text */
+        .papers-filter-row {
+            display: flex;
+            gap: .4rem;
+            margin: 0 0 .8rem 0;
+            flex-wrap: nowrap;
+        }
         .papers-filter-row select {
-            flex: 1 1 0; min-width: 110px;
-            border: 1.5px solid var(--border);
+            flex: 1 1 0;
+            min-width: 0;
             background: var(--sf2);
+            border: 1.5px solid var(--border);
             border-radius: var(--rf);
-            padding: .55rem 1.8rem .55rem .85rem;
-            font-size: .78rem; font-weight: 700;
-            color: var(--text);
-            cursor: pointer; outline: none;
-            appearance: none; -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230ea5e9' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            padding: .55rem 1.7rem .55rem .75rem;
+            font-size: .76rem;
+            font-weight: 700;
+            color: var(--sky-dark);
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right .6rem center;
-            background-size: 11px;
+            background-position: right .5rem center;
+            background-size: 10px;
             transition: all .2s;
             min-height: 40px;
             text-overflow: ellipsis;
+            font-family: inherit;
         }
-        .papers-filter-row select:focus { border-color: var(--sky); background-color: #fff; box-shadow: 0 0 0 4px rgba(14,165,233,.1); }
+        .papers-filter-row select:focus,
+        .papers-filter-row select:active {
+            border-color: var(--sky);
+            background-color: #fff;
+            color: var(--sky-dark);
+            box-shadow: 0 0 0 4px rgba(14,165,233,.1);
+        }
+        .papers-filter-row select option {
+            color: var(--text);
+            background: #fff;
+            font-weight: 600;
+            padding: .5rem;
+        }
+
+        @media (max-width: 480px) {
+            .papers-filter-row select {
+                font-size: .68rem;
+                padding: .5rem 1.4rem .5rem .55rem;
+                background-size: 9px;
+                background-position: right .35rem center;
+                min-height: 38px;
+            }
+        }
 
         .papers-cards-grid {
             display: grid;
@@ -817,6 +851,7 @@
                 </div>
                 <div class="papers-filter-row">
                     <select id="papersYearFilter"><option value="">All years</option></select>
+                    <select id="papersCategoryFilter"><option value="">All categories</option></select>
                     <select id="papersSubjectFilter"><option value="">All subjects</option></select>
                 </div>
                 <div class="papers-cards-grid" id="papersCardsGrid">
@@ -983,7 +1018,7 @@
         factsBox: $('factsContainer'), factsSearchBar: $('factsSearchBar'), factsSearchInput: $('factsSearchInput'), factsSearchClear: $('factsSearchClear'), factsSearchCount: $('factsSearchCount'),
         factsLoadMoreBtn: $('factsLoadMoreBtn'),
         papersSearchBar: $('papersSearchBar'), papersSearchInput: $('papersSearchInput'), papersSearchClear: $('papersSearchClear'), papersSearchCount: $('papersSearchCount'),
-        papersYearFilter: $('papersYearFilter'), papersSubjectFilter: $('papersSubjectFilter'), papersCardsGrid: $('papersCardsGrid'),
+        papersYearFilter: $('papersYearFilter'), papersCategoryFilter: $('papersCategoryFilter'), papersSubjectFilter: $('papersSubjectFilter'), papersCardsGrid: $('papersCardsGrid'),
         dots: $('dotGrid'), doneC: $('doneCount'), pendC: $('pendingCount'), corrC: $('correctCount'), wrongC: $('wrongCount'), invC: $('invalidCount'), invLeg: $('invalidLegend'),
         result: $('resultArea'), score: $('finalScore'), rmsg: $('resultMessage'), rdetails: $('resultDetails'), restart: $('restartFromResult'),
         modal: $('refreshModal'), mCancel: $('modalCancel'), mConfirm: $('modalConfirm'), mReset: $('modalResetBtn'), mUserAv: $('modalUserAvatar'), mUserName: $('modalUserName'), mLogout: $('modalLogoutBtn'),
@@ -1259,9 +1294,12 @@
 
     function populatePapersFilters() {
         const years = [...new Set(papers.map(p => p.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
+        const categories = [...new Set(papers.map(p => p.category).filter(Boolean))].sort();
         const subjects = [...new Set(papers.map(p => p.subject).filter(Boolean))].sort();
         ui.papersYearFilter.innerHTML = '<option value="">All years</option>';
         years.forEach(y => { const o = document.createElement('option'); o.value = y; o.textContent = y; ui.papersYearFilter.appendChild(o); });
+        ui.papersCategoryFilter.innerHTML = '<option value="">All categories</option>';
+        categories.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; ui.papersCategoryFilter.appendChild(o); });
         ui.papersSubjectFilter.innerHTML = '<option value="">All subjects</option>';
         subjects.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; ui.papersSubjectFilter.appendChild(o); });
     }
@@ -1275,11 +1313,13 @@
 
     function renderPapersCards() {
         const year = ui.papersYearFilter.value;
+        const category = ui.papersCategoryFilter.value;
         const subj = ui.papersSubjectFilter.value;
         const q = papersSearchQuery.toLowerCase().trim();
 
         const filtered = papers.filter(p => {
             if (year && p.year !== year) return false;
+            if (category && p.category !== category) return false;
             if (subj && p.subject !== subj) return false;
             if (!paperMatchesSearch(p, q)) return false;
             return true;
@@ -1359,6 +1399,7 @@
     ui.papersSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.papersSearchInput.value = ''; papersSearchQuery = ''; renderPapersCards(); ui.papersSearchInput.blur(); } });
     ui.papersSearchClear.onclick = () => { ui.papersSearchInput.value = ''; papersSearchQuery = ''; renderPapersCards(); ui.papersSearchInput.focus(); };
     ui.papersYearFilter.addEventListener('change', renderPapersCards);
+    ui.papersCategoryFilter.addEventListener('change', renderPapersCards);
     ui.papersSubjectFilter.addEventListener('change', renderPapersCards);
 
     function applyQuizTitle() {
@@ -1582,7 +1623,6 @@
         if (shownCount === 0) { ui.readBox.innerHTML = '<div class="read-empty">🔍 No questions match "' + escapeHtml(readSearchQuery) + '"</div>'; ui.readSearchCount.textContent = '0'; }
         else { ui.readBox.innerHTML = html; ui.readSearchCount.textContent = readSearchQuery ? (shownCount + ' found') : ''; ui.readBox.querySelectorAll('.read-q').forEach((el) => { el.onclick = (e) => { e.stopPropagation(); openGoogleSearch(decodeURIComponent(el.dataset.q), decodeURIComponent(el.dataset.s), decodeURIComponent(el.dataset.t)); }; }); }
 
-        // Load more button for read mode
         const totalLimit = isGuest ? Math.min(GUEST_LIMIT, questions.length) : questions.length;
         const hasMore = !readSearchQuery && readVisibleLimit < totalLimit;
         if (ui.readLoadMoreBtn) {
