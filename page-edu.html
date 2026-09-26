@@ -404,6 +404,11 @@
         .mode-search-bar .msb-count:empty { display: none; }
 
         .facts-container { margin-top: .7rem; display: flex; flex-direction: column; gap: .7rem; max-height: 78vh; min-height: 55vh; overflow-y: auto; padding-right: .5rem; }
+        .facts-load-more-wrap { display: flex; justify-content: center; margin-top: 1rem; padding-bottom: .5rem; }
+        .facts-load-more-btn { background: linear-gradient(135deg, var(--sky), var(--sky-dark)); color: #fff; border: none; font-weight: 700; font-size: .88rem; padding: .75rem 2rem; border-radius: var(--rf); cursor: pointer; font-family: inherit; box-shadow: 0 4px 12px -4px rgba(14,165,233,.4); transition: all .15s; }
+        .facts-load-more-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(14,165,233,.5); }
+        .facts-load-more-btn:disabled { opacity: .5; cursor: not-allowed; }
+
         .fact-card { background: var(--sf2); border: 1.5px solid var(--border); border-left: 4px solid var(--sky); border-radius: var(--r); padding: .9rem 1.1rem .8rem; position: relative; cursor: pointer; transition: all .18s; }
         .fact-card:hover { background: var(--sky-soft); border-left-color: var(--yellow); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
         .fact-card.read-flag { background: var(--success-bg); border-left-color: var(--success); }
@@ -422,7 +427,7 @@
         .verify-corner.unknown { background: var(--border-strong); color: var(--text-muted); }
 
         /* ============================================================
-           PAPERS — FLAT LAYOUT (no nested cards)
+           PAPERS — FLAT LAYOUT
            ============================================================ */
         #papersView { display: none; }
 
@@ -441,11 +446,7 @@
         .papers-search-bar.has-text .psb-clear { display: block; }
         .papers-search-bar .psb-count { font-size: .68rem; font-weight: 800; color: var(--sky-dark); background: var(--sky-soft); padding: .18rem .5rem; border-radius: var(--rf); white-space: nowrap; }
 
-        .papers-filter-row {
-            display: flex; gap: .45rem;
-            margin-bottom: .8rem;
-            flex-wrap: wrap;
-        }
+        .papers-filter-row { display: flex; gap: .45rem; margin-bottom: .8rem; flex-wrap: wrap; }
         .papers-filter-row select {
             flex: 1 1 0; min-width: 110px;
             border: 1.5px solid var(--border);
@@ -636,17 +637,12 @@
         }
 
         /* ============================================================
-           ★★★ MODE VISIBILITY — HIGH SPECIFICITY OVERRIDE ★★★
-           This block guarantees only the active mode's view is shown.
-           Prefixed with #quizApp to beat all other rules.
-           Keep this block LAST in the stylesheet.
+           MODE VISIBILITY — HIGH SPECIFICITY OVERRIDE
            ============================================================ */
-
         #quizApp #readView,
         #quizApp #factsView,
         #quizApp #papersView { display: none !important; }
 
-        /* READ MODE */
         #quizApp.read-mode-active #singleQuestionView,
         #quizApp.read-mode-active .progress-block,
         #quizApp.read-mode-active .overview-section,
@@ -656,7 +652,6 @@
         #quizApp.read-mode-active #papersView { display: none !important; }
         #quizApp.read-mode-active #readView { display: block !important; }
 
-        /* FACTS MODE */
         #quizApp.facts-mode-active #singleQuestionView,
         #quizApp.facts-mode-active .progress-block,
         #quizApp.facts-mode-active .overview-section,
@@ -666,7 +661,6 @@
         #quizApp.facts-mode-active #papersView { display: none !important; }
         #quizApp.facts-mode-active #factsView { display: block !important; }
 
-        /* PAPERS MODE */
         #quizApp.papers-mode-active #singleQuestionView,
         #quizApp.papers-mode-active .progress-block,
         #quizApp.papers-mode-active .overview-section,
@@ -676,7 +670,6 @@
         #quizApp.papers-mode-active #factsView { display: none !important; }
         #quizApp.papers-mode-active #papersView { display: block !important; }
 
-        /* RESULT MODE */
         #quizApp.result-active #singleQuestionView { display: none !important; }
         #quizApp.result-active #resultArea { display: block !important; }
     </style>
@@ -797,11 +790,14 @@
             <div id="factsView">
                 <div class="mode-search-bar" id="factsSearchBar">
                     <span class="msb-icon">🔍</span>
-                    <input type="text" id="factsSearchInput" placeholder="Search facts, answers, topics..." autocomplete="off"/>
+                    <input type="text" id="factsSearchInput" placeholder="Search facts, answers, topics, tags…" autocomplete="off"/>
                     <span class="msb-count" id="factsSearchCount"></span>
                     <button class="msb-clear" id="factsSearchClear">✕</button>
                 </div>
                 <div class="facts-container" id="factsContainer"></div>
+                <div class="facts-load-more-wrap" id="factsLoadMoreWrap" style="display:none">
+                    <button class="facts-load-more-btn" id="factsLoadMoreBtn">⬇️ Load 100 more</button>
+                </div>
             </div>
 
             <div id="papersView">
@@ -964,6 +960,7 @@
     const KEY_INSTALL_DISMISSED = 'slInstallDismissed';
     const KEY_PAPERS_CACHE = 'slPapersCache';
     const GUEST_LIMIT = 15;
+    const FACTS_PAGE_SIZE = 100;
 
     const $ = (id) => document.getElementById(id);
     const ui = {
@@ -975,6 +972,7 @@
         prev: $('prevBtn'), next: $('nextBtn'), endBtn: $('endQuizBtn'),
         readBox: $('readContainer'), readSearchBar: $('readSearchBar'), readSearchInput: $('readSearchInput'), readSearchClear: $('readSearchClear'), readSearchCount: $('readSearchCount'),
         factsBox: $('factsContainer'), factsSearchBar: $('factsSearchBar'), factsSearchInput: $('factsSearchInput'), factsSearchClear: $('factsSearchClear'), factsSearchCount: $('factsSearchCount'),
+        factsLoadMoreWrap: $('factsLoadMoreWrap'), factsLoadMoreBtn: $('factsLoadMoreBtn'),
         papersSearchBar: $('papersSearchBar'), papersSearchInput: $('papersSearchInput'), papersSearchClear: $('papersSearchClear'), papersSearchCount: $('papersSearchCount'),
         papersYearFilter: $('papersYearFilter'), papersSubjectFilter: $('papersSubjectFilter'), papersCardsGrid: $('papersCardsGrid'),
         dots: $('dotGrid'), doneC: $('doneCount'), pendC: $('pendingCount'), corrC: $('correctCount'), wrongC: $('wrongCount'), invC: $('invalidCount'), invLeg: $('invalidLegend'),
@@ -991,6 +989,7 @@
     let mode = 'mcq', isGuest = false, user = null;
     let selJobs = [], selSubjs = [], availSubjs = [], jobSearchText = '', subjSearchText = '';
     let facts = [], factsLoaded = false, factsLoading = false, factsReadSet = new Set();
+    let factsVisibleLimit = FACTS_PAGE_SIZE;
     let readSearchQuery = '', factsSearchQuery = '';
     let papers = [], papersLoaded = false, papersLoading = false, papersSearchQuery = '';
     let toastTimer = null, confirmResolve = null;
@@ -1149,17 +1148,27 @@
             const srnoIdx = findIdx(['srno', 'sr no', 's.no', 'serial'], 0);
             const qIdx = findIdx(['question'], 1);
             const aIdx = findIdx(['answer'], 2);
-            const topicIdx = findIdx(['question topic', 'topic'], 3);
+            const topicIdx = findIdx(['topic'], 3);
             const subjIdx = findIdx(['subject'], 4);
-            const verifyIdx = findIdx(['verify'], 5);
-            const createdIdx = findIdx(['created'], 6);
+            const verifyIdx = findIdx(['is question and answer', 'verify', 'correct'], 5);
+            const createdIdx = findIdx(['created date', 'created'], 6);
+            const tagIdx = findIdx(['tag_common_word', 'tag'], 7);
             for (let i = 1; i < lines.length; i++) {
                 const cols = parseCSVLine(lines[i]);
                 if (!cols.length) continue;
                 const question = cols[qIdx] ? cols[qIdx].trim() : '';
                 if (!question) continue;
                 const rawVerify = cols[verifyIdx] ? cols[verifyIdx].trim() : '';
-                facts.push({ srno: cols[srnoIdx] ? cols[srnoIdx].trim() : String(i), question, answer: cols[aIdx] ? cols[aIdx].trim() : '', topic: cols[topicIdx] ? cols[topicIdx].trim() : '', subject: cols[subjIdx] ? cols[subjIdx].trim() : '', verify: interpretVerify(rawVerify), created: cols[createdIdx] ? cols[createdIdx].trim() : '' });
+                facts.push({
+                    srno: cols[srnoIdx] ? cols[srnoIdx].trim() : String(i),
+                    question,
+                    answer: cols[aIdx] ? cols[aIdx].trim() : '',
+                    topic: cols[topicIdx] ? cols[topicIdx].trim() : '',
+                    subject: cols[subjIdx] ? cols[subjIdx].trim() : '',
+                    verify: interpretVerify(rawVerify),
+                    created: cols[createdIdx] ? cols[createdIdx].trim() : '',
+                    tag: cols[tagIdx] ? cols[tagIdx].trim() : ''
+                });
             }
             factsLoaded = true; factsLoading = false; if (callback) callback();
         }).catch((err) => { console.error('Facts fetch error:', err); factsLoading = false; ui.factsBox.innerHTML = '<div class="read-empty" style="color:#dc2626;">❌ Failed to load facts</div>'; });
@@ -1517,7 +1526,9 @@
         } else if (mode === 'read') {
             ui.quizApp.classList.add('read-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); renderReadMode();
         } else if (mode === 'facts') {
-            ui.quizApp.classList.add('facts-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); if (!factsLoaded && !factsLoading) fetchFacts(() => renderFactsMode()); else renderFactsMode();
+            ui.quizApp.classList.add('facts-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine();
+            factsVisibleLimit = FACTS_PAGE_SIZE;
+            if (!factsLoaded && !factsLoading) fetchFacts(() => renderFactsMode()); else renderFactsMode();
         } else if (mode === 'papers') {
             ui.quizApp.classList.add('papers-mode-active'); applyQuizTitle(); renderSelectedSubjectsLine(); loadPapersInline();
         }
@@ -1562,13 +1573,36 @@
     ui.readSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.readSearchInput.value = ''; readSearchQuery = ''; renderReadMode(); ui.readSearchInput.blur(); } });
     ui.readSearchClear.onclick = () => { ui.readSearchInput.value = ''; readSearchQuery = ''; renderReadMode(); ui.readSearchInput.focus(); };
 
-    function factMatchesSearch(f, query) { if (!query) return true; const nq = query.toLowerCase(); if (f.question && f.question.toLowerCase().includes(nq)) return true; if (f.answer && f.answer.toLowerCase().includes(nq)) return true; if (f.topic && f.topic.toLowerCase().includes(nq)) return true; if (f.subject && f.subject.toLowerCase().includes(nq)) return true; return false; }
+    /* ============ FACTS SEARCH — searches all 8 columns ============ */
+    function factMatchesSearch(f, query) {
+        if (!query) return true;
+        const nq = query.toLowerCase();
+        if (f.question && f.question.toLowerCase().includes(nq)) return true;
+        if (f.answer && f.answer.toLowerCase().includes(nq)) return true;
+        if (f.topic && f.topic.toLowerCase().includes(nq)) return true;
+        if (f.subject && f.subject.toLowerCase().includes(nq)) return true;
+        if (f.srno && String(f.srno).toLowerCase().includes(nq)) return true;
+        if (f.created && f.created.toLowerCase().includes(nq)) return true;
+        if (f.tag && f.tag.toLowerCase().includes(nq)) return true;
+        if (f.verify && f.verify.toLowerCase().includes(nq)) return true;
+        return false;
+    }
     function getFactKey(f, i) { return String(i) + '::' + String(f.srno || f.question || '').trim().substring(0, 80); }
 
     function renderFactsMode() {
         if (!factsLoaded) { if (!factsLoading) fetchFacts(() => renderFactsMode()); return; }
-        if (!facts.length) { ui.factsBox.innerHTML = '<div class="read-empty">No facts available</div>'; ui.factsDone.textContent = '0'; ui.factsTotal.textContent = '0'; ui.factsSearchCount.textContent = ''; return; }
-        const limit = isGuest ? GUEST_LIMIT : facts.length;
+        if (!facts.length) {
+            ui.factsBox.innerHTML = '<div class="read-empty">No facts available</div>';
+            ui.factsDone.textContent = '0';
+            ui.factsTotal.textContent = '0';
+            ui.factsSearchCount.textContent = '';
+            if (ui.factsLoadMoreWrap) ui.factsLoadMoreWrap.style.display = 'none';
+            return;
+        }
+
+        const guestLimit = isGuest ? GUEST_LIMIT : facts.length;
+        const limit = Math.min(factsVisibleLimit, guestLimit);
+
         let html = '', shownCount = 0;
         facts.slice(0, limit).forEach((f, i) => {
             if (!factMatchesSearch(f, factsSearchQuery)) return;
@@ -1580,13 +1614,29 @@
             if (f.verify === 'true') cornerHtml = '<span class="verify-corner true">✔</span>';
             else if (f.verify === 'false') cornerHtml = '<span class="verify-corner false">✘</span>';
             else cornerHtml = '<span class="verify-corner unknown">?</span>';
+
+            // Topic = Subject → show only subject
             const metaChips = [];
-            if (f.topic) metaChips.push(`<span class="fm-chip topic">🏷️ ${escapeHtml(f.topic)}</span>`);
-            if (f.subject) metaChips.push(`<span class="fm-chip">📚 ${escapeHtml(f.subject)}</span>`);
+            const topicClean = (f.topic || '').trim().toLowerCase();
+            const subjectClean = (f.subject || '').trim().toLowerCase();
+            const sameTopicSubject = topicClean && subjectClean && topicClean === subjectClean;
+
+            if (f.subject) {
+                metaChips.push(`<span class="fm-chip">📚 ${escapeHtml(f.subject)}</span>`);
+                if (f.topic && !sameTopicSubject) {
+                    metaChips.push(`<span class="fm-chip topic">🏷️ ${escapeHtml(f.topic)}</span>`);
+                }
+            } else if (f.topic) {
+                metaChips.push(`<span class="fm-chip topic">🏷️ ${escapeHtml(f.topic)}</span>`);
+            }
+
             html += `<div class="fact-card${isRead ? ' read-flag' : ''}" data-key="${encodeURIComponent(key)}" data-q="${encodeURIComponent(f.question)}" data-c="${encodeURIComponent(f.subject || f.topic || '')}">${cornerHtml}<div class="fact-head"><span class="fact-srno">${escapeHtml(f.srno)}</span><span class="fact-question">${escapeHtml(f.question)} <span class="fact-search-hint">🔍</span></span></div><div class="fact-answer${hasAnswer ? '' : ' empty'}"><strong>Answer:</strong> ${hasAnswer ? escapeHtml(f.answer) : '—'}</div>${metaChips.length ? '<div class="fact-meta">' + metaChips.join('') + '</div>' : ''}</div>`;
         });
-        if (shownCount === 0) { ui.factsBox.innerHTML = '<div class="read-empty">🔍 No facts match "' + escapeHtml(factsSearchQuery) + '"</div>'; ui.factsSearchCount.textContent = '0'; }
-        else {
+
+        if (shownCount === 0) {
+            ui.factsBox.innerHTML = '<div class="read-empty">🔍 No facts match "' + escapeHtml(factsSearchQuery) + '"</div>';
+            ui.factsSearchCount.textContent = '0';
+        } else {
             ui.factsBox.innerHTML = html;
             ui.factsSearchCount.textContent = factsSearchQuery ? (shownCount + ' found') : '';
             ui.factsBox.querySelectorAll('.fact-card').forEach((card) => {
@@ -1600,7 +1650,27 @@
                 };
             });
         }
-        updateFactsCounter(); updateSearchBarState(ui.factsSearchBar, ui.factsSearchInput);
+
+        // Show / hide "Load more" button
+        const totalLimit = isGuest ? Math.min(GUEST_LIMIT, facts.length) : facts.length;
+        const hasMore = !factsSearchQuery && factsVisibleLimit < totalLimit;
+        if (ui.factsLoadMoreWrap) ui.factsLoadMoreWrap.style.display = hasMore ? 'flex' : 'none';
+        if (ui.factsLoadMoreBtn) {
+            const remaining = totalLimit - factsVisibleLimit;
+            const step = Math.min(FACTS_PAGE_SIZE, Math.max(remaining, 0));
+            ui.factsLoadMoreBtn.textContent = step > 0 ? `⬇️ Load ${step} more` : '⬇️ Load more';
+            ui.factsLoadMoreBtn.disabled = !hasMore;
+        }
+
+        updateFactsCounter();
+        updateSearchBarState(ui.factsSearchBar, ui.factsSearchInput);
+    }
+
+    if (ui.factsLoadMoreBtn) {
+        ui.factsLoadMoreBtn.addEventListener('click', () => {
+            factsVisibleLimit += FACTS_PAGE_SIZE;
+            renderFactsMode();
+        });
     }
 
     function updateFactsCounter() {
@@ -1610,9 +1680,13 @@
         ui.factsDone.textContent = done;
         ui.factsTotal.textContent = limit;
     }
-    ui.factsSearchInput.addEventListener('input', () => { factsSearchQuery = ui.factsSearchInput.value.trim(); renderFactsMode(); });
-    ui.factsSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.factsSearchInput.value = ''; factsSearchQuery = ''; renderFactsMode(); ui.factsSearchInput.blur(); } });
-    ui.factsSearchClear.onclick = () => { ui.factsSearchInput.value = ''; factsSearchQuery = ''; renderFactsMode(); ui.factsSearchInput.focus(); };
+    ui.factsSearchInput.addEventListener('input', () => {
+        factsSearchQuery = ui.factsSearchInput.value.trim();
+        factsVisibleLimit = FACTS_PAGE_SIZE;
+        renderFactsMode();
+    });
+    ui.factsSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { ui.factsSearchInput.value = ''; factsSearchQuery = ''; factsVisibleLimit = FACTS_PAGE_SIZE; renderFactsMode(); ui.factsSearchInput.blur(); } });
+    ui.factsSearchClear.onclick = () => { ui.factsSearchInput.value = ''; factsSearchQuery = ''; factsVisibleLimit = FACTS_PAGE_SIZE; renderFactsMode(); ui.factsSearchInput.focus(); };
     function updateSearchBarState(bar, input) { if (!bar || !input) return; bar.classList.toggle('has-text', input.value.length > 0); }
 
     const panels = {
@@ -1685,7 +1759,7 @@
     document.addEventListener('click', (e) => { ['modal', 'drawer'].forEach((key) => { const p = panels[key]; if (!p.jobC.contains(e.target) && !p.subjC.contains(e.target)) { p.jobC.classList.remove('open'); p.subjC.classList.remove('open'); } }); });
 
     function resetFilters() { selJobs = []; selSubjs = []; jobSearchText = subjSearchText = ''; panels.modal.jobSearch.value = ''; panels.modal.subjSearch.value = ''; panels.drawer.jobSearch.value = ''; panels.drawer.subjSearch.value = ''; updateAvailableSubjects(); renderJobChipsBoth(); renderJobDropdowns(); renderSubjectChipsBoth(); renderSubjectDropdowns(); toast('Filters reset', 'info', 2000, false); }
-    function confirmAndRefresh() { closeBothPanels(); if (timerHandle) clearInterval(timerHandle); resetToQuizView(); fetchQuestions(true); factsLoaded = false; if (mode === 'facts') fetchFacts(() => renderFactsMode()); if (mode === 'papers') { papersLoaded = false; loadPapersInline(); } }
+    function confirmAndRefresh() { closeBothPanels(); if (timerHandle) clearInterval(timerHandle); resetToQuizView(); fetchQuestions(true); factsLoaded = false; factsVisibleLimit = FACTS_PAGE_SIZE; if (mode === 'facts') fetchFacts(() => renderFactsMode()); if (mode === 'papers') { papersLoaded = false; loadPapersInline(); } }
     function populatePanels() { updateUserLabels(); renderJobChipsBoth(); renderJobDropdowns(); updateAvailableSubjects(); renderSubjectChipsBoth(); renderSubjectDropdowns(); }
     function openModal() { populatePanels(); ui.modal.classList.add('active'); }
     function closeModal() { ui.modal.classList.remove('active'); closeAllDropdowns(); }
