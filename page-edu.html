@@ -168,103 +168,10 @@
 
         .top-row-1 { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; position: relative; z-index: 2; }
 
-        /* ============================================================
-           INTRO STAGE 1 — SINGLE-LINE FLAG WAVE (0–3s)
-           ============================================================ */
-        .flags-wave {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 1;
-            transition: opacity .8s ease;
-        }
-        .flags-wave.hide { opacity: 0; pointer-events: none; }
-
-        .flags-wave-track {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%);
-            display: flex;
-            align-items: center;
-            gap: 1.1rem;
-            white-space: nowrap;
-            animation: flagsMarch 6s linear infinite;
-        }
-        .flags-wave-track span {
-            font-size: 1rem;
-            opacity: 0;
-            animation: flagPop 6s linear infinite;
-            filter: drop-shadow(0 1px 2px rgba(10,30,63,.18));
-        }
-        @keyframes flagsMarch {
-            0%   { transform: translateY(-50%) translateX(20%); }
-            100% { transform: translateY(-50%) translateX(-100%); }
-        }
-        @keyframes flagPop {
-            0%, 8%   { opacity: 0; }
-            20%, 80% { opacity: .92; }
-            100%     { opacity: 0; }
-        }
-
-        /* ============================================================
-           AMBIENT FLAGS (after intro) — scattered floaters
-           ============================================================ */
-        .flags-layer {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0;
-            transition: opacity 1.2s ease .5s;
-        }
-        .flags-layer.show { opacity: 1; }
-
-        .flag-emoji {
-            position: absolute;
-            font-size: 1rem;
-            opacity: 0;
-            will-change: transform, opacity;
-            filter: drop-shadow(0 1px 2px rgba(10,30,63,.15));
-        }
-        .flag-emoji.p1 { animation: flagFloat1 14s linear infinite; }
-        .flag-emoji.p2 { animation: flagFloat2 16s linear infinite; }
-        .flag-emoji.p3 { animation: flagFloat3 12s linear infinite; }
-
-        @keyframes flagFloat1 {
-            0%   { transform: translate(0, 0)    rotate(0);   opacity: 0; }
-            10%  { opacity: .85; }
-            50%  { transform: translate(30px, -8px) rotate(6deg); opacity: .7; }
-            90%  { opacity: .85; }
-            100% { transform: translate(60px, 0)   rotate(0);   opacity: 0; }
-        }
-        @keyframes flagFloat2 {
-            0%   { transform: translate(0, 0)     rotate(0);    opacity: 0; }
-            12%  { opacity: .8; }
-            50%  { transform: translate(-28px, 10px) rotate(-6deg); opacity: .65; }
-            88%  { opacity: .8; }
-            100% { transform: translate(-56px, 0)   rotate(0);    opacity: 0; }
-        }
-        @keyframes flagFloat3 {
-            0%   { transform: translate(0, 0)    scale(.9);   opacity: 0; }
-            15%  { opacity: .75; }
-            50%  { transform: translate(16px, -14px) scale(1.05); opacity: .85; }
-            85%  { opacity: .75; }
-            100% { transform: translate(32px, 0)   scale(.9);   opacity: 0; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .flags-wave-track, .flags-wave-track span { animation: none !important; }
-            .flag-emoji { animation: none !important; opacity: .25; }
-        }
-
         .brand { display: flex; align-items: flex-start; gap: .65rem; min-width: 0; flex: 1 1 auto; }
 
         /* ============================================================
-           BRAND LOGO — no bird, just the mark + golden ring chase
+           BRAND LOGO + GOLDEN RING
            ============================================================ */
         .brand-logo-wrap {
             position: relative;
@@ -281,9 +188,6 @@
             z-index: 2;
         }
 
-        /* ============================================================
-           STAGE 4 — GOLDEN STRIP CHASING LOGO CORNERS (starts at 9s)
-           ============================================================ */
         .logo-ring {
             position: absolute;
             inset: -3px;
@@ -323,7 +227,6 @@
         @keyframes ringSpin {
             to { --ring-angle: 360deg; }
         }
-        /* Fallback for browsers without @property support */
         @supports not (background: conic-gradient(from var(--ring-angle, 0deg), red, blue)) {
             .logo-ring.run {
                 background: conic-gradient(from 0deg, rgba(245,184,0,0) 0deg, #f5b800 90deg, rgba(245,184,0,0) 180deg, rgba(245,184,0,0) 360deg);
@@ -333,7 +236,7 @@
         }
 
         /* ============================================================
-           BRAND TITLE + MATH FORMULAS (STAGE 2 — reveal 3–6s)
+           BRAND TITLE + MATH FORMULAS (reveal 3s+, drift forever)
            ============================================================ */
         .brand-title { min-width: 0; flex: 1 1 auto; position: relative; }
         .brand-title h1 {
@@ -361,7 +264,6 @@
             white-space: nowrap;
             will-change: transform, opacity;
         }
-        /* Initial reveal: formulas are hidden until .run-intro is added */
         .formula.f1 { top: 4px;  left: 8%;   font-size: .85rem; color: rgba(2,132,199,.55); }
         .formula.f2 { top: 22px; left: 22%;  font-size: .75rem; color: rgba(10,30,63,.45);  }
         .formula.f3 { top: 6px;  left: 36%;  font-size: .9rem;  color: rgba(245,184,0,.65); }
@@ -371,15 +273,15 @@
         .formula.f7 { top: 8px;  left: 90%;  font-size: .7rem;  color: rgba(245,184,0,.55); }
         .formula.f8 { top: 18px; left: 14%;  font-size: .65rem; color: rgba(2,132,199,.50); }
 
-        /* Per-formula reveal delay (staggered between 3s and 6s) */
-        .top-bar.run-intro .formula.f1 { animation: formulaReveal .8s ease 3.0s forwards, floatA 9s linear 3.8s infinite; }
-        .top-bar.run-intro .formula.f2 { animation: formulaReveal .8s ease 3.35s forwards, floatB 11s linear 4.15s infinite; }
-        .top-bar.run-intro .formula.f3 { animation: formulaReveal .8s ease 3.7s forwards, floatA 10s linear 4.5s infinite; }
-        .top-bar.run-intro .formula.f4 { animation: formulaReveal .8s ease 4.05s forwards, floatC 12s linear 4.85s infinite; }
-        .top-bar.run-intro .formula.f5 { animation: formulaReveal .8s ease 4.4s forwards, floatB 10s linear 5.2s infinite; }
-        .top-bar.run-intro .formula.f6 { animation: formulaReveal .8s ease 4.75s forwards, floatA 13s linear 5.55s infinite; }
-        .top-bar.run-intro .formula.f7 { animation: formulaReveal .8s ease 5.1s forwards, floatC 11s linear 5.9s infinite; }
-        .top-bar.run-intro .formula.f8 { animation: formulaReveal .8s ease 5.45s forwards, floatB 8.5s linear 6.25s infinite; }
+        /* Reveal + drift — triggered by .run-intro on .top-bar */
+        .top-bar.run-intro .formula.f1 { animation: formulaReveal .8s ease 0s forwards, floatA 9s linear .8s infinite; }
+        .top-bar.run-intro .formula.f2 { animation: formulaReveal .8s ease .35s forwards, floatB 11s linear 1.15s infinite; }
+        .top-bar.run-intro .formula.f3 { animation: formulaReveal .8s ease .7s forwards, floatA 10s linear 1.5s infinite; }
+        .top-bar.run-intro .formula.f4 { animation: formulaReveal .8s ease 1.05s forwards, floatC 12s linear 1.85s infinite; }
+        .top-bar.run-intro .formula.f5 { animation: formulaReveal .8s ease 1.4s forwards, floatB 10s linear 2.2s infinite; }
+        .top-bar.run-intro .formula.f6 { animation: formulaReveal .8s ease 1.75s forwards, floatA 13s linear 2.55s infinite; }
+        .top-bar.run-intro .formula.f7 { animation: formulaReveal .8s ease 2.1s forwards, floatC 11s linear 2.9s infinite; }
+        .top-bar.run-intro .formula.f8 { animation: formulaReveal .8s ease 2.45s forwards, floatB 8.5s linear 3.25s infinite; }
 
         @keyframes formulaReveal {
             from { opacity: 0; transform: scale(.6); }
@@ -411,35 +313,7 @@
             .top-bar.run-intro .formula.f6,
             .top-bar.run-intro .formula.f7,
             .top-bar.run-intro .formula.f8 { animation: none !important; opacity: .35 !important; }
-        }
-
-        /* ============================================================
-           STAGE 3 — TAGLINE reveal (6–9s)
-           ============================================================ */
-        .brand-tagline {
-            font-size: .68rem;
-            font-weight: 700;
-            color: var(--sky-dark);
-            letter-spacing: .04em;
-            margin-top: .25rem;
-            opacity: 0;
-            transform: translateY(4px);
-            transition: opacity .8s ease, transform .8s ease;
-            position: relative;
-            z-index: 2;
-            display: block;
-        }
-        .brand-tagline .tag-prefix {
-            font-weight: 900;
-            color: var(--navy);
-            text-transform: uppercase;
-            font-size: .62rem;
-            letter-spacing: .1em;
-        }
-        .top-bar.run-intro .brand-tagline {
-            opacity: 1;
-            transform: translateY(0);
-            transition-delay: 6.0s;
+            .logo-ring.run { animation: none !important; }
         }
 
         .selected-subjects {
@@ -910,7 +784,6 @@
             .btn-icon#refreshBtn { display: none; }
             .quiz-wrapper { padding: 1rem .85rem 1.15rem; border-radius: 22px; }
             .formula.f3, .formula.f6 { display: none; }
-            .flag-emoji.fk-mobile-hide { display: none; }
             .question-card { padding: 1.15rem 1rem .75rem; }
             .question-card .q-text { font-size: 1rem; }
             .options-list .option-btn { padding: .7rem .95rem; font-size: .87rem; }
@@ -939,9 +812,6 @@
             .papers-cards-grid { max-height: 72vh; min-height: 50vh; }
             .papers-filter-pill { font-size: .64rem; padding: .28rem .6rem; max-width: 140px; }
             .papers-filter-pill .pfp-label { max-width: 90px; }
-            .flag-emoji { font-size: .85rem; }
-            .flags-wave-track { gap: .7rem; }
-            .flags-wave-track span { font-size: .85rem; }
         }
 
         #quizApp #readView,
@@ -1026,21 +896,12 @@
 
     <div class="quiz-wrapper" id="quizApp">
         <div class="top-bar" id="topBar">
-            <!-- STAGE 1: single-line flag wave (0–3s) -->
-            <div class="flags-wave" id="flagsWave" aria-hidden="true">
-                <div class="flags-wave-track" id="flagsWaveTrack"></div>
-            </div>
-
-            <!-- AFTER INTRO: scattered ambient flags -->
-            <div class="flags-layer" id="flagsLayer" aria-hidden="true"></div>
-
             <div class="top-row-1">
                 <div class="brand">
                     <div class="brand-logo-wrap">
                         <img class="brand-logo" id="brandLogo"
                              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230a1e3f'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-family='Inter,sans-serif' font-size='24' font-weight='700' fill='%23f5b800'%3ESL%3C/text%3E%3C/svg%3E"
                              alt="Logo">
-                        <!-- STAGE 4: golden ring chase -->
                         <span class="logo-ring" id="logoRing" aria-hidden="true"></span>
                     </div>
                     <div class="brand-title">
@@ -1055,10 +916,6 @@
                             <span class="formula f8">≠</span>
                         </div>
                         <h1 id="quizTitle">All Jobs MCQs</h1>
-                        <!-- STAGE 3: tagline -->
-                        <span class="brand-tagline" id="brandTagline">
-                            <span class="tag-prefix">Self Learners</span> — Quality Content Creator Platform
-                        </span>
                         <div class="selected-subjects" id="selectedSubjectsLine"></div>
                     </div>
                 </div>
@@ -1303,20 +1160,6 @@
     const GUEST_LIMIT = 15;
     const PAGE_SIZE = 100;
 
-    /* Top ~100 developed countries (HDI) as flags + Pakistan 🇵🇰 */
-    const TOP_COUNTRY_FLAGS = [
-        '🇨🇭','🇳🇴','🇮🇸','🇭🇰','🇩🇰','🇸🇪','🇩🇪','🇮🇪','🇸🇬','🇦🇺',
-        '🇳🇱','🇧🇪','🇫🇮','🇬🇧','🇳🇿','🇨🇦','🇰🇷','🇱🇺','🇯🇵','🇮🇱',
-        '🇲🇹','🇸🇮','🇦🇹','🇦🇪','🇱🇹','🇪🇸','🇨🇿','🇫🇷','🇮🇹','🇪🇪',
-        '🇸🇦','🇨🇾','🇬🇷','🇵🇱','🇧🇭','🇦🇩','🇭🇷','🇱🇻','🇶🇦','🇨🇱',
-        '🇧🇳','🇸🇰','🇭🇺','🇧🇭','🇦🇷','🇰🇼','🇲🇪','🇷🇴','🇵🇹','🇧🇬',
-        '🇧🇭','🇰🇿','🇧🇾','🇷🇺','🇧🇦','🇺🇾','🇵🇦','🇧🇧','🇵🇱','🇴🇲',
-        '🇬🇪','🇨🇷','🇲🇾','🇷🇸','🇹🇭','🇱🇰','🇦🇱','🇧🇬','🇦🇲','🇲🇺',
-        '🇮🇷','🇦🇿','🇲🇰','🇹🇷','🇧🇷','🇲🇽','🇨🇳','🇨🇴','🇵🇪','🇲🇻',
-        '🇯🇴','🇹🇳','🇪🇨','🇿🇦','🇩🇴','🇱🇧','🇧🇹','🇩🇿','🇻🇪','🇲🇳',
-        '🇧🇼','🇸🇷','🇯🇲','🇵🇾','🇫🇯','🇧🇿','🇬🇦','🇬🇾','🇹🇴','🇵🇰'
-    ];
-
     const $ = (id) => document.getElementById(id);
     const ui = {
         quizApp: $('quizApp'), topBar: $('topBar'), brandLogo: $('brandLogo'), qTitle: $('quizTitle'), subjLine: $('selectedSubjectsLine'),
@@ -1340,8 +1183,6 @@
         installBanner: $('installBanner'), installBtn: $('installBtn'), installClose: $('installClose'),
         jobSitesBtn: $('jobSitesBtn'), jobsitesOverlay: $('jobsitesOverlay'), jobsitesClose: $('jobsitesClose'), jobsitesSearchInput: $('jobsitesSearchInput'), jobsitesList: $('jobsitesList'),
         desktopNav: $('desktopNav'),
-        flagsWave: $('flagsWave'), flagsWaveTrack: $('flagsWaveTrack'),
-        flagsLayer: $('flagsLayer'),
         logoRing: $('logoRing'),
     };
 
@@ -1388,63 +1229,20 @@
     function withCacheBust(url) { const sep = url.includes('?') ? '&' : '?'; return url + sep + '_t=' + Date.now(); }
 
     /* ============================================================
-       INTRO SEQUENCE BUILDER
-       Stage 1 (0–3s): single-line flag wave
-       Stage 2 (3–6s): formulas reveal
-       Stage 3 (6–9s): tagline reveal
-       Stage 4 (9s+):  golden ring chase around logo (permanent)
+       INTRO SEQUENCE
+       Stage 2 (3s): formulas reveal + drift forever
+       Stage 4 (9s): golden ring chase around logo (permanent)
        ============================================================ */
     function buildIntroSequence() {
-        // STAGE 1: single-line flag wave
-        if (ui.flagsWaveTrack) {
-            ui.flagsWaveTrack.innerHTML = '';
-            TOP_COUNTRY_FLAGS.forEach((flag, i) => {
-                const span = document.createElement('span');
-                span.textContent = flag;
-                span.style.animationDelay = ((i * 0.11) % 6).toFixed(2) + 's';
-                ui.flagsWaveTrack.appendChild(span);
-            });
-        }
-
-        // STAGE 2: formulas start floating — add .run-intro to header (triggers reveals)
-        // STAGE 3: tagline fade is driven by the same class (see CSS)
+        // Stage 2: formulas start revealing — add .run-intro to header
         setTimeout(() => {
             if (ui.topBar) ui.topBar.classList.add('run-intro');
         }, 3000);
 
-        // STAGE 1 exit: fade out wave at 3s
-        setTimeout(() => {
-            if (ui.flagsWave) ui.flagsWave.classList.add('hide');
-        }, 3000);
-
-        // After wave fades out, build ambient scattered flags
-        setTimeout(() => {
-            buildAmbientFlagsLayer();
-            if (ui.flagsLayer) ui.flagsLayer.classList.add('show');
-        }, 3600);
-
-        // STAGE 4: golden ring chase around logo — starts at 9s, runs forever
+        // Stage 4: golden ring chase around logo
         setTimeout(() => {
             if (ui.logoRing) ui.logoRing.classList.add('run');
         }, 9000);
-    }
-
-    function buildAmbientFlagsLayer() {
-        if (!ui.flagsLayer) return;
-        ui.flagsLayer.innerHTML = '';
-        const total = TOP_COUNTRY_FLAGS.length;
-        TOP_COUNTRY_FLAGS.forEach((flag, i) => {
-            const span = document.createElement('span');
-            span.className = 'flag-emoji p' + ((i % 3) + 1);
-            span.textContent = flag;
-            span.style.left = ((i / total) * 100).toFixed(1) + '%';
-            span.style.top = (4 + ((i * 37) % 74)) + '%';
-            span.style.animationDelay = ((i * 0.17) % 14).toFixed(2) + 's';
-            const sizeVar = 0.85 + ((i * 7) % 5) * 0.08;
-            span.style.fontSize = sizeVar.toFixed(2) + 'rem';
-            if (i % 3 === 2) span.classList.add('fk-mobile-hide');
-            ui.flagsLayer.appendChild(span);
-        });
     }
 
     function toast(message, type = 'info', duration = 4000, showIcon = true) { if (toastTimer) clearTimeout(toastTimer); const container = $('toastContainer'); while (container.firstChild) container.removeChild(container.firstChild); const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' }; const t = document.createElement('div'); t.className = 'toast ' + type; t.innerHTML = (showIcon ? `<span class="toast-icon">${icons[type]}</span>` : '') + `<span>${message}</span>` + `<button class="toast-close">✕</button>`; container.appendChild(t); const remove = () => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); }; t.querySelector('.toast-close').onclick = remove; toastTimer = setTimeout(remove, duration); }
