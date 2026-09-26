@@ -12,7 +12,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
         :root {
             --navy: #0a1e3f; --navy-dark: #061428; --navy-light: #1a3a6b; --navy-soft: #e8eef7;
-            --black: #0f1419; --yellow: #f5b800; --yellow-soft: #fff7dd;
+            --black: #0f1419; --yellow: #f5b800; --yellow-dark: #d99e00; --yellow-soft: #fff7dd;
             --sky: #0ea5e9; --sky-dark: #0284c7; --sky-soft: #e0f2fe; --sky-light: #7dd3fc;
             --bg: #f4f6fa; --sf: #ffffff; --sf2: #f8fafc;
             --text: #0f1419; --text-soft: #475569; --text-muted: #94a3b8;
@@ -47,23 +47,28 @@
         @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-8px); } }
         .toast.removing { animation: fadeOutToast .25s ease forwards; }
 
+        /* ============================================================
+           SINGLE CARD — nothing nested inside
+           ============================================================ */
         .login-wrapper {
-            background: var(--sf); border-radius: 28px;
-            padding: 3rem 2.25rem; box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border); position: relative; overflow: hidden;
+            background: var(--sf);
+            border-radius: 28px;
+            padding: 3rem 2.25rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
         }
         .login-wrapper::before {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
-            background: linear-gradient(90deg,var(--navy) 0%,var(--sky) 50%,var(--yellow) 100%);
+            content: "";
+            position: absolute; top: 0; left: 0; right: 0; height: 5px;
+            background: linear-gradient(90deg, var(--navy) 0%, var(--sky) 50%, var(--yellow) 100%);
         }
 
-        /* ==================== VERSION LABEL (TOP RIGHT) ==================== */
         .version-label {
             position: absolute;
-            top: 14px;
-            right: 16px;
-            font-size: .58rem;
-            font-weight: 700;
+            top: 14px; right: 16px;
+            font-size: .58rem; font-weight: 700;
             color: var(--text-muted);
             letter-spacing: .04em;
             background: rgba(255,255,255,.9);
@@ -72,18 +77,83 @@
             border: 1px solid var(--border);
             z-index: 5;
             pointer-events: none;
-            font-family: 'Inter', monospace, system-ui, sans-serif;
         }
 
+        /* ============================================================
+           LOGO + GOLDEN RING
+           ============================================================ */
+        .logo-wrap {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.4rem;
+        }
         .login-wrapper .logo {
             width: 80px; height: 80px; border-radius: var(--r); object-fit: contain;
             background: var(--sf2); padding: 12px;
-            margin: 0 auto 1.4rem; display: block;
+            display: block;
             box-shadow: 0 8px 24px -8px rgba(10,30,63,.2);
+            position: relative;
+            z-index: 2;
+        }
+        .logo-ring {
+            position: absolute;
+            inset: -4px;
+            border-radius: 24px;
+            z-index: 3;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .5s ease;
+            padding: 3px;
+            background:
+                conic-gradient(
+                    from var(--ring-angle, 0deg),
+                    rgba(245,184,0,0)    0deg,
+                    rgba(245,184,0,0)   40deg,
+                    #f5b800             80deg,
+                    #ffd94a            100deg,
+                    #f5b800            120deg,
+                    rgba(245,184,0,0)  180deg,
+                    rgba(245,184,0,0)  360deg
+                );
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+        }
+        .logo-ring.run {
+            opacity: 1;
+            animation: ringSpin 3.2s linear infinite;
+        }
+        @property --ring-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+        @keyframes ringSpin {
+            to { --ring-angle: 360deg; }
+        }
+        @supports not (background: conic-gradient(from var(--ring-angle, 0deg), red, blue)) {
+            .logo-ring.run {
+                background: conic-gradient(from 0deg, rgba(245,184,0,0) 0deg, #f5b800 90deg, rgba(245,184,0,0) 180deg, rgba(245,184,0,0) 360deg);
+                animation: ringSpinFallback 3.2s linear infinite;
+            }
+            @keyframes ringSpinFallback { to { transform: rotate(360deg); } }
+        }
+
+        /* ============================================================
+           TITLE + FLOATING MATH FORMULAS
+           ============================================================ */
+        .title-wrap {
+            position: relative;
+            margin-bottom: 2rem;
         }
         .login-wrapper h1 {
             font-size: 2rem; font-weight: 800; letter-spacing: -.03em;
             color: var(--navy); text-align: center; margin-bottom: .35rem;
+            position: relative;
+            z-index: 2;
         }
         .login-wrapper h1::after {
             content: ""; display: block; width: 50px; height: 4px;
@@ -91,8 +161,81 @@
         }
         .login-wrapper .sub {
             color: var(--text-muted); font-size: .92rem; text-align: center;
-            margin-bottom: 2rem; font-weight: 500;
+            font-weight: 500;
+            position: relative;
+            z-index: 2;
         }
+
+        .formula-layer {
+            position: absolute;
+            inset: -12px -10px -12px -10px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .formula {
+            position: absolute;
+            font-family: 'Inter', system-ui, sans-serif;
+            font-weight: 700;
+            color: var(--sky-dark);
+            opacity: 0;
+            white-space: nowrap;
+            will-change: transform, opacity;
+        }
+        .formula.f1 { top: 6px;  left: 6%;   font-size: .9rem;  color: rgba(2,132,199,.55); }
+        .formula.f2 { top: 32px; left: 20%;  font-size: .8rem;  color: rgba(10,30,63,.45);  }
+        .formula.f3 { top: 10px; left: 34%;  font-size: .95rem; color: rgba(245,184,0,.65); }
+        .formula.f4 { top: 38px; left: 48%;  font-size: .75rem; color: rgba(2,132,199,.45); }
+        .formula.f5 { top: 4px;  left: 62%;  font-size: .85rem; color: rgba(10,30,63,.40);  }
+        .formula.f6 { top: 36px; left: 76%;  font-size: 1rem;   color: rgba(14,165,233,.60); }
+        .formula.f7 { top: 12px; left: 88%;  font-size: .75rem; color: rgba(245,184,0,.55); }
+        .formula.f8 { top: 28px; left: 12%;  font-size: .7rem;  color: rgba(2,132,199,.50); }
+
+        .login-wrapper.run-intro .formula.f1 { animation: formulaReveal .8s ease 0s forwards, floatA 9s linear .8s infinite; }
+        .login-wrapper.run-intro .formula.f2 { animation: formulaReveal .8s ease .35s forwards, floatB 11s linear 1.15s infinite; }
+        .login-wrapper.run-intro .formula.f3 { animation: formulaReveal .8s ease .7s forwards, floatA 10s linear 1.5s infinite; }
+        .login-wrapper.run-intro .formula.f4 { animation: formulaReveal .8s ease 1.05s forwards, floatC 12s linear 1.85s infinite; }
+        .login-wrapper.run-intro .formula.f5 { animation: formulaReveal .8s ease 1.4s forwards, floatB 10s linear 2.2s infinite; }
+        .login-wrapper.run-intro .formula.f6 { animation: formulaReveal .8s ease 1.75s forwards, floatA 13s linear 2.55s infinite; }
+        .login-wrapper.run-intro .formula.f7 { animation: formulaReveal .8s ease 2.1s forwards, floatC 11s linear 2.9s infinite; }
+        .login-wrapper.run-intro .formula.f8 { animation: formulaReveal .8s ease 2.45s forwards, floatB 8.5s linear 3.25s infinite; }
+
+        @keyframes formulaReveal {
+            from { opacity: 0; transform: scale(.6); }
+            to   { opacity: .85; transform: scale(1); }
+        }
+        @keyframes floatA {
+            0%   { transform: translateY(6px)  translateX(0)   rotate(-3deg); opacity: .3; }
+            50%  { transform: translateY(-6px) translateX(6px) rotate(2deg);  opacity: .95; }
+            100% { transform: translateY(6px)  translateX(12px) rotate(-3deg); opacity: .3; }
+        }
+        @keyframes floatB {
+            0%   { transform: translateY(-4px) translateX(0)    rotate(2deg);  opacity: .3; }
+            50%  { transform: translateY(6px)  translateX(-6px) rotate(-2deg); opacity: .9; }
+            100% { transform: translateY(-4px) translateX(-12px) rotate(2deg); opacity: .3; }
+        }
+        @keyframes floatC {
+            0%   { transform: translateY(0)    translateX(0)   scale(.9); opacity: .3; }
+            50%  { transform: translateY(-8px) translateX(4px) scale(1.05); opacity: .95; }
+            100% { transform: translateY(0)    translateX(8px) scale(.9);  opacity: .3; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .formula { animation: none !important; opacity: .35; }
+            .login-wrapper.run-intro .formula.f1,
+            .login-wrapper.run-intro .formula.f2,
+            .login-wrapper.run-intro .formula.f3,
+            .login-wrapper.run-intro .formula.f4,
+            .login-wrapper.run-intro .formula.f5,
+            .login-wrapper.run-intro .formula.f6,
+            .login-wrapper.run-intro .formula.f7,
+            .login-wrapper.run-intro .formula.f8 { animation: none !important; opacity: .35 !important; }
+            .logo-ring.run { animation: none !important; }
+        }
+
+        /* ============================================================
+           FORM FIELDS — flat, no cards
+           ============================================================ */
         .login-wrapper label {
             display: block; font-weight: 700; font-size: .82rem;
             color: var(--navy); margin-bottom: .4rem;
@@ -124,28 +267,23 @@
         .login-wrapper .btn-login:hover:not(:disabled) { transform: translateY(-1px); }
         .login-wrapper .btn-login:disabled { opacity: .5; cursor: not-allowed; }
 
-        /* ==================== WHATSAPP SIGNUP/CONTACT (below Sign In) ==================== */
-        .wa-section {
-            margin-top: 1.1rem;
-            padding: .9rem 1rem;
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            border-radius: 16px;
-            border: 1.5px solid rgba(37,211,102,.35);
-            text-align: center;
-        }
-        .wa-section .wa-label {
-            font-size: .74rem;
-            color: #065f46;
-            font-weight: 700;
-            margin-bottom: .55rem;
+        /* ============================================================
+           FLAT WhatsApp BUTTON — no outer container box
+           ============================================================ */
+        .wa-label {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: .35rem;
+            font-size: .74rem;
+            color: #065f46;
+            font-weight: 700;
+            margin: 1.4rem 0 .6rem;
             text-transform: uppercase;
             letter-spacing: .04em;
+            text-align: center;
         }
-        .wa-section .wa-label .wa-dot {
+        .wa-label .wa-dot {
             width: 8px; height: 8px; border-radius: 50%;
             background: var(--whatsapp);
             box-shadow: 0 0 0 3px rgba(37,211,102,.25);
@@ -154,9 +292,9 @@
         }
         @keyframes waPulse {
             0%, 100% { box-shadow: 0 0 0 3px rgba(37,211,102,.25); }
-            50% { box-shadow: 0 0 0 6px rgba(37,211,102,.08); }
+            50%      { box-shadow: 0 0 0 6px rgba(37,211,102,.08); }
         }
-        .wa-section .wa-btn {
+        .btn-whatsapp {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -165,38 +303,36 @@
             background: linear-gradient(135deg, var(--whatsapp), var(--whatsapp-dark));
             color: #fff;
             font-weight: 800;
-            font-size: .88rem;
-            padding: .75rem 1rem;
+            font-size: .9rem;
+            padding: .85rem 1rem;
             border-radius: var(--rf);
             text-decoration: none;
             box-shadow: 0 6px 16px -4px rgba(37,211,102,.5);
             transition: all .2s;
-            min-height: 46px;
+            min-height: 48px;
             font-family: inherit;
             border: none;
             cursor: pointer;
         }
-        .wa-section .wa-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 22px -4px rgba(37,211,102,.6);
-        }
-        .wa-section .wa-btn:active { transform: translateY(0); }
-        .wa-section .wa-btn .wa-icon { font-size: 1.1rem; display: inline-flex; }
-        .wa-section .wa-number {
-            display: inline-block;
-            margin-top: .5rem;
-            font-size: .72rem;
+        .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -4px rgba(37,211,102,.6); }
+        .btn-whatsapp:active { transform: translateY(0); }
+        .btn-whatsapp .wa-icon { font-size: 1.15rem; display: inline-flex; }
+        .wa-number {
+            display: block;
+            text-align: center;
+            margin-top: .55rem;
+            font-size: .74rem;
             color: #065f46;
             font-weight: 700;
             letter-spacing: .02em;
-            background: rgba(255,255,255,.7);
-            padding: .25rem .7rem;
-            border-radius: var(--rf);
         }
 
-        /* ==================== GUEST + DIVIDER ==================== */
+        /* ============================================================
+           DIVIDER + GUEST BUTTON — flat, no cards
+           ============================================================ */
         .login-wrapper .divider {
-            display: flex; align-items: center; gap: .8rem; margin: 1.1rem 0 .6rem;
+            display: flex; align-items: center; gap: .8rem;
+            margin: 1.4rem 0 1.2rem;
             color: var(--text-muted); font-size: .72rem; font-weight: 600;
             text-transform: uppercase; letter-spacing: .08em;
         }
@@ -205,26 +341,39 @@
             content: ''; flex: 1; height: 1px; background: var(--border);
         }
         .login-wrapper .btn-guest {
-            width: 100%; background: var(--sf2);
-            border: 1.5px solid var(--border); color: var(--text-soft);
-            font-weight: 700; font-size: .95rem; padding: .9rem;
-            border-radius: var(--rf); cursor: pointer; font-family: inherit;
-            display: flex; align-items: center;
-            justify-content: center; gap: .4rem;
+            width: 100%;
+            background: var(--sf2);
+            border: 1.5px solid var(--border);
+            color: var(--text-soft);
+            font-weight: 700;
+            font-size: .95rem;
+            padding: .9rem;
+            border-radius: var(--rf);
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .4rem;
+            transition: all .18s;
         }
         .login-wrapper .btn-guest:hover { background: #fff; border-color: var(--sky); color: var(--sky-dark); }
+        .login-wrapper .btn-guest .guest-hint {
+            font-size: .75rem; font-weight: 500; color: #92400e;
+        }
         .login-wrapper .login-footer {
             text-align: center; font-size: .8rem; color: var(--text-muted);
-            margin-top: 1.2rem; font-weight: 500;
+            margin-top: 1.4rem; font-weight: 500;
         }
 
         @media (max-width: 560px) {
             body { padding: 1rem .9rem; }
             .login-wrapper { padding: 2rem 1.4rem; border-radius: 22px; }
-            .login-wrapper .logo { width: 64px; height: 64px; margin-bottom: 1rem; padding: 10px; }
+            .logo-wrap { width: 64px; height: 64px; margin-bottom: 1rem; }
+            .login-wrapper .logo { width: 64px; height: 64px; padding: 10px; }
             .login-wrapper h1 { font-size: 1.65rem; }
-            .wa-section { padding: .8rem .85rem; }
             .version-label { top: 12px; right: 14px; font-size: .55rem; padding: 2px 7px; }
+            .formula.f3, .formula.f6 { display: none; }
         }
     </style>
 </head>
@@ -232,15 +381,30 @@
 <div class="login-page">
     <div class="toast-container" id="toastContainer"></div>
 
-    <div class="login-wrapper">
-        <!-- ==================== VERSION LABEL ==================== -->
+    <div class="login-wrapper" id="loginWrapper">
         <span class="version-label" id="versionLabel">v:1.0</span>
 
-        <img class="logo" id="loginLogo"
-             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230a1e3f'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter,sans-serif' font-size='38' font-weight='800' fill='%23f5b800'%3ESL%3C/text%3E%3C/svg%3E"
-             alt="Logo"/>
-        <h1>Self Learners</h1>
-        <p class="sub">We provide you high quality content.</p>
+        <div class="logo-wrap">
+            <img class="logo" id="loginLogo"
+                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='20' fill='%230a1e3f'/%3E%3Ctext x='40' y='52' text-anchor='middle' font-family='Inter,sans-serif' font-size='38' font-weight='800' fill='%23f5b800'%3ESL%3C/text%3E%3C/svg%3E"
+                 alt="Logo"/>
+            <span class="logo-ring" id="logoRing" aria-hidden="true"></span>
+        </div>
+
+        <div class="title-wrap">
+            <div class="formula-layer" aria-hidden="true">
+                <span class="formula f1">∑</span>
+                <span class="formula f2">π</span>
+                <span class="formula f3">√x</span>
+                <span class="formula f4">∫</span>
+                <span class="formula f5">∞</span>
+                <span class="formula f6">±</span>
+                <span class="formula f7">θ</span>
+                <span class="formula f8">≠</span>
+            </div>
+            <h1>Self Learners</h1>
+            <p class="sub">We provide you high quality content.</p>
+        </div>
 
         <label for="emailInput">Email / Username</label>
         <div class="input-group">
@@ -255,28 +419,28 @@
 
         <button class="btn-login" id="loginBtn">Sign In</button>
 
-        <!-- ==================== WHATSAPP SIGNUP (IMMEDIATELY BELOW SIGN IN) ==================== -->
-        <div class="wa-section">
-            <div class="wa-label">
-                <span class="wa-dot"></span>
-                New here? Sign up on WhatsApp
-            </div>
-            <a class="wa-btn"
-               id="waRegisterBtn"
-               href="https://wa.me/923070508401?text=Hi%21%20I%20want%20to%20sign%20up%20for%20Self%20Learners%20Jobs%20Exam%20Hub.%20Please%20guide%20me."
-               target="_blank"
-               rel="noopener noreferrer">
-                <span class="wa-icon">💬</span>
-                Sign Up / Contact on WhatsApp
-            </a>
-            <span class="wa-number">+92 307 0508401</span>
+        <!-- WhatsApp signup — flat green button, no outer card -->
+        <div class="wa-label">
+            <span class="wa-dot"></span>
+            New here? Sign up on WhatsApp
         </div>
+        <a class="btn-whatsapp"
+           id="waRegisterBtn"
+           href="https://wa.me/923070508401?text=Hi%21%20I%20want%20to%20sign%20up%20for%20Self%20Learners%20Jobs%20Exam%20Hub.%20Please%20guide%20me."
+           target="_blank"
+           rel="noopener noreferrer">
+            <span class="wa-icon">💬</span>
+            Sign Up / Contact on WhatsApp
+        </a>
+        <span class="wa-number">+92 307 0508401</span>
 
         <div class="divider">or</div>
+
         <button class="btn-guest" id="guestBtn">
             👤 Continue as Guest
-            <span style="font-size:.75rem;font-weight:500;color:#92400e;">(15 MCQs only)</span>
+            <span class="guest-hint">(15 MCQs only)</span>
         </button>
+
         <div class="login-footer"><span id="loginStatus">Loading...</span></div>
     </div>
 </div>
@@ -288,27 +452,25 @@
     const LOGIN_GID = '2076597807';
     const LOGIN_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LOGIN_GID}`;
     const KEY_USER = 'slUser';
-    const APP_VERSION = '1.0';   // ← change this to bump version
+    const APP_VERSION = '1.0';
 
-    const WHATSAPP_NUMBER = '923070508401';       // no +, no spaces
-    const WHATSAPP_DISPLAY = '+92 307 0508401';   // shown on screen
+    const WHATSAPP_NUMBER = '923070508401';
+    const WHATSAPP_DISPLAY = '+92 307 0508401';
 
     const $ = (id) => document.getElementById(id);
     const ui = {
         logo: $('loginLogo'), email: $('emailInput'), pass: $('passwordInput'),
         tglPw: $('togglePasswordBtn'), loginBtn: $('loginBtn'),
         guestBtn: $('guestBtn'), loginStat: $('loginStatus'),
-        waRegisterBtn: $('waRegisterBtn'), versionLabel: $('versionLabel')
+        waRegisterBtn: $('waRegisterBtn'), versionLabel: $('versionLabel'),
+        loginWrapper: $('loginWrapper'), logoRing: $('logoRing')
     };
 
     let users = [];
     let passwordVisible = false;
     let toastTimer = null;
 
-    // Set version label
-    if (ui.versionLabel) {
-        ui.versionLabel.textContent = 'v:' + APP_VERSION;
-    }
+    if (ui.versionLabel) ui.versionLabel.textContent = 'v:' + APP_VERSION;
 
     function clean(v) { if (v == null) return ''; return String(v).replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ').replace(/\s+/g, ' ').trim(); }
     function parseCSVLine(line) {
@@ -359,7 +521,7 @@
     function fetchUsers() {
         ui.loginStat.textContent = '⏳ Loading...';
         ui.loginBtn.disabled = true;
-        fetch(LOGIN_URL + '&_t=' + Date.now())
+        fetch(LOGIN_URL + '&_t=' + Date.now(), { cache: 'no-store' })
             .then((r) => r.text())
             .then((text) => {
                 const lines = text.split('\n').filter((l) => l.trim());
@@ -414,7 +576,6 @@
         setTimeout(() => notifyParent(guestUser, true), 400);
     }
 
-    /* ---------- WhatsApp signup/contact button ---------- */
     function buildWhatsAppLink() {
         const msg = "Hi! I want to sign up for Self Learners Jobs Exam Hub. Please guide me.";
         return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
@@ -433,6 +594,21 @@
     ui.guestBtn.onclick = handleGuest;
     ui.email.onkeydown = ui.pass.onkeydown = (e) => { if (e.key === 'Enter') handleLogin(); };
 
+    /* ============================================================
+       INTRO SEQUENCE — same timing as edu page
+       3s: formulas reveal
+       9s: golden ring around logo
+       ============================================================ */
+    function buildIntroSequence() {
+        setTimeout(() => {
+            if (ui.loginWrapper) ui.loginWrapper.classList.add('run-intro');
+        }, 3000);
+        setTimeout(() => {
+            if (ui.logoRing) ui.logoRing.classList.add('run');
+        }, 9000);
+    }
+
+    buildIntroSequence();
     fetchUsers();
 })();
 </script>
