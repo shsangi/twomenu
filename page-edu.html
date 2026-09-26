@@ -765,9 +765,6 @@
         .jobsites-loading, .jobsites-empty { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: .9rem; font-weight: 500; }
         .jobsites-loading .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--sky); border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: .5rem; }
 
-        /* ============================================================
-           GUEST PAPERS LOCK BANNER
-           ============================================================ */
         .guest-papers-lock {
             margin-top: 1rem;
             padding: 1.5rem 1.25rem;
@@ -1257,6 +1254,7 @@
     function resolveCorrectIndex(raw, options) { if (!raw) return -1; const r = clean(raw); for (let i = 0; i < options.length; i++) if (clean(options[i]) === r) return i; const rl = r.toLowerCase(); for (let i = 0; i < options.length; i++) if (clean(options[i]).toLowerCase() === rl) return i; if (/^[A-Da-d]$/.test(r)) return 'abcd'.indexOf(r.toLowerCase()); if (/^[1-4]$/.test(r)) return parseInt(r, 10) - 1; const m = r.match(/^(?:option\s*|opt\.?\s*)?[\(\[\{\-]?\s*([A-Da-d])\s*[\)\]\}\.\-:]?/i); if (m && m[1]) return 'abcd'.indexOf(m[1].toLowerCase()); return -1; }
     function isValidLink(link) { if (!link) return false; const t = link.trim(); return t !== '' && t !== '#' && /^https?:\/\//i.test(t); }
     function withCacheBust(url) { const sep = url.includes('?') ? '&' : '?'; return url + sep + '_t=' + Date.now(); }
+    function noCacheHeaders() { return { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }; }
 
     function buildIntroSequence() {
         setTimeout(() => {
@@ -1344,7 +1342,7 @@
             }
         }
         if (forceRefresh) { clearSavedState(); if (timerHandle) clearInterval(timerHandle); }
-        fetch(withCacheBust(QUIZ_URL), { cache: 'no-store' }).then((r) => r.text()).then((text) => {
+        fetch(withCacheBust(QUIZ_URL), { cache: 'no-store', headers: noCacheHeaders() }).then((r) => r.text()).then((text) => {
             const lines = text.split('\n').filter((l) => l.trim());
             originalQuestions = [];
             for (let i = 1; i < lines.length; i++) {
@@ -1383,7 +1381,7 @@
         if (factsLoading) return;
         factsLoading = true;
         ui.factsBox.innerHTML = '<div class="read-empty">🔄 Loading facts...</div>';
-        fetch(withCacheBust(FACTS_URL), { cache: 'no-store' }).then((r) => r.text()).then((text) => {
+        fetch(withCacheBust(FACTS_URL), { cache: 'no-store', headers: noCacheHeaders() }).then((r) => r.text()).then((text) => {
             const lines = text.split('\n').filter((l) => l.trim());
             facts = [];
             if (lines.length < 2) { factsLoaded = true; factsLoading = false; if (callback) callback(); return; }
@@ -1421,7 +1419,7 @@
 
     async function fetchPapersWithCache() {
         try {
-            const r = await fetch(withCacheBust(PAPERS_URL), { cache: 'no-store' });
+            const r = await fetch(withCacheBust(PAPERS_URL), { cache: 'no-store', headers: noCacheHeaders() });
             if (!r.ok) throw new Error('HTTP ' + r.status);
             const text = await r.text();
             try { localStorage.setItem(KEY_PAPERS_CACHE, text); } catch (e) {}
@@ -1548,7 +1546,6 @@
     function renderPapersCards() {
         const q = papersSearchQuery.toLowerCase().trim();
 
-        // ★ GUEST LIMIT: only first N papers, skip filters for guests
         const isGuestLimited = isGuest;
         let filtered = papers.filter(p => {
             if (!isGuestLimited) {
@@ -2088,7 +2085,40 @@
     document.addEventListener('click', (e) => { ['modal', 'drawer'].forEach((key) => { const p = panels[key]; if (!p.jobC.contains(e.target) && !p.subjC.contains(e.target)) { p.jobC.classList.remove('open'); p.subjC.classList.remove('open'); } }); });
 
     function resetFilters() { selJobs = []; selSubjs = []; jobSearchText = subjSearchText = ''; panels.modal.jobSearch.value = ''; panels.modal.subjSearch.value = ''; panels.drawer.jobSearch.value = ''; panels.drawer.subjSearch.value = ''; updateAvailableSubjects(); renderJobChipsBoth(); renderJobDropdowns(); renderSubjectChipsBoth(); renderSubjectDropdowns(); toast('Filters reset', 'info', 2000, false); }
-    function confirmAndRefresh() { closeBothPanels(); if (timerHandle) clearInterval(timerHandle); resetToQuizView(); fetchQuestions(true); factsLoaded = false; factsVisibleLimit = PAGE_SIZE; readVisibleLimit = PAGE_SIZE; if (mode === 'facts') fetchFacts(() => renderFactsMode()); if (mode === 'papers') { papersLoaded = false; loadPapersInline(); } }
+
+    /* ★ LOAD & REFRESH — clears all caches, then re-fetches fresh from Google Sheets */
+    function confirmAndRefresh() {
+        closeBothPanels();
+        if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+
+        // Clear localStorage caches
+        try { localStorage.removeItem(KEY_QUIZ); } catch (e) {}
+        try { localStorage.removeItem(KEY_PAPERS_CACHE); } catch (e) {}
+        try { sessionStorage.clear(); } catch (e) {}
+
+        // Purge Service Worker caches (if any)
+        if ('caches' in window) {
+            try {
+                caches.keys().then(function (keys) {
+                    keys.forEach(function (k) { caches.delete(k); });
+                }).catch(function () {});
+            } catch (e) {}
+        }
+        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            try { navigator.serviceWorker.controller.postMessage({ type: 'PURGE_CACHE' }); } catch (e) {}
+        }
+
+        resetToQuizView();
+        factsLoaded = false;
+        factsVisibleLimit = PAGE_SIZE;
+        readVisibleLimit = PAGE_SIZE;
+
+        fetchQuestions(true);
+
+        if (mode === 'facts') fetchFacts(() => renderFactsMode());
+        if (mode === 'papers') { papersLoaded = false; loadPapersInline(); }
+    }
+
     function populatePanels() { updateUserLabels(); renderJobChipsBoth(); renderJobDropdowns(); updateAvailableSubjects(); renderSubjectChipsBoth(); renderSubjectDropdowns(); }
     function openModal() { populatePanels(); ui.modal.classList.add('active'); }
     function closeModal() { ui.modal.classList.remove('active'); closeAllDropdowns(); }
@@ -2118,7 +2148,7 @@
         if (jobSitesLoading) return;
         jobSitesLoading = true;
         ui.jobsitesList.innerHTML = '<div class="jobsites-loading"><div class="spinner"></div><br>Loading job sites...</div>';
-        fetch(withCacheBust(JOBSITES_URL), { cache: 'no-store' }).then((r) => r.text()).then((text) => {
+        fetch(withCacheBust(JOBSITES_URL), { cache: 'no-store', headers: noCacheHeaders() }).then((r) => r.text()).then((text) => {
             const lines = text.split('\n').filter((l) => l.trim());
             jobSites = [];
             if (lines.length < 2) { jobSitesLoaded = true; jobSitesLoading = false; if (callback) callback(); return; }
@@ -2158,9 +2188,6 @@
     ui.jobsitesOverlay.addEventListener('click', (e) => { if (e.target === ui.jobsitesOverlay) closeJobSitesModal(); });
     ui.jobsitesSearchInput.addEventListener('input', () => { jobSitesSearchQuery = ui.jobsitesSearchInput.value; renderJobSites(); });
 
-    /* ============================================================
-       PARENT MESSAGES — includes auth change re-render fix
-       ============================================================ */
     window.addEventListener('message', (e) => {
         const d = e.data;
         if (!d || typeof d !== 'object') return;
@@ -2178,7 +2205,6 @@
             if (ui.papersSubjectPillWrap) ui.papersSubjectPillWrap.classList.remove('open');
             document.body.style.overflow = '';
 
-            // ★ Re-render current view if guest status changed (fixes lock persisting after login)
             if (prevIsGuest !== isGuest) {
                 if (mode === 'mcq') {
                     renderDots(currentQ);
@@ -2193,8 +2219,6 @@
                     renderPapersCards();
                     renderSelectedSubjectsLine();
                 }
-                // Re-sync overview dots in case limit changed
-                if (ui.dots && mode === 'mcq') renderDots(currentQ);
             }
         } else if (d.type === 'SL_SET_MODE') {
             setMode(d.mode, true);
