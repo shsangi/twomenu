@@ -133,8 +133,8 @@
         }
         .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 24px -6px rgba(14,165,233,.6); }
 
-        .results-section { margin-top: 28px; padding-top: 24px; border-top: 2px dashed var(--border); display: none; }
-        .results-section.visible { display: block; animation: slideUp .4s ease; }
+        .results-section { margin-top: 28px; padding-top: 24px; border-top: 2px dashed var(--border); }
+        .results-section.visible { animation: slideUp .4s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         .results-title { font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
         .results-title::before { content: ""; width: 4px; height: 18px; background: var(--sky); border-radius: 2px; }
@@ -160,6 +160,15 @@
         .results-note { font-size: 12.5px; color: var(--text-soft); margin-top: 20px; line-height: 1.6; padding: 16px 18px; background: var(--sky-soft); border-radius: var(--radius); border-left: 4px solid var(--sky); font-weight: 500; }
         .results-note strong { color: var(--navy); font-weight: 800; }
 
+        .placeholder-text {
+            text-align: center;
+            font-size: 13.5px;
+            color: var(--text-muted);
+            padding: 18px 12px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
         /* Mobile tweaks */
         @media (max-width: 640px) {
             body { padding: .75rem; }
@@ -168,7 +177,7 @@
             h2 { font-size: 17px; }
         }
 
-        /* Desktop: soft card so it doesn't float orphaned, and nothing auto-scrolls */
+        /* Desktop: soft card so it doesn't float orphaned */
         @media (min-width: 641px) {
             body { padding: 2rem 1.5rem; }
             .eligibility-page { max-width: 560px; }
@@ -211,6 +220,7 @@
         <div class="top-accent"></div>
         <div class="content">
             <div class="version-watermark">v2.6</div>
+
             <div class="brand-header">
                 <img class="brand-logo"
                      src="https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27"
@@ -264,7 +274,9 @@
 
             <div class="results-section" id="resultsSection">
                 <div class="results-title">Year-by-Year Eligibility</div>
-                <div class="year-cards-container" id="yearCardsContainer"></div>
+                <div class="year-cards-container" id="yearCardsContainer">
+                    <div class="placeholder-text">Fill the form above and tap "Check Eligibility" to see results.</div>
+                </div>
                 <p class="results-note">
                     <strong>Note (CSS CE Rules 2019):</strong> Age must be <strong>21-30 years</strong> on the cut-off date (31st Dec of the preceding year).
                     <strong>2-year relaxation</strong> (max 32) for SC/Buddhist, recognized tribes, AJK/GB residents, special candidates, and in-service Govt servants (2+ years) - one concession only.
@@ -286,6 +298,7 @@ function calculateEligibility() {
     let prevAttempts = 0;
     for (const r of document.getElementsByName('prevAttempts')) if (r.checked) { prevAttempts = parseInt(r.value); break; }
     if (!dobInput) { alert("Please enter your Date of Birth."); return; }
+
     const dob = new Date(dobInput);
     const minAge = 21;
     const maxAge = (relaxation === 'none') ? 30 : 32;
@@ -301,6 +314,7 @@ function calculateEligibility() {
         let yearMonths = simulatedCutoff.getMonth() - dob.getMonth();
         if (simulatedCutoff.getDate() - dob.getDate() < 0) yearMonths--;
         if (yearMonths < 0) { yearAge--; yearMonths += 12; }
+
         const isSimAgeEligible = (yearAge >= minAge && yearAge < maxAge);
         let cardClass = "", statusBadge = "", noteText = "";
 
@@ -337,7 +351,9 @@ function calculateEligibility() {
 
         cardsHtml += `<div class="year-card ${cardClass}"><div class="year-card-top"><div class="year-card-info"><span class="year-card-title">CSS ${targetExamYear}</span><span class="year-card-age">Cut-off: Dec ${targetCutoffYear} · Age: ${yearAge}y ${yearMonths}m</span></div><div class="year-card-status">${statusBadge}</div></div>${noteText}</div>`;
     }
-    document.getElementById('yearCardsContainer').innerHTML = cardsHtml;
+
+    const container = document.getElementById('yearCardsContainer');
+    container.innerHTML = cardsHtml;
     document.getElementById('resultsSection').classList.add('visible');
 }
 </script>
