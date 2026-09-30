@@ -25,7 +25,7 @@
             --border: #e2e8f0;
             --whatsapp: #25d366; --whatsapp-dark: #128c7e;
             --rf: 9999px;
-            --shadow-sm: 0 2px 6px rgba(10,30,63,.06);
+            --shadow-md: 0 8px 20px -6px rgba(10,30,63,.12);
             --shadow-xl: 0 30px 60px -15px rgba(10,30,63,.25);
         }
         html, body { -webkit-text-size-adjust: 100%; }
@@ -151,7 +151,7 @@
         }
 
         /* ============================================================
-           PLAIN FORM — no card, no box, no shadow
+           FORM (base = plain, no card)
            ============================================================ */
         .login-form label {
             display: block;
@@ -329,10 +329,81 @@
             font-weight: 500;
         }
 
-        @media (max-width: 560px) {
+        /* ============================================================
+           MOBILE — plain (no card)
+           ============================================================ */
+        @media (max-width: 640px) {
             body { padding: 1.2rem 1rem; }
+            .login-page { max-width: 100%; }
             .logo-stage svg { width: 160px; }
             .logo-stage { margin-bottom: 1.2rem; }
+        }
+
+        /* ============================================================
+           DESKTOP — wrap everything in a soft card so it doesn't
+           float orphaned in the middle of the empty page
+           ============================================================ */
+        @media (min-width: 641px) {
+            body { padding: 2rem 1.5rem; }
+
+            .login-page {
+                max-width: 440px;
+                background: #ffffff;
+                border-radius: 24px;
+                padding: 2.5rem 2.5rem 2.2rem;
+                box-shadow: 0 20px 50px -18px rgba(10,30,63,.18),
+                            0 0 0 1px rgba(226,232,240,.9);
+                position: relative;
+            }
+
+            /* subtle sky-blue accent strip at the top of the card */
+            .login-page::before {
+                content: "";
+                position: absolute;
+                top: 0; left: 0; right: 0;
+                height: 4px;
+                border-radius: 24px 24px 0 0;
+                background: linear-gradient(90deg,
+                    var(--sky) 0%,
+                    var(--sky-dark) 60%,
+                    #f5b800 100%);
+            }
+
+            .logo-stage svg { width: 200px; }
+            .logo-stage { margin-bottom: 1.8rem; margin-top: .4rem; }
+
+            /* slightly bigger inputs on desktop */
+            .login-form .input-group input {
+                padding: 1rem 1.15rem;
+                padding-right: 3.2rem;
+                font-size: 1rem;
+            }
+            .login-form .btn-login {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+            .btn-whatsapp {
+                padding: .95rem 1.2rem;
+                font-size: .92rem;
+                min-height: 50px;
+            }
+            .btn-guest {
+                padding: .95rem;
+                font-size: .95rem;
+            }
+            .wa-label { font-size: .76rem; margin-top: 1.8rem; }
+            .wa-number { font-size: .76rem; }
+            .divider { margin: 1.5rem 0 1.2rem; }
+            .login-footer { font-size: .82rem; margin-top: 1.4rem; }
+        }
+
+        /* Extra-large screens: give a touch more breathing room */
+        @media (min-width: 1024px) {
+            .login-page {
+                max-width: 460px;
+                padding: 2.8rem 2.8rem 2.4rem;
+            }
+            .logo-stage svg { width: 220px; }
         }
     </style>
 </head>
@@ -340,7 +411,7 @@
 <div class="login-page">
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Animated logo (plain, no card) -->
+    <!-- Animated logo -->
     <div class="logo-stage" id="logoStage" onclick="replayLogoAnimation()" title="Click to replay">
         <svg viewBox="0 0 820 870" xmlns="http://www.w3.org/2000/svg">
             <!-- Shape 1: Black -->
@@ -374,7 +445,7 @@
         </svg>
     </div>
 
-    <!-- Plain form (no card, no box) -->
+    <!-- Plain form (card is applied only on desktop via media query) -->
     <div class="login-form">
         <label for="emailInput">Email / Username</label>
         <div class="input-group">
