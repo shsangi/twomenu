@@ -59,19 +59,51 @@
         .toast.removing { animation: fadeOutToast .25s ease forwards; }
 
         /* ============================================================
-           LOGO ANIMATION (top of page, above the card)
+           SINGLE UNIFIED CARD — logo + form all together
+           ============================================================ */
+        .login-wrapper {
+            background: var(--sf);
+            border-radius: 28px;
+            padding: 2rem 2.25rem 2.6rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .login-wrapper::before {
+            content: "";
+            position: absolute; top: 0; left: 0; right: 0; height: 5px;
+            background: linear-gradient(90deg, var(--navy) 0%, var(--sky) 50%, var(--yellow) 100%);
+        }
+
+        .version-label {
+            position: absolute;
+            top: 14px; right: 16px;
+            font-size: .58rem; font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: .04em;
+            background: rgba(255,255,255,.9);
+            padding: 3px 8px;
+            border-radius: var(--rf);
+            border: 1px solid var(--border);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           LOGO ANIMATION (inside card, top)
            ============================================================ */
         .logo-stage {
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: .6rem;
+            margin: -0.4rem 0 .3rem;
             cursor: pointer;
             user-select: none;
         }
         .logo-stage svg {
-            width: 220px;
+            width: 200px;
             height: auto;
             overflow: visible;
             display: block;
@@ -157,56 +189,7 @@
         }
 
         /* ============================================================
-           LOGIN CARD
-           ============================================================ */
-        .login-wrapper {
-            background: var(--sf);
-            border-radius: 28px;
-            padding: 2.2rem 2.25rem 2.6rem;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
-        }
-        .login-wrapper::before {
-            content: "";
-            position: absolute; top: 0; left: 0; right: 0; height: 5px;
-            background: linear-gradient(90deg, var(--navy) 0%, var(--sky) 50%, var(--yellow) 100%);
-        }
-
-        .version-label {
-            position: absolute;
-            top: 14px; right: 16px;
-            font-size: .58rem; font-weight: 700;
-            color: var(--text-muted);
-            letter-spacing: .04em;
-            background: rgba(255,255,255,.9);
-            padding: 3px 8px;
-            border-radius: var(--rf);
-            border: 1px solid var(--border);
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .login-wrapper .card-title {
-            text-align: center;
-            margin-bottom: 1.6rem;
-        }
-        .login-wrapper .card-title h1 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--navy);
-            letter-spacing: -.02em;
-        }
-        .login-wrapper .card-title p {
-            color: var(--text-muted);
-            font-size: .85rem;
-            font-weight: 500;
-            margin-top: .3rem;
-        }
-
-        /* ============================================================
-           FORM FIELDS
+           FORM FIELDS (directly inside the card, no nested box)
            ============================================================ */
         .login-wrapper label {
             display: block; font-weight: 700; font-size: .82rem;
@@ -234,7 +217,7 @@
             padding: 1rem; border-radius: var(--rf); cursor: pointer;
             font-family: inherit;
             box-shadow: 0 8px 20px -6px rgba(14,165,233,.5);
-            margin-top: .5rem; transition: all .2s;
+            margin-top: .3rem; transition: all .2s;
         }
         .login-wrapper .btn-login:hover:not(:disabled) { transform: translateY(-1px); }
         .login-wrapper .btn-login:disabled { opacity: .5; cursor: not-allowed; }
@@ -335,14 +318,13 @@
         }
         .login-wrapper .login-footer {
             text-align: center; font-size: .8rem; color: var(--text-muted);
-            margin-top: 1.4rem; font-weight: 500;
+            margin-top: 1.2rem; font-weight: 500;
         }
 
         @media (max-width: 560px) {
             body { padding: 1rem .9rem; }
-            .logo-stage svg { width: 180px; }
-            .login-wrapper { padding: 1.8rem 1.4rem 2.2rem; border-radius: 22px; }
-            .login-wrapper .card-title h1 { font-size: 1.25rem; }
+            .logo-stage svg { width: 170px; }
+            .login-wrapper { padding: 1.6rem 1.4rem 2.2rem; border-radius: 22px; }
             .version-label { top: 12px; right: 14px; font-size: .55rem; padding: 2px 7px; }
         }
     </style>
@@ -352,52 +334,46 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- ============================================================
-         ANIMATED LOGO (top of page, above the card)
-         ============================================================ -->
-    <div class="logo-stage" id="logoStage" onclick="replayLogoAnimation()" title="Click to replay">
-        <svg viewBox="0 0 820 870" xmlns="http://www.w3.org/2000/svg">
-            <!-- Shape 1: Black -->
-            <polygon class="shape shape-1"
-                points="44,7  255,560  115,560  4,267"
-                fill="#000000" />
-
-            <!-- Shape 2: Yellow -->
-            <polygon class="shape shape-2"
-                points="290,33  478,560  335,560  252,300"
-                fill="#F6D810" />
-
-            <!-- Shape 3: Blue -->
-            <polygon class="shape shape-3"
-                points="510,27  700,560  555,560  472,288"
-                fill="#38B6FE" />
-
-            <!-- Dots -->
-            <circle class="dot dot-1" cx="200" cy="628" r="32" fill="#000000" />
-            <circle class="dot dot-2" cx="440" cy="630" r="32" fill="#F6D810" />
-            <circle class="dot dot-3" cx="660" cy="630" r="32" fill="#38B6FE" />
-
-            <!-- Typography -->
-            <text class="logo-text" x="410" y="780"
-                  font-family="'Times New Roman', Times, Georgia, serif"
-                  font-size="40" font-weight="700" fill="#111111"
-                  text-anchor="middle" letter-spacing="5.8">
-                <tspan font-size="48" font-weight="800">S</tspan>ELF 
-                <tspan font-size="48" font-weight="800">L</tspan>EARNERS
-            </text>
-        </svg>
-    </div>
-
-    <!-- ============================================================
-         LOGIN CARD
+         SINGLE UNIFIED CARD — Logo animation + login form
          ============================================================ -->
     <div class="login-wrapper" id="loginWrapper">
         <span class="version-label" id="versionLabel">v:1.0</span>
 
-        <div class="card-title">
-            <h1>Welcome Back</h1>
-            <p>Sign in to continue your learning</p>
+        <!-- Animated logo (inside the card, at top) -->
+        <div class="logo-stage" id="logoStage" onclick="replayLogoAnimation()" title="Click to replay">
+            <svg viewBox="0 0 820 870" xmlns="http://www.w3.org/2000/svg">
+                <!-- Shape 1: Black -->
+                <polygon class="shape shape-1"
+                    points="44,7  255,560  115,560  4,267"
+                    fill="#000000" />
+
+                <!-- Shape 2: Yellow -->
+                <polygon class="shape shape-2"
+                    points="290,33  478,560  335,560  252,300"
+                    fill="#F6D810" />
+
+                <!-- Shape 3: Blue -->
+                <polygon class="shape shape-3"
+                    points="510,27  700,560  555,560  472,288"
+                    fill="#38B6FE" />
+
+                <!-- Dots -->
+                <circle class="dot dot-1" cx="200" cy="628" r="32" fill="#000000" />
+                <circle class="dot dot-2" cx="440" cy="630" r="32" fill="#F6D810" />
+                <circle class="dot dot-3" cx="660" cy="630" r="32" fill="#38B6FE" />
+
+                <!-- Typography -->
+                <text class="logo-text" x="410" y="780"
+                      font-family="'Times New Roman', Times, Georgia, serif"
+                      font-size="40" font-weight="700" fill="#111111"
+                      text-anchor="middle" letter-spacing="5.8">
+                    <tspan font-size="48" font-weight="800">S</tspan>ELF 
+                    <tspan font-size="48" font-weight="800">L</tspan>EARNERS
+                </text>
+            </svg>
         </div>
 
+        <!-- Form (directly below logo, same card) -->
         <label for="emailInput">Email / Username</label>
         <div class="input-group">
             <input type="text" id="emailInput" placeholder="Enter your email or username" autocomplete="username"/>
