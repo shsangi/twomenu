@@ -31,9 +31,7 @@
         }
         .schedule-page { width: 100%; max-width: 700px; }
 
-        /* ============================================================
-           BASE (mobile = plain, no card)
-           ============================================================ */
+        /* Base: plain on mobile */
         .card {
             background: transparent;
             border-radius: 0;
@@ -129,9 +127,7 @@
         .error-text { color: #dc2626; }
         .loading-text small, .error-text small { color: var(--text-muted); font-size: .75rem; display: block; margin-top: 6px; }
 
-        /* ============================================================
-           MOBILE tweaks (still plain, no card)
-           ============================================================ */
+        /* Mobile tweaks */
         @media (max-width: 640px) {
             body { padding: .6rem; }
             .banner { padding: 10px 16px; min-height: 48px; }
@@ -145,9 +141,7 @@
             .footer { font-size: .63rem; flex-direction: column; align-items: stretch; gap: 6px; }
         }
 
-        /* ============================================================
-           DESKTOP — soft card so it doesn't float orphaned
-           ============================================================ */
+        /* Desktop: soft card so it doesn't float orphaned */
         @media (min-width: 641px) {
             body { padding: 2rem 1.5rem; }
             .schedule-page { max-width: 780px; }
@@ -192,23 +186,23 @@
         <div class="banner">
             <div class="banner-activity">
                 <span class="status-dot"></span>
-                <span class="banner-subject" id="currentActivity">Loading schedule…</span>
+                <span class="banner-subject" id="currentActivity">Loading schedule...</span>
             </div>
         </div>
         <div class="status-bar">
-            <span class="done-count">✅ Done: <span id="doneCount">0</span></span>
-            <span class="remaining-time">⏳ <span id="remainingTimeMinutes">--</span>:<span id="remainingTimeSeconds">--</span></span>
-            <span class="remaining-count">⏳ Left: <span id="remainingCount">0</span></span>
+            <span class="done-count">Done: <span id="doneCount">0</span></span>
+            <span class="remaining-time"><span id="remainingTimeMinutes">--</span>:<span id="remainingTimeSeconds">--</span></span>
+            <span class="remaining-count">Left: <span id="remainingCount">0</span></span>
         </div>
         <div class="schedule-grid" id="scheduleContainer">
-            <div class="loading-text">⏳ Loading from Google Sheet…<br><small>Please wait</small></div>
+            <div class="loading-text">Loading from Google Sheet...<br><small>Please wait</small></div>
         </div>
         <div class="footer">
             <div class="exam-dates">
-                <span class="mpt-date">📝 MPT: <span id="mptDateDisplay">--</span> <span class="count-days" id="mptDays">--</span>d</span>
-                <span class="written-date">✍️ Written: <span id="writtenDateDisplay">--</span> <span class="count-days" id="writtenDays">--</span>d</span>
+                <span class="mpt-date">MPT: <span id="mptDateDisplay">--</span> <span class="count-days" id="mptDays">--</span>d</span>
+                <span class="written-date">Written: <span id="writtenDateDisplay">--</span> <span class="count-days" id="writtenDays">--</span>d</span>
             </div>
-            <span class="pkt-clock">🇵🇰 <span id="pkTime">--:-- --</span></span>
+            <span class="pkt-clock">PKT <span id="pkTime">--:-- --</span></span>
         </div>
     </div>
 </div>
@@ -240,14 +234,14 @@
         const data = []; let mptStr = null, writtenStr = null;
 
         for (let i = 1; i < lines.length; i++) {
-            const cols = lines[i].split(',').map(c => c.trim());
-            if (cols.length < 4 || cols.every(c => !c)) continue;
+            const cols = lines[i].split(',').map(x => x.trim());
+            if (cols.length < 4 || cols.every(x => !x)) continue;
             const subject = idx.subject >= 0 ? cols[idx.subject] : cols[0] || '';
             let from = (idx.from >= 0 ? cols[idx.from] : cols[1] || '').replace(/\s/g, ''),
                 to = (idx.to >= 0 ? cols[idx.to] : cols[2] || '').replace(/\s/g, ''),
                 duration = (idx.duration >= 0 ? cols[idx.duration] : cols[3] || '').replace(/\s/g, '');
-            if (idx.mpt >= 0 && cols[idx.mpt]?.match(/\d{1,2}\s+[A-Za-z]{3}\s+\d{4}/)) mptStr = cols[idx.mpt];
-            if (idx.written >= 0 && cols[idx.written]?.match(/\d{1,2}\s+[A-Za-z]{3}\s+\d{4}/)) writtenStr = cols[idx.written];
+            if (idx.mpt >= 0 && cols[idx.mpt] && /\d{1,2}\s+[A-Za-z]{3}\s+\d{4}/.test(cols[idx.mpt])) mptStr = cols[idx.mpt];
+            if (idx.written >= 0 && cols[idx.written] && /\d{1,2}\s+[A-Za-z]{3}\s+\d{4}/.test(cols[idx.written])) writtenStr = cols[idx.written];
             if (!from || !to || !subject) continue;
             if (from.length === 4) from = '0' + from;
             if (to.length === 4) to = '0' + to;
@@ -304,12 +298,7 @@
         if (written) $('writtenDays').textContent = daysUntil(written, now);
         const { idx, remain } = getCurrent(now);
         const item = s[idx] || { subject: 'No schedule', type: '' };
-        const prefix = { core: '📘 ', compulsory: '📖 ', optional: '📚 ', mpt: '📝 ', review: '📋 ' };
-        let activity = item.subject;
-        if (item.type === 'break') activity = '☕ ' + activity;
-        else if (item.type === 'sleep') activity = '🌙 ' + activity;
-        else if (prefix[item.type]) activity = prefix[item.type] + activity;
-        $('currentActivity').textContent = activity;
+        $('currentActivity').textContent = item.subject;
         $('remainingTimeMinutes').textContent = String(Math.floor(remain / 60)).padStart(2, '0');
         $('remainingTimeSeconds').textContent = String(Math.floor(remain % 60)).padStart(2, '0');
         let html = '', done = 0, left = 0;
@@ -321,8 +310,7 @@
             else if (i === idx) { cls += ' current'; left++; }
             else { left++; }
             if (isBreak) cls += ' break-row';
-            const emoji = { core: ' ✏️', compulsory: ' 📖', optional: ' 📚', mpt: ' 📝', review: ' 📘', break: '', sleep: ' 🌙' };
-            html += `<div class="${cls}"><span class="srno">${i+1}</span><span class="time">${row.from} – ${row.to}</span><span class="subject">${row.subject}${emoji[row.type]||''}</span><span class="duration-badge">${row.duration}</span></div>`;
+            html += `<div class="${cls}"><span class="srno">${i+1}</span><span class="time">${row.from} - ${row.to}</span><span class="subject">${row.subject}</span><span class="duration-badge">${row.duration}</span></div>`;
         }
         c.innerHTML = html;
         $('doneCount').textContent = done;
@@ -332,7 +320,7 @@
     async function init() {
         const loaded = await load();
         if (!loaded) {
-            c.innerHTML = '<div class="error-text">❌ Failed to load schedule<br><small>Check internet and refresh</small></div>';
+            c.innerHTML = '<div class="error-text">Failed to load schedule<br><small>Check internet and refresh</small></div>';
             return;
         }
         render();
