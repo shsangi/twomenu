@@ -19,36 +19,35 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         :root {
-            --navy: #0a1e3f; --navy-dark: #061428; --navy-light: #1a3a6b; --navy-soft: #e8eef7;
-            --black: #0f1419; --yellow: #f5b800; --yellow-dark: #d99e00; --yellow-soft: #fff7dd;
-            --sky: #0ea5e9; --sky-dark: #0284c7; --sky-soft: #e0f2fe; --sky-light: #7dd3fc;
-            --bg: #f4f6fa; --sf: #ffffff; --sf2: #f8fafc;
+            --navy: #0a1e3f;
+            --sky: #0ea5e9; --sky-dark: #0284c7; --sky-soft: #e0f2fe;
             --text: #0f1419; --text-soft: #475569; --text-muted: #94a3b8;
             --border: #e2e8f0;
-            --danger: #dc2626;
-            --whatsapp: #25d366;
-            --whatsapp-dark: #128c7e;
-            --r: 20px; --rf: 9999px;
-            --shadow-lg: 0 20px 40px -12px rgba(10,30,63,.18);
+            --whatsapp: #25d366; --whatsapp-dark: #128c7e;
+            --rf: 9999px;
+            --shadow-sm: 0 2px 6px rgba(10,30,63,.06);
             --shadow-xl: 0 30px 60px -15px rgba(10,30,63,.25);
         }
         html, body { -webkit-text-size-adjust: 100%; }
         body {
-            background: transparent;
+            background: #f4f6fa;
             min-height: 100dvh;
             display: flex; align-items: center; justify-content: center;
-            padding: 1.25rem;
+            padding: 1.5rem 1.25rem;
             color: var(--text);
             -webkit-font-smoothing: antialiased;
             overscroll-behavior: contain;
         }
-        .login-page { width: 100%; max-width: 420px; }
+        .login-page {
+            width: 100%;
+            max-width: 400px;
+        }
 
         /* ============================================================
            TOASTS
            ============================================================ */
         .toast-container { position: fixed; top: 1.3rem; right: 1.3rem; z-index: 9999; display: flex; flex-direction: column; gap: .7rem; max-width: 380px; width: calc(100% - 2.6rem); }
-        .toast { padding: 1rem 1.2rem; border-radius: var(--r); font-size: .88rem; font-weight: 600; box-shadow: var(--shadow-xl); animation: slideInToast .35s cubic-bezier(.16,1,.3,1); display: flex; align-items: center; gap: .7rem; border-left: 4px solid; }
+        .toast { padding: 1rem 1.2rem; border-radius: 14px; font-size: .88rem; font-weight: 600; box-shadow: var(--shadow-xl); animation: slideInToast .35s cubic-bezier(.16,1,.3,1); display: flex; align-items: center; gap: .7rem; border-left: 4px solid; }
         .toast.success { background: #d1fae5; color: #065f46; border-left-color: #059669; }
         .toast.error { background: #fee2e2; color: #991b1b; border-left-color: #dc2626; }
         .toast.warning { background: #fef3c7; color: #92400e; border-left-color: #d97706; }
@@ -59,51 +58,19 @@
         .toast.removing { animation: fadeOutToast .25s ease forwards; }
 
         /* ============================================================
-           SINGLE UNIFIED CARD — logo + form all together
-           ============================================================ */
-        .login-wrapper {
-            background: var(--sf);
-            border-radius: 28px;
-            padding: 2rem 2.25rem 2.6rem;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
-        }
-        .login-wrapper::before {
-            content: "";
-            position: absolute; top: 0; left: 0; right: 0; height: 5px;
-            background: linear-gradient(90deg, var(--navy) 0%, var(--sky) 50%, var(--yellow) 100%);
-        }
-
-        .version-label {
-            position: absolute;
-            top: 14px; right: 16px;
-            font-size: .58rem; font-weight: 700;
-            color: var(--text-muted);
-            letter-spacing: .04em;
-            background: rgba(255,255,255,.9);
-            padding: 3px 8px;
-            border-radius: var(--rf);
-            border: 1px solid var(--border);
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        /* ============================================================
-           LOGO ANIMATION (inside card, top)
+           LOGO ANIMATION
            ============================================================ */
         .logo-stage {
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: -0.4rem 0 .3rem;
+            margin-bottom: 1.5rem;
             cursor: pointer;
             user-select: none;
         }
         .logo-stage svg {
-            width: 200px;
+            width: 180px;
             height: auto;
             overflow: visible;
             display: block;
@@ -174,11 +141,6 @@
             50%      { transform: scale(1.1); }
         }
 
-        .logo-stage:hover .shape-1 { filter: drop-shadow(0 10px 14px rgba(0,0,0,0.18)); }
-        .logo-stage:hover .shape-2 { filter: drop-shadow(0 10px 14px rgba(246,216,16,0.35)); }
-        .logo-stage:hover .shape-3 { filter: drop-shadow(0 10px 14px rgba(56,182,254,0.35)); }
-        .logo-stage:hover .dot     { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12)); }
-
         @media (prefers-reduced-motion: reduce) {
             .logo-stage .shape,
             .logo-stage .dot,
@@ -189,38 +151,67 @@
         }
 
         /* ============================================================
-           FORM FIELDS (directly inside the card, no nested box)
+           PLAIN FORM — no card, no box, no shadow
            ============================================================ */
-        .login-wrapper label {
-            display: block; font-weight: 700; font-size: .82rem;
-            color: var(--navy); margin-bottom: .4rem;
+        .login-form label {
+            display: block;
+            font-weight: 600;
+            font-size: .82rem;
+            color: var(--navy);
+            margin-bottom: .4rem;
         }
-        .login-wrapper .input-group { position: relative; margin-bottom: 1.3rem; }
-        .login-wrapper .input-group input {
-            width: 100%; padding: 1rem 1.2rem; padding-right: 3.2rem;
-            border: 1.5px solid var(--border); border-radius: var(--rf);
-            font-size: .95rem; font-family: inherit; background: var(--sf2);
-            color: var(--text); font-weight: 500; transition: all .2s;
+        .login-form .input-group {
+            position: relative;
+            margin-bottom: 1.1rem;
         }
-        .login-wrapper .input-group input:focus {
-            outline: 0; border-color: var(--sky); background: #fff;
-            box-shadow: 0 0 0 4px rgba(14,165,233,.15);
-        }
-        .login-wrapper .toggle-password {
-            position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
-            background: 0 0; border: none; cursor: pointer; font-size: 1.2rem;
-            color: var(--text-muted); padding: .3rem;
-        }
-        .login-wrapper .btn-login {
-            width: 100%; background: linear-gradient(135deg,var(--sky),var(--sky-dark));
-            border: none; color: #fff; font-weight: 800; font-size: 1rem;
-            padding: 1rem; border-radius: var(--rf); cursor: pointer;
+        .login-form .input-group input {
+            width: 100%;
+            padding: .95rem 1.1rem;
+            padding-right: 3rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--rf);
+            font-size: .95rem;
             font-family: inherit;
-            box-shadow: 0 8px 20px -6px rgba(14,165,233,.5);
-            margin-top: .3rem; transition: all .2s;
+            background: #ffffff;
+            color: var(--text);
+            font-weight: 500;
+            transition: all .2s;
         }
-        .login-wrapper .btn-login:hover:not(:disabled) { transform: translateY(-1px); }
-        .login-wrapper .btn-login:disabled { opacity: .5; cursor: not-allowed; }
+        .login-form .input-group input:focus {
+            outline: 0;
+            border-color: var(--sky);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(14,165,233,.12);
+        }
+        .login-form .toggle-password {
+            position: absolute;
+            right: .95rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: 0 0;
+            border: none;
+            cursor: pointer;
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            padding: .3rem;
+        }
+        .login-form .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: .98rem;
+            padding: .95rem;
+            border-radius: var(--rf);
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 8px 20px -6px rgba(14,165,233,.45);
+            margin-top: .3rem;
+            transition: all .2s;
+        }
+        .login-form .btn-login:hover:not(:disabled) { transform: translateY(-1px); }
+        .login-form .btn-login:disabled { opacity: .5; cursor: not-allowed; }
 
         /* ============================================================
            WHATSAPP
@@ -230,16 +221,16 @@
             align-items: center;
             justify-content: center;
             gap: .35rem;
-            font-size: .74rem;
+            font-size: .72rem;
             color: #065f46;
             font-weight: 700;
-            margin: 1.4rem 0 .6rem;
+            margin: 1.6rem 0 .6rem;
             text-transform: uppercase;
             letter-spacing: .04em;
             text-align: center;
         }
         .wa-label .wa-dot {
-            width: 8px; height: 8px; border-radius: 50%;
+            width: 7px; height: 7px; border-radius: 50%;
             background: var(--whatsapp);
             box-shadow: 0 0 0 3px rgba(37,211,102,.25);
             animation: waPulse 2s infinite;
@@ -257,52 +248,59 @@
             width: 100%;
             background: linear-gradient(135deg, var(--whatsapp), var(--whatsapp-dark));
             color: #fff;
-            font-weight: 800;
-            font-size: .9rem;
+            font-weight: 700;
+            font-size: .88rem;
             padding: .85rem 1rem;
             border-radius: var(--rf);
             text-decoration: none;
-            box-shadow: 0 6px 16px -4px rgba(37,211,102,.5);
+            box-shadow: 0 6px 16px -4px rgba(37,211,102,.45);
             transition: all .2s;
-            min-height: 48px;
+            min-height: 46px;
             font-family: inherit;
             border: none;
             cursor: pointer;
         }
-        .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -4px rgba(37,211,102,.6); }
-        .btn-whatsapp:active { transform: translateY(0); }
-        .btn-whatsapp .wa-icon { font-size: 1.15rem; display: inline-flex; }
+        .btn-whatsapp:hover { transform: translateY(-2px); }
+        .btn-whatsapp .wa-icon { font-size: 1.1rem; display: inline-flex; }
         .wa-number {
             display: block;
             text-align: center;
-            margin-top: .55rem;
-            font-size: .74rem;
+            margin-top: .5rem;
+            font-size: .72rem;
             color: #065f46;
-            font-weight: 700;
+            font-weight: 600;
             letter-spacing: .02em;
         }
 
         /* ============================================================
            DIVIDER + GUEST
            ============================================================ */
-        .login-wrapper .divider {
-            display: flex; align-items: center; gap: .8rem;
-            margin: 1.4rem 0 1.2rem;
-            color: var(--text-muted); font-size: .72rem; font-weight: 600;
-            text-transform: uppercase; letter-spacing: .08em;
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            margin: 1.3rem 0 1.1rem;
+            color: var(--text-muted);
+            font-size: .7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
         }
-        .login-wrapper .divider::before,
-        .login-wrapper .divider::after {
-            content: ''; flex: 1; height: 1px; background: var(--border);
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
         }
-        .login-wrapper .btn-guest {
+        .btn-guest {
             width: 100%;
-            background: var(--sf2);
+            background: #ffffff;
             border: 1.5px solid var(--border);
             color: var(--text-soft);
-            font-weight: 700;
-            font-size: .95rem;
-            padding: .9rem;
+            font-weight: 600;
+            font-size: .92rem;
+            padding: .85rem;
             border-radius: var(--rf);
             cursor: pointer;
             font-family: inherit;
@@ -312,20 +310,29 @@
             gap: .4rem;
             transition: all .18s;
         }
-        .login-wrapper .btn-guest:hover { background: #fff; border-color: var(--sky); color: var(--sky-dark); }
-        .login-wrapper .btn-guest .guest-hint {
-            font-size: .75rem; font-weight: 500; color: #92400e;
+        .btn-guest:hover {
+            background: #fff;
+            border-color: var(--sky);
+            color: var(--sky-dark);
         }
-        .login-wrapper .login-footer {
-            text-align: center; font-size: .8rem; color: var(--text-muted);
-            margin-top: 1.2rem; font-weight: 500;
+        .btn-guest .guest-hint {
+            font-size: .74rem;
+            font-weight: 500;
+            color: #92400e;
+        }
+
+        .login-footer {
+            text-align: center;
+            font-size: .78rem;
+            color: var(--text-muted);
+            margin-top: 1.2rem;
+            font-weight: 500;
         }
 
         @media (max-width: 560px) {
-            body { padding: 1rem .9rem; }
-            .logo-stage svg { width: 170px; }
-            .login-wrapper { padding: 1.6rem 1.4rem 2.2rem; border-radius: 22px; }
-            .version-label { top: 12px; right: 14px; font-size: .55rem; padding: 2px 7px; }
+            body { padding: 1.2rem 1rem; }
+            .logo-stage svg { width: 160px; }
+            .logo-stage { margin-bottom: 1.2rem; }
         }
     </style>
 </head>
@@ -333,47 +340,42 @@
 <div class="login-page">
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ============================================================
-         SINGLE UNIFIED CARD — Logo animation + login form
-         ============================================================ -->
-    <div class="login-wrapper" id="loginWrapper">
-        <span class="version-label" id="versionLabel">v:1.0</span>
+    <!-- Animated logo (plain, no card) -->
+    <div class="logo-stage" id="logoStage" onclick="replayLogoAnimation()" title="Click to replay">
+        <svg viewBox="0 0 820 870" xmlns="http://www.w3.org/2000/svg">
+            <!-- Shape 1: Black -->
+            <polygon class="shape shape-1"
+                points="44,7  255,560  115,560  4,267"
+                fill="#000000" />
 
-        <!-- Animated logo (inside the card, at top) -->
-        <div class="logo-stage" id="logoStage" onclick="replayLogoAnimation()" title="Click to replay">
-            <svg viewBox="0 0 820 870" xmlns="http://www.w3.org/2000/svg">
-                <!-- Shape 1: Black -->
-                <polygon class="shape shape-1"
-                    points="44,7  255,560  115,560  4,267"
-                    fill="#000000" />
+            <!-- Shape 2: Yellow -->
+            <polygon class="shape shape-2"
+                points="290,33  478,560  335,560  252,300"
+                fill="#F6D810" />
 
-                <!-- Shape 2: Yellow -->
-                <polygon class="shape shape-2"
-                    points="290,33  478,560  335,560  252,300"
-                    fill="#F6D810" />
+            <!-- Shape 3: Blue -->
+            <polygon class="shape shape-3"
+                points="510,27  700,560  555,560  472,288"
+                fill="#38B6FE" />
 
-                <!-- Shape 3: Blue -->
-                <polygon class="shape shape-3"
-                    points="510,27  700,560  555,560  472,288"
-                    fill="#38B6FE" />
+            <!-- Dots -->
+            <circle class="dot dot-1" cx="200" cy="628" r="32" fill="#000000" />
+            <circle class="dot dot-2" cx="440" cy="630" r="32" fill="#F6D810" />
+            <circle class="dot dot-3" cx="660" cy="630" r="32" fill="#38B6FE" />
 
-                <!-- Dots -->
-                <circle class="dot dot-1" cx="200" cy="628" r="32" fill="#000000" />
-                <circle class="dot dot-2" cx="440" cy="630" r="32" fill="#F6D810" />
-                <circle class="dot dot-3" cx="660" cy="630" r="32" fill="#38B6FE" />
+            <!-- Typography -->
+            <text class="logo-text" x="410" y="780"
+                  font-family="'Times New Roman', Times, Georgia, serif"
+                  font-size="40" font-weight="700" fill="#111111"
+                  text-anchor="middle" letter-spacing="5.8">
+                <tspan font-size="48" font-weight="800">S</tspan>ELF 
+                <tspan font-size="48" font-weight="800">L</tspan>EARNERS
+            </text>
+        </svg>
+    </div>
 
-                <!-- Typography -->
-                <text class="logo-text" x="410" y="780"
-                      font-family="'Times New Roman', Times, Georgia, serif"
-                      font-size="40" font-weight="700" fill="#111111"
-                      text-anchor="middle" letter-spacing="5.8">
-                    <tspan font-size="48" font-weight="800">S</tspan>ELF 
-                    <tspan font-size="48" font-weight="800">L</tspan>EARNERS
-                </text>
-            </svg>
-        </div>
-
-        <!-- Form (directly below logo, same card) -->
+    <!-- Plain form (no card, no box) -->
+    <div class="login-form">
         <label for="emailInput">Email / Username</label>
         <div class="input-group">
             <input type="text" id="emailInput" placeholder="Enter your email or username" autocomplete="username"/>
@@ -416,12 +418,10 @@
 (function () {
     'use strict';
 
-    const LOGIN_LOGO = 'https://lh3.googleusercontent.com/d/1NRgM5kUkl8A0R5QrklfvdhwYlVj6OY27';
     const SHEET_ID = '17yY_LUiqMsABz7tbtAXFpZIYpHN2TJTZSxo7oJWzckI';
     const LOGIN_GID = '2076597807';
     const LOGIN_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&gid=' + LOGIN_GID;
     const KEY_USER = 'slUser';
-    const APP_VERSION = '1.0';
 
     const WHATSAPP_NUMBER = '923070508401';
 
@@ -430,14 +430,12 @@
         email: $('emailInput'), pass: $('passwordInput'),
         tglPw: $('togglePasswordBtn'), loginBtn: $('loginBtn'),
         guestBtn: $('guestBtn'), loginStat: $('loginStatus'),
-        waRegisterBtn: $('waRegisterBtn'), versionLabel: $('versionLabel')
+        waRegisterBtn: $('waRegisterBtn')
     };
 
     let users = [];
     let passwordVisible = false;
     let toastTimer = null;
-
-    if (ui.versionLabel) ui.versionLabel.textContent = 'v:' + APP_VERSION;
 
     /* ---------- Logo animation replay ---------- */
     window.replayLogoAnimation = function () {
