@@ -31,12 +31,15 @@
         }
         .schedule-page { width: 100%; max-width: 700px; }
 
+        /* ============================================================
+           BASE (mobile = plain, no card)
+           ============================================================ */
         .card {
-            background: var(--card);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-md);
-            padding: 20px 18px 22px;
-            border: 1px solid var(--border);
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+            border: none;
         }
 
         .banner {
@@ -126,9 +129,11 @@
         .error-text { color: #dc2626; }
         .loading-text small, .error-text small { color: var(--text-muted); font-size: .75rem; display: block; margin-top: 6px; }
 
-        @media (max-width: 480px) {
-            body { padding: .5rem; }
-            .card { padding: 14px 12px 18px; border-radius: 22px; }
+        /* ============================================================
+           MOBILE tweaks (still plain, no card)
+           ============================================================ */
+        @media (max-width: 640px) {
+            body { padding: .6rem; }
             .banner { padding: 10px 16px; min-height: 48px; }
             .banner-subject { font-size: .85rem; }
             .row { padding: 7px 10px; font-size: .75rem; }
@@ -138,6 +143,46 @@
             .row .subject { font-size: .74rem; }
             .status-bar { font-size: .72rem; padding: 6px 12px; }
             .footer { font-size: .63rem; flex-direction: column; align-items: stretch; gap: 6px; }
+        }
+
+        /* ============================================================
+           DESKTOP — soft card so it doesn't float orphaned
+           ============================================================ */
+        @media (min-width: 641px) {
+            body { padding: 2rem 1.5rem; }
+            .schedule-page { max-width: 780px; }
+            .card {
+                background: var(--card);
+                border-radius: var(--radius-xl);
+                box-shadow: 0 20px 50px -18px rgba(10,30,63,.18),
+                            0 0 0 1px rgba(226,232,240,.9);
+                padding: 26px 26px 24px;
+                position: relative;
+                overflow: hidden;
+            }
+            .card::before {
+                content: "";
+                position: absolute;
+                top: 0; left: 0; right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--sky) 0%, var(--sky-dark) 60%, var(--yellow) 100%);
+            }
+            .banner { margin-top: 6px; }
+            .row { padding: 11px 18px; font-size: .92rem; }
+            .row .srno { font-size: .78rem; min-width: 30px; }
+            .row .time { font-size: .82rem; min-width: 88px; }
+            .row .subject { font-size: .9rem; }
+            .row .duration-badge { font-size: .72rem; padding: 4px 14px; }
+            .status-bar { font-size: .88rem; padding: 10px 20px; }
+            .banner-subject { font-size: 1.05rem; }
+            .footer { font-size: .78rem; }
+            .footer .pkt-clock { font-size: .8rem; }
+            .footer .exam-dates span { font-size: .78rem; }
+        }
+
+        @media (min-width: 1024px) {
+            .schedule-page { max-width: 860px; }
+            .card { padding: 32px 32px 28px; }
         }
     </style>
 </head>
