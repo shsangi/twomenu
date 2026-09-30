@@ -146,56 +146,6 @@
         }
 
         /* ============================================================
-           FLAGS ROW — below logo
-           ============================================================ */
-        .flags-row {
-            position: relative;
-            overflow: hidden;
-            height: 30px;
-            margin: 0 -.75rem 1rem;
-            border-radius: 8px;
-            mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
-            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
-        }
-        .flags-track {
-            display: inline-flex;
-            align-items: center;
-            gap: .6rem;
-            white-space: nowrap;
-            height: 100%;
-            padding-left: .6rem;
-            animation: flagScroll 40s linear infinite;
-            will-change: transform;
-        }
-        .flags-track .flag-item {
-            font-size: 1.15rem;
-            line-height: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', system-ui, sans-serif;
-            filter: drop-shadow(0 1px 2px rgba(10,30,63,.12));
-        }
-        .flags-track .flag-item[data-code]::after {
-            content: attr(data-code);
-            font-size: .55rem;
-            font-weight: 800;
-            color: var(--text-muted);
-            margin-left: 2px;
-            font-family: 'Inter', system-ui, sans-serif;
-            letter-spacing: .03em;
-        }
-        @keyframes flagScroll {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .flags-track { animation: none !important; }
-            .logo-ring { animation: none !important; opacity: .5; }
-        }
-
-        /* ============================================================
            TITLE + BLINKING TEXT MESSAGES
            ============================================================ */
         .title-wrap {
@@ -271,6 +221,7 @@
                 animation: none !important;
                 opacity: .55 !important;
             }
+            .logo-ring { animation: none !important; opacity: .5; }
         }
 
         /* ============================================================
@@ -414,8 +365,6 @@
             .login-wrapper h1 { font-size: 1.65rem; }
             .version-label { top: 12px; right: 14px; font-size: .55rem; padding: 2px 7px; }
             .floater.t3, .floater.t6 { display: none; }
-            .flags-row { height: 26px; margin-bottom: .8rem; }
-            .flags-track .flag-item { font-size: 1rem; }
         }
     </style>
 </head>
@@ -432,11 +381,6 @@
                  alt="Logo"
                  onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 80 80\'%3E%3Crect width=\'80\' height=\'80\' rx=\'20\' fill=\'%230a1e3f\'/%3E%3Ctext x=\'40\' y=\'52\' text-anchor=\'middle\' font-family=\'Inter,sans-serif\' font-size=\'38\' font-weight=\'800\' fill=\'%23f5b800\'%3ESL%3C/text%3E%3C/svg%3E';">
             <span class="logo-ring" aria-hidden="true"></span>
-        </div>
-
-        <!-- Flags row -->
-        <div class="flags-row" aria-hidden="true">
-            <div class="flags-track" id="flagsTrack"></div>
         </div>
 
         <div class="title-wrap">
@@ -506,31 +450,12 @@
 
     const WHATSAPP_NUMBER = '923070508401';
 
-    const FLAGS = [
-        { emoji: '🇨🇭', code: 'CH' }, { emoji: '🇳🇴', code: 'NO' },
-        { emoji: '🇮🇸', code: 'IS' }, { emoji: '🇭🇰', code: 'HK' },
-        { emoji: '🇩🇰', code: 'DK' }, { emoji: '🇸🇪', code: 'SE' },
-        { emoji: '🇩🇪', code: 'DE' }, { emoji: '🇮🇪', code: 'IE' },
-        { emoji: '🇸🇬', code: 'SG' }, { emoji: '🇦🇺', code: 'AU' },
-        { emoji: '🇳🇱', code: 'NL' }, { emoji: '🇧🇪', code: 'BE' },
-        { emoji: '🇫🇮', code: 'FI' }, { emoji: '🇬🇧', code: 'GB' },
-        { emoji: '🇳🇿', code: 'NZ' }, { emoji: '🇨🇦', code: 'CA' },
-        { emoji: '🇰🇷', code: 'KR' }, { emoji: '🇱🇺', code: 'LU' },
-        { emoji: '🇯🇵', code: 'JP' }, { emoji: '🇮🇱', code: 'IL' },
-        { emoji: '🇲🇹', code: 'MT' }, { emoji: '🇸🇮', code: 'SI' },
-        { emoji: '🇦🇹', code: 'AT' }, { emoji: '🇦🇪', code: 'AE' },
-        { emoji: '🇱🇹', code: 'LT' }, { emoji: '🇪🇸', code: 'ES' },
-        { emoji: '🇨🇿', code: 'CZ' }, { emoji: '🇫🇷', code: 'FR' },
-        { emoji: '🇮🇹', code: 'IT' }, { emoji: '🇵🇰', code: 'PK' }
-    ];
-
     const $ = (id) => document.getElementById(id);
     const ui = {
         logo: $('loginLogo'), email: $('emailInput'), pass: $('passwordInput'),
         tglPw: $('togglePasswordBtn'), loginBtn: $('loginBtn'),
         guestBtn: $('guestBtn'), loginStat: $('loginStatus'),
-        waRegisterBtn: $('waRegisterBtn'), versionLabel: $('versionLabel'),
-        flagsTrack: $('flagsTrack')
+        waRegisterBtn: $('waRegisterBtn'), versionLabel: $('versionLabel')
     };
 
     let users = [];
@@ -572,19 +497,6 @@
         const remove = function () { t.classList.add('removing'); setTimeout(function () { t.remove(); }, 300); };
         t.querySelector('.toast-close').onclick = remove;
         toastTimer = setTimeout(remove, duration);
-    }
-
-    function buildFlagsRow() {
-        if (!ui.flagsTrack) return;
-        ui.flagsTrack.innerHTML = '';
-        var html = '';
-        for (var copy = 0; copy < 4; copy++) {
-            for (var i = 0; i < FLAGS.length; i++) {
-                var f = FLAGS[i];
-                html += '<span class="flag-item" data-code="' + f.code + '" title="' + f.code + '">' + f.emoji + '</span>';
-            }
-        }
-        ui.flagsTrack.innerHTML = html;
     }
 
     ui.tglPw.onclick = function () {
@@ -669,7 +581,6 @@
     ui.guestBtn.onclick = handleGuest;
     ui.email.onkeydown = ui.pass.onkeydown = function (e) { if (e.key === 'Enter') handleLogin(); };
 
-    buildFlagsRow();
     fetchUsers();
 })();
 </script>
