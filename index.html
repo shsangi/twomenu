@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#0ea5e9">
     <title>Self Learners · Jobs Exam Hub</title>
 
-    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -44,6 +43,8 @@
             display: flex; justify-content: center;
             font-size: 15px; line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         .app-wrapper { max-width: 1560px; width: 100%; }
 
@@ -78,7 +79,7 @@
 
         .page-stage {
             position: relative;
-            min-height: calc(100vh - 100px);
+            min-height: auto;
             background: var(--card);
             border-radius: 20px;
             box-shadow: var(--shadow-md);
@@ -86,17 +87,25 @@
             overflow: hidden;
         }
         .page-frame {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
+            width: 100%;
             border: none; background: transparent;
             opacity: 0; pointer-events: none;
             transition: opacity .25s ease;
+            display: none;
+            height: 0;
+            overflow: hidden;
         }
         .page-frame.active {
-            opacity: 1; pointer-events: auto;
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
             position: relative;
-            min-height: calc(100vh - 100px);
             height: auto;
+            overflow: visible;
+        }
+        .page-frame.active iframe {
+            display: block;
+            width: 100%;
         }
         .page-loading {
             display: flex; flex-direction: column;
@@ -153,7 +162,6 @@
             background: var(--sky);
         }
 
-        /* ==================== INSTALL BUTTON ==================== */
         #pwaInstallBtn {
             display: none;
             position: fixed;
@@ -180,9 +188,6 @@
             #pwaInstallBtn { bottom: 24px; right: 24px; }
         }
 
-        /* ============================================================
-           NAV VISIBILITY RULES
-           ============================================================ */
         #topToggleBarPostLogin { display: none !important; }
 
         @media (max-width: 768px) {
@@ -279,7 +284,6 @@
     </div>
 </nav>
 
-<!-- ==================== PWA INSTALL BUTTON ==================== -->
 <button id="pwaInstallBtn" aria-label="Install app">
     📲 Install App
 </button>
@@ -312,6 +316,37 @@
         const KEY_LAST_PAGE = 'slLastPage';
         let eduFrameRef = null;
 
+        /* Auto-size the iframe to its inner content so there is only ONE page scrollbar */
+        function attachIframeAutoSize(iframe) {
+            function resize() {
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (!doc) return;
+                    const h = Math.max(
+                        doc.body ? doc.body.scrollHeight : 0,
+                        doc.documentElement ? doc.documentElement.scrollHeight : 0,
+                        doc.body ? doc.body.offsetHeight : 0,
+                        doc.documentElement ? doc.documentElement.offsetHeight : 0
+                    );
+                    if (h > 0) iframe.style.height = h + 'px';
+                } catch (e) { /* cross-origin, ignore */ }
+            }
+            resize();
+            let ticks = 0;
+            const iv = setInterval(() => {
+                resize();
+                if (++ticks > 30) clearInterval(iv);
+            }, 300);
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                if (doc && 'ResizeObserver' in window) {
+                    const ro = new ResizeObserver(resize);
+                    if (doc.body) ro.observe(doc.body);
+                    if (doc.documentElement) ro.observe(doc.documentElement);
+                }
+            } catch (e) { /* ignore */ }
+        }
+
         function showPage(pageId, src) {
             if (activePage === pageId) return;
             activePage = pageId;
@@ -325,10 +360,6 @@
             if (!frames.has(pageId)) {
                 const wrap = document.createElement('div');
                 wrap.className = 'page-frame';
-                wrap.style.position = 'relative';
-                wrap.style.minHeight = 'calc(100vh - 100px)';
-                wrap.style.opacity = '0';
-                wrap.style.pointerEvents = 'none';
                 wrap.dataset.pageId = pageId;
 
                 const loader = document.createElement('div');
@@ -339,7 +370,7 @@
                 iframe.src = src;
                 iframe.title = 'Self Learners · ' + pageId;
                 iframe.setAttribute('loading', 'lazy');
-                iframe.style.cssText = 'width:100%;min-height:calc(100vh - 100px);border:none;display:block;background:transparent;';
+                iframe.style.cssText = 'width:100%;border:none;display:block;background:transparent;';
 
                 wrap.appendChild(loader);
                 wrap.appendChild(iframe);
@@ -349,16 +380,17 @@
                     try {
                         iframe.contentWindow.postMessage({ type: 'SL_THEME', theme: THEME }, '*');
                     } catch (e) { /* ignore */ }
+                    loader.style.display = 'none';
                     wrap.style.opacity = '1';
                     wrap.style.pointerEvents = 'auto';
-                    loader.style.display = 'none';
+                    attachIframeAutoSize(iframe);
                 });
 
                 setTimeout(() => {
                     if (loader.style.display !== 'none') {
+                        loader.style.display = 'none';
                         wrap.style.opacity = '1';
                         wrap.style.pointerEvents = 'auto';
-                        loader.style.display = 'none';
                     }
                 }, 3000);
 
@@ -370,8 +402,6 @@
                 wrap.classList.toggle('active', isActive);
                 wrap.style.opacity = isActive ? '1' : '0';
                 wrap.style.pointerEvents = isActive ? 'auto' : 'none';
-                wrap.style.position = isActive ? 'relative' : 'absolute';
-                wrap.style.display = isActive ? 'block' : 'none';
             });
 
             if (pageId === 'syllabus' || pageId === 'schedule' || pageId === 'eligibility') {
@@ -398,7 +428,7 @@
             bottomNavPost.style.display = '';
 
             frames.forEach((wrap) => {
-                wrap.style.display = 'none';
+                wrap.classList.remove('active');
                 wrap.style.opacity = '0';
                 wrap.style.pointerEvents = 'none';
             });
@@ -406,10 +436,6 @@
             if (!eduFrameRef) {
                 const wrap = document.createElement('div');
                 wrap.className = 'page-frame active';
-                wrap.style.position = 'relative';
-                wrap.style.minHeight = 'calc(100vh - 100px)';
-                wrap.style.opacity = '1';
-                wrap.style.pointerEvents = 'auto';
                 wrap.dataset.pageId = 'edu';
 
                 const loader = document.createElement('div');
@@ -417,9 +443,9 @@
                 loader.innerHTML = '<div class="spinner"></div><span>Loading…</span>';
 
                 const iframe = document.createElement('iframe');
-                iframe.src = 'page-edu.html';
+                iframe.src = 'page-edu.html?v=30';
                 iframe.title = 'Self Learners · Edu';
-                iframe.style.cssText = 'width:100%;min-height:calc(100vh - 100px);border:none;display:block;background:transparent;';
+                iframe.style.cssText = 'width:100%;border:none;display:block;background:transparent;';
 
                 wrap.appendChild(loader);
                 wrap.appendChild(iframe);
@@ -431,26 +457,26 @@
                         if (opts.user) iframe.contentWindow.postMessage({ type: 'SL_USER', user: opts.user, isGuest: opts.isGuest }, '*');
                         if (opts.mode) iframe.contentWindow.postMessage({ type: 'SL_SET_MODE', mode: opts.mode }, '*');
                     } catch (e) { /* ignore */ }
+                    loader.style.display = 'none';
                     wrap.style.opacity = '1';
                     wrap.style.pointerEvents = 'auto';
-                    loader.style.display = 'none';
+                    attachIframeAutoSize(iframe);
                 });
 
                 setTimeout(() => {
                     if (loader.style.display !== 'none') {
+                        loader.style.display = 'none';
                         wrap.style.opacity = '1';
                         wrap.style.pointerEvents = 'auto';
-                        loader.style.display = 'none';
                     }
                 }, 3000);
 
                 eduFrameRef = { wrap, iframe };
                 frames.set('edu', wrap);
             } else {
-                eduFrameRef.wrap.style.display = 'block';
+                eduFrameRef.wrap.classList.add('active');
                 eduFrameRef.wrap.style.opacity = '1';
                 eduFrameRef.wrap.style.pointerEvents = 'auto';
-                eduFrameRef.wrap.classList.add('active');
                 try {
                     if (opts.user) eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_USER', user: opts.user, isGuest: opts.isGuest }, '*');
                     if (opts.mode) eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_SET_MODE', mode: opts.mode }, '*');
@@ -469,10 +495,9 @@
             bottomNavPre.style.display = '';
 
             if (eduFrameRef) {
-                eduFrameRef.wrap.style.display = 'none';
+                eduFrameRef.wrap.classList.remove('active');
                 eduFrameRef.wrap.style.opacity = '0';
                 eduFrameRef.wrap.style.pointerEvents = 'none';
-                eduFrameRef.wrap.classList.remove('active');
                 try {
                     eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_FORCE_CLOSE_OVERLAYS' }, '*');
                 } catch (e) { /* ignore */ }
@@ -565,7 +590,6 @@
 </script>
 
 <script>
-/* Service worker registration */
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js')
@@ -576,7 +600,6 @@ if ('serviceWorker' in navigator) {
 </script>
 
 <script>
-/* ==================== PWA INSTALL BUTTON ==================== */
 (function () {
     const btn = document.getElementById('pwaInstallBtn');
     let deferredPrompt = null;
@@ -601,22 +624,16 @@ if ('serviceWorker' in navigator) {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const choice = await deferredPrompt.userChoice;
-                if (choice.outcome === 'accepted') {
-                    btn.classList.remove('show');
-                }
+                if (choice.outcome === 'accepted') btn.classList.remove('show');
                 deferredPrompt = null;
             } else {
                 const ua = navigator.userAgent || '';
                 const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
                 const isAndroid = /Android/.test(ua);
                 let msg = '📲 To install this app:\n\n';
-                if (isIOS) {
-                    msg += '1. Tap the Share button (⬆️)\n2. Scroll and tap "Add to Home Screen"\n3. Tap "Add"';
-                } else if (isAndroid) {
-                    msg += '1. Tap the menu (⋮) in your browser\n2. Tap "Install app" or "Add to Home Screen"\n3. Confirm install';
-                } else {
-                    msg += '1. Look for the install icon in the address bar\n2. Or open browser menu → "Install App"\n3. Confirm install';
-                }
+                if (isIOS) msg += '1. Tap the Share button (⬆️)\n2. Scroll and tap "Add to Home Screen"\n3. Tap "Add"';
+                else if (isAndroid) msg += '1. Tap the menu (⋮) in your browser\n2. Tap "Install app" or "Add to Home Screen"\n3. Confirm install';
+                else msg += '1. Look for the install icon in the address bar\n2. Or open browser menu → "Install App"\n3. Confirm install';
                 alert(msg);
             }
         });
