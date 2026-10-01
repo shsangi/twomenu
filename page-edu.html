@@ -792,13 +792,12 @@
             box-shadow: 0 4px 12px -4px rgba(245,184,0,.5);
         }
         .btn-progress-report:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(245,184,0,.6); }
-        .btn-progress-report[hidden] { display: none !important; }
 
         /* PIN prompt modal */
         .pin-overlay {
             position: fixed; inset: 0; background: rgba(10,30,63,.65);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            z-index: 10001; display: none; align-items: center;
+            z-index: 99999; display: none; align-items: center;
             justify-content: center; padding: 1rem;
         }
         .pin-overlay.active { display: flex; }
@@ -836,9 +835,7 @@
             background: #fff;
             box-shadow: 0 0 0 4px rgba(14,165,233,.15);
         }
-        .pin-actions {
-            display: flex; gap: .6rem; justify-content: center;
-        }
+        .pin-actions { display: flex; gap: .6rem; justify-content: center; }
         .pin-actions button {
             flex: 1;
             padding: .75rem 1rem;
@@ -861,7 +858,7 @@
             box-shadow: 0 4px 12px -4px rgba(14,165,233,.5);
         }
 
-        /* Progress report overlay */
+        /* Progress overlay */
         .progress-overlay {
             position: fixed; inset: 0; background: rgba(10,30,63,.65);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -948,15 +945,8 @@
             background: rgba(255,255,255,.3);
             color: #fff;
         }
-        .progress-tab.wrong-tab.active {
-            background: linear-gradient(135deg, var(--danger), #991b1b);
-        }
-        .progress-tab.attempted-tab.active {
-            background: linear-gradient(135deg, var(--sky), var(--sky-dark));
-        }
-        .progress-tab.pending-tab.active {
-            background: linear-gradient(135deg, var(--text-soft), var(--navy));
-        }
+        .progress-tab.wrong-tab.active { background: linear-gradient(135deg, var(--danger), #991b1b); }
+        .progress-tab.pending-tab.active { background: linear-gradient(135deg, var(--text-soft), var(--navy)); }
 
         .progress-job-filter-wrap { position: relative; margin-left: auto; }
         .progress-job-pill {
@@ -973,9 +963,7 @@
             overflow: hidden; text-overflow: ellipsis;
             white-space: nowrap; max-width: 150px;
         }
-        .progress-job-pill .pjf-arrow {
-            font-size: .55rem; transition: transform .2s;
-        }
+        .progress-job-pill .pjf-arrow { font-size: .55rem; transition: transform .2s; }
         .progress-job-filter-wrap.open .pjf-arrow { transform: rotate(180deg); }
         .progress-job-menu {
             position: absolute; top: calc(100% + 6px); right: 0;
@@ -1059,7 +1047,6 @@
             border: 1.5px dashed var(--border);
         }
 
-        /* Summary cards (kept compact) */
         .progress-summary-grid {
             display: grid; grid-template-columns: repeat(2, 1fr);
             gap: .7rem; margin-bottom: 1.2rem;
@@ -1165,7 +1152,6 @@
             .papers-filter-pill { font-size: .64rem; padding: .28rem .6rem; max-width: 140px; }
             .papers-filter-pill .pfp-label { max-width: 90px; }
 
-            /* Progress modal full screen on mobile */
             .progress-overlay { padding: 0; align-items: stretch; }
             .progress-modal {
                 border-radius: 0;
@@ -1259,7 +1245,7 @@
     <div class="pin-overlay" id="pinOverlay" aria-hidden="true">
         <div class="pin-modal" role="dialog" aria-modal="true">
             <h3>🔐 Enter PIN</h3>
-            <p>Enter your 4-digit PIN to open your progress report.</p>
+            <p id="pinMessage">Enter your 4-digit PIN to open your progress report.</p>
             <input type="password" class="pin-input" id="pinInput" maxlength="10" inputmode="numeric" autocomplete="off" placeholder="••••">
             <div class="pin-actions">
                 <button class="pin-cancel" id="pinCancelBtn" type="button">Cancel</button>
@@ -1513,8 +1499,8 @@
                 </div>
 
                 <div class="drawer-bottom">
-                    <button class="btn-progress-report" id="progressReportBtn" hidden>📊 Progress Report</button>
-                    <button class="btn-job-sites" id="jobSitesBtn">🌐 All Jobs Websites</button>
+                    <button class="btn-progress-report" id="progressReportBtn" type="button">📊 Progress Report</button>
+                    <button class="btn-job-sites" id="jobSitesBtn" type="button">🌐 All Jobs Websites</button>
                     <div class="panel-user-info" style="margin-bottom:0">
                         <div class="panel-user-left">
                             <span class="panel-user-avatar" id="drawerUserAvatar">U</span>
@@ -1570,7 +1556,6 @@
     const FACTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTRO-FPemOqN9exgEgDyt_x1KfNgTAxf0mOeg16c7THfRaaHg0mbgwuTrObcbIwJKSx2dWtrQCNcrCV/pub?output=csv';
     const PAPERS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTarve67hHynjJ0GzHY4IUl5ip1GnDgc2kyRyun5psdUN2IeSUcktBWWl7qEVFmMEM9x4TiPIyrcLzh/pub?output=csv';
     const JOBSITES_URL = 'https://docs.google.com/spreadsheets/d/108C9USSy1WysOwKThC1JFsL5OfjSC3HAX5EysDMw4gM/gviz/tq?tqx=out:csv&gid=614189291';
-    /* Login sheet (matches page-login.html) - used for PIN lookup */
     const LOGIN_SHEET_ID = '17yY_LUiqMsABz7tbtAXFpZIYpHN2TJTZSxo7oJWzckI';
     const LOGIN_GID = '2076597807';
     const LOGIN_URL = 'https://docs.google.com/spreadsheets/d/' + LOGIN_SHEET_ID + '/export?format=csv&gid=' + LOGIN_GID;
@@ -1608,7 +1593,6 @@
         jobSitesBtn: $('jobSitesBtn'), jobsitesOverlay: $('jobsitesOverlay'), jobsitesClose: $('jobsitesClose'), jobsitesSearchInput: $('jobsitesSearchInput'), jobsitesList: $('jobsitesList'),
         desktopNav: $('desktopNav'),
         logoRing: $('logoRing'),
-        /* Progress report */
         progressReportBtn: $('progressReportBtn'),
         progressOverlay: $('progressOverlay'),
         progressBody: $('progressBody'),
@@ -1616,7 +1600,6 @@
         progressUploadBtn: $('progressUploadBtn'),
         progressCloseBtn: $('progressCloseBtn'),
         progressFileInput: $('progressFileInput'),
-        /* PIN prompt */
         pinOverlay: $('pinOverlay'),
         pinInput: $('pinInput'),
         pinCancelBtn: $('pinCancelBtn'),
@@ -1637,11 +1620,9 @@
     let toastTimer = null, confirmResolve = null;
     let jobSites = [], jobSitesLoaded = false, jobSitesLoading = false, jobSitesSearchQuery = '';
     let deferredPrompt = null;
-    /* Progress report state */
-    let progressTab = 'all';           // all | attempted | wrong | pending
-    let progressJobFilter = '';        // '' = all jobs
-    let currentPin = null;             // user's PIN from sheet
-    /* PIN flow */
+    let progressTab = 'all';
+    let progressJobFilter = '';
+    let currentPin = null;
     let pinResolve = null;
 
     function clean(v) { if (v == null) return ''; return String(v).replace(/[\u200B-\u200D\uFEFF\u00A0]/g, ' ').replace(/\s+/g, ' ').trim(); }
@@ -2446,60 +2427,82 @@
     ui.jobsitesSearchInput.addEventListener('input', () => { jobSitesSearchQuery = ui.jobsitesSearchInput.value; renderJobSites(); });
 
     /* ============================================================
-       PIN LOOKUP — reads column D of the login sheet for the logged-in user
+       PIN LOOKUP — reads column D of the login sheet
        ============================================================ */
-    function cachePinMap(map) { try { localStorage.setItem(PIN_CACHE_KEY, JSON.stringify(map)); } catch (e) {} }
-    function loadCachedPinMap() { try { return JSON.parse(localStorage.getItem(PIN_CACHE_KEY) || '{}'); } catch (e) { return {}; } }
+
+    function cachePinMap(map) {
+        try { localStorage.setItem(PIN_CACHE_KEY, JSON.stringify(map)); } catch (e) {}
+    }
+    function loadCachedPinMap() {
+        try { return JSON.parse(localStorage.getItem(PIN_CACHE_KEY) || '{}'); } catch (e) { return {}; }
+    }
 
     async function loadPinForUser(username) {
-        const uname = (username || '').toLowerCase().trim();
+        const uname = String(username || '').toLowerCase().trim();
         if (!uname) return null;
 
-        // Try cache first (fast path)
         const cached = loadCachedPinMap();
-        if (cached[uname]) { currentPin = cached[uname]; return currentPin; }
+        if (cached[uname]) {
+            currentPin = cached[uname];
+            console.log('[PIN] Using cached PIN for', uname, '=', currentPin);
+            return currentPin;
+        }
 
-        // Fetch sheet
         try {
-            const r = await fetch(LOGIN_URL + '&_t=' + Date.now(), { cache: 'no-store' });
+            const url = LOGIN_URL + '&_t=' + Date.now();
+            console.log('[PIN] Fetching sheet:', url);
+            const r = await fetch(url, { cache: 'no-store' });
             if (!r.ok) throw new Error('HTTP ' + r.status);
             const text = await r.text();
             const lines = text.split('\n').filter((l) => l.trim());
+            console.log('[PIN] Sheet rows:', lines.length);
             const map = {};
             for (let i = 1; i < lines.length; i++) {
                 const cols = parseCSVLine(lines[i]);
-                if (cols.length >= 2 && cols[0]) {
-                    const u = cols[0].trim().toLowerCase();
-                    const pin = (cols[3] !== undefined ? cols[3] : '').trim(); // column D (index 3)
+                if (cols.length >= 1 && cols[0]) {
+                    const u = String(cols[0]).toLowerCase().trim();
+                    const pin = (cols[3] !== undefined && cols[3] !== null) ? String(cols[3]).trim() : '';
                     if (u && pin) map[u] = pin;
                 }
             }
+            console.log('[PIN] Built PIN map:', map);
             cachePinMap(map);
             currentPin = map[uname] || null;
+            console.log('[PIN] PIN for', uname, '=', currentPin);
             return currentPin;
         } catch (err) {
-            console.warn('[PIN] Failed to load pin map:', err);
-            return currentPin; // return whatever we have (may be null)
+            console.error('[PIN] Failed to load pin map:', err);
+            return currentPin;
         }
     }
 
-    /* Fetch pin when a user is known */
     async function refreshPinForCurrentUser() {
-        if (!user || !user.user) { currentPin = null; return; }
-        if (user.user === 'Guest') { currentPin = null; ui.progressReportBtn.hidden = true; return; }
-        const pin = await loadPinForUser(user.user);
-        // Show the button ONLY if the user has a PIN in column D
-        ui.progressReportBtn.hidden = !pin;
+        if (!user || !user.user) {
+            currentPin = null;
+            console.log('[PIN] No user logged in');
+            return;
+        }
+        if (String(user.user).toLowerCase() === 'guest') {
+            currentPin = null;
+            console.log('[PIN] Guest user — PIN disabled');
+            return;
+        }
+        await loadPinForUser(user.user);
+        console.log('[PIN] Ready. currentPin =', currentPin);
     }
 
-    /* Prompt for PIN and verify */
     function promptForPin() {
         return new Promise((resolve) => {
             pinResolve = resolve;
             ui.pinInput.value = '';
+            const msg = document.getElementById('pinMessage');
+            if (msg) msg.textContent = 'Enter your PIN to open your progress report.';
             ui.pinOverlay.classList.add('active');
             ui.pinOverlay.setAttribute('aria-hidden', 'false');
-            setTimeout(() => ui.pinInput.focus(), 80);
+            console.log('[PIN] Prompt opened');
+            setTimeout(() => {
+                try { ui.pinInput.focus(); } catch (e) {}
+            }, 100);
         });
     }
     function closePinPrompt() {
@@ -2508,16 +2511,20 @@
         ui.pinInput.value = '';
     }
     function cancelPinPrompt() {
+        console.log('[PIN] Cancelled by user');
         closePinPrompt();
         if (pinResolve) { pinResolve(false); pinResolve = null; }
     }
     function submitPin() {
-        const typed = (ui.pinInput.value || '').trim();
+        const typed = String(ui.pinInput.value || '').trim();
+        console.log('[PIN] Submitted:', typed, '| Expected:', currentPin);
         if (!typed) { toast('Please enter your PIN.', 'warning', 2500, false); return; }
         if (currentPin && typed === String(currentPin).trim()) {
+            console.log('[PIN] Match — opening report');
             closePinPrompt();
             if (pinResolve) { pinResolve(true); pinResolve = null; }
         } else {
+            console.log('[PIN] Mismatch');
             toast('Incorrect PIN.', 'error', 2500, false);
             ui.pinInput.value = '';
             ui.pinInput.focus();
@@ -2542,29 +2549,38 @@
     const progressCloseBtn = document.getElementById('progressCloseBtn');
     const progressFileInput = document.getElementById('progressFileInput');
 
-    /* Open the report: PIN check -> close drawer -> open modal */
     async function handleProgressButtonClick() {
-        /* If no PIN for this user, do nothing (button should be hidden anyway) */
+        console.log('[Progress] Button clicked. currentPin =', currentPin, '| user =', user);
+
         if (!currentPin) {
-            toast('No PIN set for your account. Contact admin.', 'warning', 3500, false);
+            if (user && user.user && String(user.user).toLowerCase() !== 'guest') {
+                try {
+                    localStorage.removeItem(PIN_CACHE_KEY);
+                    await loadPinForUser(user.user);
+                } catch (e) {}
+            }
+        }
+
+        if (!currentPin) {
+            toast('No PIN set for your account. Ask admin to add PIN in column D.', 'warning', 4000, false);
             return;
         }
-        /* Close the drawer first so transitions feel clean */
-        if (ui.drawer.classList.contains('open')) closeDrawer();
 
-        /* Ask for PIN */
+        const drawerWasOpen = ui.drawer.classList.contains('open');
+        if (drawerWasOpen) closeDrawer();
+
         const ok = await promptForPin();
+        console.log('[Progress] PIN result =', ok);
         if (!ok) return;
 
         setTimeout(() => {
-            /* Always default to the "current view" — what the user sees on screen */
             progressTab = 'all';
             progressJobFilter = '';
             renderProgressReport();
             progressOverlay.classList.add('active');
             progressOverlay.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
-        }, ui.drawer.classList.contains('open') ? 320 : 0);
+        }, drawerWasOpen ? 320 : 0);
     }
 
     function closeProgressReport() {
@@ -2593,29 +2609,14 @@
         const attempted = correct + wrong;
         const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0;
 
-        const subjectStats = {}, jobStats = {};
-        items.forEach(({ q, state }) => {
-            const subj = q.subject || 'Unknown';
-            const job = q.job || 'Unknown';
-            if (!subjectStats[subj]) subjectStats[subj] = { correct: 0, wrong: 0, pending: 0, total: 0 };
-            if (!jobStats[job]) jobStats[job] = { correct: 0, wrong: 0, pending: 0, total: 0 };
-            subjectStats[subj].total++;
-            jobStats[job].total++;
-            if (state === 'correct') { subjectStats[subj].correct++; jobStats[job].correct++; }
-            else if (state === 'wrong') { subjectStats[subj].wrong++; jobStats[job].wrong++; }
-            else { subjectStats[subj].pending++; jobStats[job].pending++; }
-        });
-
-        return { displayTotal, items, correct, wrong, pending, attempted, accuracy, subjectStats, jobStats };
+        return { displayTotal, items, correct, wrong, pending, attempted, accuracy };
     }
 
     function applyProgressFilters(items) {
         let list = items;
-        /* Tab filter */
         if (progressTab === 'attempted') list = list.filter(x => x.state === 'correct' || x.state === 'wrong');
         else if (progressTab === 'wrong') list = list.filter(x => x.state === 'wrong');
         else if (progressTab === 'pending') list = list.filter(x => x.state === 'pending');
-        /* Job filter */
         if (progressJobFilter) list = list.filter(x => sameText(x.q.job, progressJobFilter));
         return list;
     }
@@ -2629,13 +2630,11 @@
         const elapsedMin = Math.floor(elapsed / 60);
         const elapsedSec = elapsed % 60;
 
-        /* Job list for filter dropdown */
         const jobSet = new Set();
         s.items.forEach(x => { if (x.q.job) jobSet.add(x.q.job); });
         const jobList = [...jobSet].sort();
         if (progressJobFilter && !jobSet.has(progressJobFilter)) progressJobFilter = '';
 
-        /* Filtered list for current tab */
         const filteredItems = applyProgressFilters(s.items);
 
         const tabsHtml = `
@@ -2643,7 +2642,7 @@
                 <button class="progress-tab ${progressTab === 'all' ? 'active' : ''}" data-tab="all">
                     All <span class="tab-count">${s.items.length}</span>
                 </button>
-                <button class="progress-tab attempted-tab ${progressTab === 'attempted' ? 'active' : ''}" data-tab="attempted">
+                <button class="progress-tab ${progressTab === 'attempted' ? 'active' : ''}" data-tab="attempted">
                     Attempted <span class="tab-count">${s.attempted}</span>
                 </button>
                 <button class="progress-tab wrong-tab ${progressTab === 'wrong' ? 'active' : ''}" data-tab="wrong">
@@ -2665,7 +2664,6 @@
             </div>
         `;
 
-        /* List HTML */
         let listHtml = '';
         if (!filteredItems.length) {
             listHtml = `<div class="progress-empty">No questions match this filter.</div>`;
@@ -2676,15 +2674,10 @@
                 const userAns = answers[idx] !== null && q.options[answers[idx]] ? q.options[answers[idx]] : '';
                 const correctAns = q.correct !== -1 && q.options[q.correct] ? q.options[q.correct] : '';
                 let answerHtml = '';
-                if (state === 'correct') {
-                    answerHtml = `<div class="pq-answers">Your answer: <span class="correct-ans">${escapeHtml(userAns)}</span></div>`;
-                } else if (state === 'wrong') {
-                    answerHtml = `<div class="pq-answers">Yours: <span class="wrong-ans">${escapeHtml(userAns)}</span> · Correct: <span class="correct-ans">${escapeHtml(correctAns)}</span></div>`;
-                } else if (state === 'pending') {
-                    answerHtml = `<div class="pq-answers">Not attempted${correctAns ? ' · Correct: <span class="correct-ans">' + escapeHtml(correctAns) + '</span>' : ''}</div>`;
-                } else {
-                    answerHtml = `<div class="pq-answers">Invalid: correct answer not in options</div>`;
-                }
+                if (state === 'correct') answerHtml = `<div class="pq-answers">Your answer: <span class="correct-ans">${escapeHtml(userAns)}</span></div>`;
+                else if (state === 'wrong') answerHtml = `<div class="pq-answers">Yours: <span class="wrong-ans">${escapeHtml(userAns)}</span> · Correct: <span class="correct-ans">${escapeHtml(correctAns)}</span></div>`;
+                else if (state === 'pending') answerHtml = `<div class="pq-answers">Not attempted${correctAns ? ' · Correct: <span class="correct-ans">' + escapeHtml(correctAns) + '</span>' : ''}</div>`;
+                else answerHtml = `<div class="pq-answers">Invalid: correct answer not in options</div>`;
                 const metaChips = [];
                 if (q.job) metaChips.push(`<span class="pq-chip job">💼 ${escapeHtml(titleCase(q.job))}</span>`);
                 if (q.subject) metaChips.push(`<span class="pq-chip">📚 ${escapeHtml(titleCase(q.subject))}</span>`);
@@ -2770,7 +2763,6 @@
 
         progressBody.innerHTML = html;
 
-        /* Tab handlers */
         progressBody.querySelectorAll('.progress-tab').forEach(btn => {
             btn.onclick = () => {
                 progressTab = btn.getAttribute('data-tab');
@@ -2778,7 +2770,6 @@
             };
         });
 
-        /* Job filter dropdown */
         const jobWrap = document.getElementById('progressJobWrap');
         const jobPill = document.getElementById('progressJobPill');
         const jobMenu = document.getElementById('progressJobMenu');
@@ -2799,14 +2790,12 @@
             });
         }
 
-        /* Backup buttons */
         const dlBtn = document.getElementById('reportDownloadBtn');
         const rsBtn = document.getElementById('reportRestoreBtn');
         if (dlBtn) dlBtn.onclick = downloadProgressCSV;
         if (rsBtn) rsBtn.onclick = () => progressFileInput.click();
     }
 
-    /* Close job dropdown when clicking outside */
     document.addEventListener('click', (e) => {
         const wrap = document.getElementById('progressJobWrap');
         if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
@@ -2952,10 +2941,6 @@
         reader.readAsText(file);
     });
 
-    /* ============================================================
-       END PROGRESS REPORT
-       ============================================================ */
-
     window.addEventListener('message', (e) => {
         const d = e.data;
         if (!d || typeof d !== 'object') return;
@@ -2977,7 +2962,6 @@
                 else if (mode === 'facts') { renderFactsMode(); }
                 else if (mode === 'papers') { renderPapersCards(); renderSelectedSubjectsLine(); }
             }
-            /* Refresh PIN for this user */
             refreshPinForCurrentUser();
         } else if (d.type === 'SL_SET_MODE') {
             setMode(d.mode, true);
@@ -3004,7 +2988,6 @@
         let savedMode = 'mcq';
         try { const m = localStorage.getItem(KEY_MODE); if (m === 'read' || m === 'facts' || m === 'papers') savedMode = m; } catch (e) { /* ignore */ }
         setMode(savedMode, true);
-        /* Fetch PIN for current user (hides the button until loaded) */
         refreshPinForCurrentUser();
     }
 
