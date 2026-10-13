@@ -160,7 +160,6 @@
         .top-bar {
             display: flex; flex-direction: column; gap: .4rem;
             padding: .35rem 0 .6rem; margin-bottom: .35rem;
-            position: sticky; top: 0; z-index: 50;
             background: var(--sf); border-bottom: 1px solid transparent;
             transition: border-color .2s, box-shadow .2s;
         }
@@ -448,9 +447,13 @@
             border-radius: var(--r); padding: 1.5rem 1.5rem 1rem;
             margin: .5rem 0 .9rem; position: relative;
         }
-        .question-body { max-height: 62vh; overflow-y: auto; padding-right: .7rem; padding-bottom: .6rem; }
-        .question-body::-webkit-scrollbar { width: 8px; }
-        .question-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; border: 2px solid var(--sf2); }
+        /* NO inner scroll — full content flows */
+        .question-body {
+            max-height: none;
+            overflow: visible;
+            padding-right: 0;
+            padding-bottom: .6rem;
+        }
         .question-card .q-text { font-weight: 700; font-size: 1.12rem; margin-bottom: 1rem; color: var(--navy); line-height: 1.55; cursor: pointer; }
         .question-card .q-text:hover { color: var(--sky-dark); text-decoration: underline; text-underline-offset: 3px; }
 
@@ -554,7 +557,8 @@
         .result-details .detail-answer .correct-ans { color: var(--success); font-weight: 700; }
         .submitted-header { text-align: center; padding: .65rem 1.2rem; background: var(--success-bg); border-radius: var(--rf); margin-bottom: .9rem; font-weight: 700; color: #065f46; font-size: .85rem; }
 
-        .read-container { margin-top: .7rem; display: flex; flex-direction: column; gap: .8rem; max-height: 78vh; min-height: 55vh; overflow-y: auto; padding-right: .5rem; }
+        /* Read + Facts + Papers containers — NO internal scroll */
+        .read-container { margin-top: .7rem; display: flex; flex-direction: column; gap: .8rem; }
         .read-item { background: var(--sf2); border: 1.5px solid var(--border); border-left: 4px solid var(--sky); border-radius: var(--r); padding: .95rem 1.15rem .85rem; position: relative; }
         .read-item .read-q { font-size: .93rem; line-height: 1.55; color: var(--navy); font-weight: 700; word-break: break-word; cursor: pointer; padding-right: 1.8rem; }
         .read-item .read-q .read-srno { font-weight: 900; color: #fff; background: var(--sky); padding: 2px 9px; border-radius: var(--rf); margin-right: .5rem; font-size: .76rem; display: inline-block; vertical-align: middle; }
@@ -598,7 +602,7 @@
         .mode-search-bar .msb-load-more:disabled { opacity: .5; cursor: not-allowed; }
         .mode-search-bar .msb-load-more.hidden { display: none !important; }
 
-        .facts-container { margin-top: .7rem; display: flex; flex-direction: column; gap: .7rem; max-height: 78vh; min-height: 55vh; overflow-y: auto; padding-right: .5rem; }
+        .facts-container { margin-top: .7rem; display: flex; flex-direction: column; gap: .7rem; }
 
         .fact-card { background: var(--sf2); border: 1.5px solid var(--border); border-left: 4px solid var(--sky); border-radius: var(--r); padding: .9rem 1.1rem .8rem; position: relative; cursor: pointer; transition: all .18s; }
         .fact-card:hover { background: var(--sky-soft); border-left-color: var(--yellow); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
@@ -638,10 +642,6 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: .9rem;
-            max-height: 78vh;
-            min-height: 55vh;
-            overflow-y: auto;
-            padding-right: .35rem;
             margin-bottom: 1rem;
         }
         .papers-cards-grid::-webkit-scrollbar { width: 8px; }
@@ -793,7 +793,6 @@
         }
         .btn-progress-report:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -4px rgba(245,184,0,.6); }
 
-        /* PIN prompt modal */
         .pin-overlay {
             position: fixed; inset: 0; background: rgba(10,30,63,.65);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -858,7 +857,6 @@
             box-shadow: 0 4px 12px -4px rgba(14,165,233,.5);
         }
 
-        /* Progress overlay */
         .progress-overlay {
             position: fixed; inset: 0; background: rgba(10,30,63,.65);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -901,7 +899,6 @@
             padding: 1.4rem 1.6rem 2rem;
         }
 
-        /* Progress tabs + job filter */
         .progress-toolbar {
             display: flex; flex-wrap: wrap; gap: .55rem;
             align-items: center; margin-bottom: 1.1rem;
@@ -1135,10 +1132,8 @@
             .confirm-box { padding: 1.7rem 1.6rem; }
             .confirm-box .btn-group { flex-direction: column; }
             .confirm-box .btn-group button { width: 100%; }
-            .question-body { max-height: 58vh; }
             .read-item .read-q { font-size: .86rem; }
             .read-item .read-opt { font-size: .78rem; }
-            .read-container, .facts-container { max-height: 72vh; min-height: 50vh; }
             .fact-card .fact-head { font-size: .86rem; }
             .fact-card .fact-answer { font-size: .78rem; }
             .mode-search-bar input { font-size: .82rem; }
@@ -1148,7 +1143,6 @@
             .install-banner .ib-text strong { font-size: .85rem; }
             .install-banner .ib-text span { font-size: .7rem; }
             .install-banner .ib-btn { font-size: .78rem; padding: .6rem 1rem; }
-            .papers-cards-grid { max-height: 72vh; min-height: 50vh; }
             .papers-filter-pill { font-size: .64rem; padding: .28rem .6rem; max-width: 140px; }
             .papers-filter-pill .pfp-label { max-width: 90px; }
 
@@ -1241,7 +1235,6 @@
         </div>
     </div>
 
-    <!-- PIN prompt modal -->
     <div class="pin-overlay" id="pinOverlay" aria-hidden="true">
         <div class="pin-modal" role="dialog" aria-modal="true">
             <h3>🔐 Enter PIN</h3>
@@ -1533,7 +1526,6 @@
     </div>
 </div>
 
-<!-- Progress Report Modal -->
 <div class="progress-overlay" id="progressOverlay" aria-hidden="true">
     <div class="progress-modal" role="dialog" aria-modal="true">
         <div class="progress-header">
@@ -2426,10 +2418,6 @@
     ui.jobsitesOverlay.addEventListener('click', (e) => { if (e.target === ui.jobsitesOverlay) closeJobSitesModal(); });
     ui.jobsitesSearchInput.addEventListener('input', () => { jobSitesSearchQuery = ui.jobsitesSearchInput.value; renderJobSites(); });
 
-    /* ============================================================
-       PIN LOOKUP — reads column D of the login sheet
-       ============================================================ */
-
     function cachePinMap(map) {
         try { localStorage.setItem(PIN_CACHE_KEY, JSON.stringify(map)); } catch (e) {}
     }
@@ -2538,9 +2526,6 @@
     });
     ui.pinOverlay.addEventListener('click', (e) => { if (e.target === ui.pinOverlay) cancelPinPrompt(); });
 
-    /* ============================================================
-       PROGRESS REPORT
-       ============================================================ */
     const progressOverlay = document.getElementById('progressOverlay');
     const progressBody = document.getElementById('progressBody');
     const progressReportBtn = document.getElementById('progressReportBtn');
