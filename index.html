@@ -76,9 +76,11 @@
         }
         .toggle-btn.active .emoji { color: #fff; }
 
+        /* ============================================================
+           PAGE STAGE — normal flow, ONE scroll (parent)
+           ============================================================ */
         .page-stage {
             position: relative;
-            min-height: calc(100vh - 100px);
             background: var(--card);
             border-radius: 20px;
             box-shadow: var(--shadow-md);
@@ -86,17 +88,19 @@
             overflow: hidden;
         }
         .page-frame {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
-            border: none; background: transparent;
-            opacity: 0; pointer-events: none;
-            transition: opacity .25s ease;
+            display: none;
+            width: 100%;
         }
         .page-frame.active {
-            opacity: 1; pointer-events: auto;
-            position: relative;
-            min-height: calc(100vh - 100px);
-            height: auto;
+            display: block;
+        }
+        .page-frame iframe {
+            width: 100%;
+            display: block;
+            border: none;
+            background: transparent;
+            height: 0; /* auto-set by JS */
+            min-height: 300px;
         }
         .page-loading {
             display: flex; flex-direction: column;
@@ -312,6 +316,46 @@
         const KEY_LAST_PAGE = 'slLastPage';
         let eduFrameRef = null;
 
+        /* ---------- Auto-resize iframe to fit its content ---------- */
+        function attachAutoResize(iframe) {
+            let ro = null;
+            const resize = () => {
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (!doc || !doc.body) return;
+                    const h = Math.max(
+                        doc.body.scrollHeight,
+                        doc.documentElement ? doc.documentElement.scrollHeight : 0,
+                        doc.body.offsetHeight
+                    );
+                    if (h && h > 0) iframe.style.height = h + 'px';
+                } catch (e) { /* cross-origin safety */ }
+            };
+
+            iframe.addEventListener('load', () => {
+                resize();
+                // Re-measure after async content arrives
+                setTimeout(resize, 100);
+                setTimeout(resize, 500);
+                setTimeout(resize, 1500);
+
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (doc && doc.body && 'ResizeObserver' in window) {
+                        ro = new ResizeObserver(resize);
+                        ro.observe(doc.body);
+                    }
+                } catch (e) {}
+            });
+
+            // Fallback: periodic checks (cheap)
+            const interval = setInterval(resize, 800);
+            iframe.addEventListener('unload', () => {
+                clearInterval(interval);
+                if (ro) { try { ro.disconnect(); } catch (e) {} }
+            });
+        }
+
         function showPage(pageId, src) {
             if (activePage === pageId) return;
             activePage = pageId;
@@ -325,10 +369,6 @@
             if (!frames.has(pageId)) {
                 const wrap = document.createElement('div');
                 wrap.className = 'page-frame';
-                wrap.style.position = 'relative';
-                wrap.style.minHeight = 'calc(100vh - 100px)';
-                wrap.style.opacity = '0';
-                wrap.style.pointerEvents = 'none';
                 wrap.dataset.pageId = pageId;
 
                 const loader = document.createElement('div');
@@ -339,50 +379,39 @@
                 iframe.src = src;
                 iframe.title = 'Self Learners · ' + pageId;
                 iframe.setAttribute('loading', 'lazy');
-                iframe.style.cssText = 'width:100%;min-height:calc(100vh - 100px);border:none;display:block;background:transparent;';
+                iframe.setAttribute('scrolling', 'no');
 
                 wrap.appendChild(loader);
                 wrap.appendChild(iframe);
                 stage.appendChild(wrap);
 
+                attachAutoResize(iframe);
+
                 iframe.addEventListener('load', () => {
                     try {
                         iframe.contentWindow.postMessage({ type: 'SL_THEME', theme: THEME }, '*');
                     } catch (e) { /* ignore */ }
-                    wrap.style.opacity = '1';
-                    wrap.style.pointerEvents = 'auto';
                     loader.style.display = 'none';
                 });
 
                 setTimeout(() => {
-                    if (loader.style.display !== 'none') {
-                        wrap.style.opacity = '1';
-                        wrap.style.pointerEvents = 'auto';
-                        loader.style.display = 'none';
-                    }
+                    if (loader.style.display !== 'none') loader.style.display = 'none';
                 }, 3000);
 
-                frames.set(pageId, wrap);
+                frames.set(pageId, { wrap, iframe });
             }
 
-            frames.forEach((wrap, id) => {
+            frames.forEach((entry, id) => {
                 const isActive = id === pageId;
-                wrap.classList.toggle('active', isActive);
-                wrap.style.opacity = isActive ? '1' : '0';
-                wrap.style.pointerEvents = isActive ? 'auto' : 'none';
-                wrap.style.position = isActive ? 'relative' : 'absolute';
-                wrap.style.display = isActive ? 'block' : 'none';
+                entry.wrap.classList.toggle('active', isActive);
             });
 
             if (pageId === 'syllabus' || pageId === 'schedule' || pageId === 'eligibility') {
-                const frame = frames.get(pageId);
-                if (frame) {
-                    const iframe = frame.querySelector('iframe');
-                    if (iframe && iframe.contentWindow) {
-                        try {
-                            iframe.contentWindow.postMessage({ type: 'SL_REFRESH_DATA' }, '*');
-                        } catch (e) { /* ignore */ }
-                    }
+                const entry = frames.get(pageId);
+                if (entry && entry.iframe.contentWindow) {
+                    try {
+                        entry.iframe.contentWindow.postMessage({ type: 'SL_REFRESH_DATA' }, '*');
+                    } catch (e) { /* ignore */ }
                 }
             }
 
@@ -397,19 +426,13 @@
             bottomNavPre.style.display = 'none';
             bottomNavPost.style.display = '';
 
-            frames.forEach((wrap) => {
-                wrap.style.display = 'none';
-                wrap.style.opacity = '0';
-                wrap.style.pointerEvents = 'none';
+            frames.forEach((entry) => {
+                entry.wrap.classList.remove('active');
             });
 
             if (!eduFrameRef) {
                 const wrap = document.createElement('div');
                 wrap.className = 'page-frame active';
-                wrap.style.position = 'relative';
-                wrap.style.minHeight = 'calc(100vh - 100px)';
-                wrap.style.opacity = '1';
-                wrap.style.pointerEvents = 'auto';
                 wrap.dataset.pageId = 'edu';
 
                 const loader = document.createElement('div');
@@ -419,11 +442,13 @@
                 const iframe = document.createElement('iframe');
                 iframe.src = 'page-edu.html';
                 iframe.title = 'Self Learners · Edu';
-                iframe.style.cssText = 'width:100%;min-height:calc(100vh - 100px);border:none;display:block;background:transparent;';
+                iframe.setAttribute('scrolling', 'no');
 
                 wrap.appendChild(loader);
                 wrap.appendChild(iframe);
                 stage.appendChild(wrap);
+
+                attachAutoResize(iframe);
 
                 iframe.addEventListener('load', () => {
                     try {
@@ -431,25 +456,16 @@
                         if (opts.user) iframe.contentWindow.postMessage({ type: 'SL_USER', user: opts.user, isGuest: opts.isGuest }, '*');
                         if (opts.mode) iframe.contentWindow.postMessage({ type: 'SL_SET_MODE', mode: opts.mode }, '*');
                     } catch (e) { /* ignore */ }
-                    wrap.style.opacity = '1';
-                    wrap.style.pointerEvents = 'auto';
                     loader.style.display = 'none';
                 });
 
                 setTimeout(() => {
-                    if (loader.style.display !== 'none') {
-                        wrap.style.opacity = '1';
-                        wrap.style.pointerEvents = 'auto';
-                        loader.style.display = 'none';
-                    }
+                    if (loader.style.display !== 'none') loader.style.display = 'none';
                 }, 3000);
 
                 eduFrameRef = { wrap, iframe };
-                frames.set('edu', wrap);
+                frames.set('edu', eduFrameRef);
             } else {
-                eduFrameRef.wrap.style.display = 'block';
-                eduFrameRef.wrap.style.opacity = '1';
-                eduFrameRef.wrap.style.pointerEvents = 'auto';
                 eduFrameRef.wrap.classList.add('active');
                 try {
                     if (opts.user) eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_USER', user: opts.user, isGuest: opts.isGuest }, '*');
@@ -469,9 +485,6 @@
             bottomNavPre.style.display = '';
 
             if (eduFrameRef) {
-                eduFrameRef.wrap.style.display = 'none';
-                eduFrameRef.wrap.style.opacity = '0';
-                eduFrameRef.wrap.style.pointerEvents = 'none';
                 eduFrameRef.wrap.classList.remove('active');
                 try {
                     eduFrameRef.iframe.contentWindow.postMessage({ type: 'SL_FORCE_CLOSE_OVERLAYS' }, '*');
@@ -479,8 +492,8 @@
             }
 
             if (frames.has('login')) {
-                const w = frames.get('login');
-                w.remove();
+                const entry = frames.get('login');
+                entry.wrap.remove();
                 frames.delete('login');
             }
             activePage = null;
